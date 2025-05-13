@@ -1,0 +1,120 @@
+﻿<Window x:Class="ManagerAppV2._1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ManagerAppV2._1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="560.5" Width="1180" MinWidth="830" MinHeight="190" Icon="/AppIcon.png">
+    <Grid>
+        <Grid x:Name="Top" RenderTransformOrigin="0.5,0.5" Background="#FFB3B3B3" Height="50" VerticalAlignment="Top">
+            <Grid x:Name="Profile" Margin="0,5,5,5" HorizontalAlignment="Right" Width="140">
+                <Rectangle Stroke="Black" RadiusX="10" RadiusY="10" Fill="#FF1F7334" HorizontalAlignment="Center" Width="140"/>
+                <Label x:Name="Name" Content="Pavel Durov" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="68" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Padding="0,0,0,0" Margin="40,5,0,0" Foreground="White" FontFamily="Segoe UI Symbol"/>
+                <Label x:Name="Role" Content="Admin" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="70" HorizontalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0,0,0,0" Margin="40,20,0,0" FontSize="10" VerticalContentAlignment="Stretch" Grid.IsSharedSizeScope="True" Foreground="#FFA0ABA3"/>
+                <Button x:Name="Avatar" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Width="30" Margin="5,5,0,5">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="25"/>
+                        </Style>
+                    </Button.Resources>
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Avatar.jpg" Stretch="UniformToFill"/>
+                    </Button.Background>
+                    <StackPanel Orientation="Horizontal"/>
+                </Button>
+                <Image x:Name="About" Source="/AccountMore.png" Margin="116,5,5,5" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid x:Name="Search" Height="40" Margin="342,0,405,0">
+                <TextBox x:Name="SearchField" TextWrapping="Wrap" Text="TextBox" Height="40" VerticalContentAlignment="Center" Padding="5,0,5,0"/>
+                <Image x:Name="SearchFieldimg" Source="/Search.png" Margin="0,10,10,10" HorizontalAlignment="Right" Width="20"/>
+            </Grid>
+            <Grid x:Name="SellsPlan" Height="40" Margin="0,0,299,0" VerticalAlignment="Center" HorizontalAlignment="Right" Width="106">
+                <Label Content="Sells plan (month)" VerticalAlignment="Top" Height="20" Padding="0,2,0,0" HorizontalContentAlignment="Center" Foreground="#FF757575"/>
+                <Label Content="1.000.000" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FF1E1E1E"/>
+            </Grid>
+            <Grid x:Name="Sold" Height="40" Margin="0,0,188,0" VerticalAlignment="Center" HorizontalAlignment="Right" Width="106">
+                <Label Content="Sold (month)" VerticalAlignment="Top" Height="20" Padding="0,2,0,0" HorizontalContentAlignment="Center" Foreground="#FF757575"/>
+                <Label Content="468.278" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FFC00F0C"/>
+            </Grid>
+            <Rectangle x:Name="Separator" Margin="0,0,293,0" Fill="#FF989898" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" Width="1"/>
+            <Grid x:Name="Button" HorizontalAlignment="Left" Margin="5,5,0,5" Width="332">
+                <Button x:Name="DatabaseButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Width="115">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="Database" HorizontalAlignment="Center" Foreground="White" />
+                        <Image Source="/ArrowDown.png" Width="15" Height="15" Margin="5,3,0,0" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="UpdateButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Margin="120,0,0,0" Width="91">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Width="47" HorizontalAlignment="Center" Text="Update" Foreground="White" />
+                        <Image Source="/Refresh.png" Width="15" Height="15" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ManagersButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Margin="216,0,0,0" Width="116">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="Managers" HorizontalAlignment="Center" Foreground="White" />
+                        <Image Source="/ArrowDown.png" Width="15" Height="15" Margin="5,3,0,0" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <Button x:Name="ManagersButton_Копировать" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,150,0" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" Width="41">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="20"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Moon.png" Width="21" Height="23" />
+                </StackPanel>
+            </Button>
+        </Grid>
+        <Grid x:Name="Filter" Margin="0,50,0,0" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5" Width="235" Background="#FFD9D9D9">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+            <TextBlock HorizontalAlignment="Center" Text="Filter" Width="106" TextAlignment="Center" VerticalAlignment="Top" FontSize="20" FontStyle="Normal" Margin="0,10,0,0" Foreground="#FF757575"/>
+            <CheckBox Content="CheckBox" Margin="20,56,10,0" VerticalAlignment="Top" IsChecked="False"/>
+            <Image HorizontalAlignment="Left" Height="30" Margin="75,290,0,0" VerticalAlignment="Top" Width="30">
+                <Image.OpacityMask>
+                    <ImageBrush ImageSource="/Search.png"/>
+                </Image.OpacityMask>
+            </Image>
+        </Grid>
+        <Grid x:Name="DatabaseGrid" Margin="0,50,234,0" RenderTransformOrigin="0.5,0.5" Background="#FFD9D9D9">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+            <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}"/>
+
+        </Grid>
+
+    </Grid>
+
+</Window>
+
