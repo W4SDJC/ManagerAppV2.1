@@ -23,7 +23,19 @@
                     </Button.Background>
                     <StackPanel Orientation="Horizontal"/>
                 </Button>
-                <Image x:Name="About" Source="/AccountMore.png" Margin="116,5,5,5" HorizontalAlignment="Right" />
+                <Button x:Name="ManagersButton_Копировать1" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="108,5,5,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="20"/>
+                        </Style>
+                    </Button.Resources>
+                    <Button.Background>
+                        <SolidColorBrush Color="#FF333333" Opacity="0"/>
+                    </Button.Background>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,5,0">
+                        <Image Source="/AccountMore.png" Width="27" Height="30" Margin="0,0,5,0" />
+                    </StackPanel>
+                </Button>
             </Grid>
             <Grid x:Name="Search" Height="40" Margin="342,0,405,0">
                 <TextBox x:Name="SearchField" TextWrapping="Wrap" Text="TextBox" Height="40" VerticalContentAlignment="Center" Padding="5,0,5,0"/>
@@ -80,7 +92,7 @@
                     </Style>
                 </Button.Resources>
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Moon.png" Width="21" Height="23" />
+                    <Image Source="/Moon.png" Width="21" Height="23" VerticalAlignment="Top" />
                 </StackPanel>
             </Button>
         </Grid>
