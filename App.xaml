@@ -4,9 +4,6 @@
              xmlns:local="clr-namespace:ManagerAppV2._1"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style TargetType="{x:Type Border}">
-            <Setter Property="CornerRadius" Value="8"/>
-        </Style>
         <Style TargetType="{x:Type Label}">
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
         </Style>

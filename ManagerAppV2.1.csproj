@@ -15,32 +15,64 @@
     <None Remove="ArrowDown.png" />
     <None Remove="Avatar.jpg" />
     <None Remove="Database.png" />
+    <None Remove="Icons\ArrowUp.png" />
+    <None Remove="Icons\Avatar.jpg" />
+    <None Remove="Icons\Copy.png" />
+    <None Remove="Icons\Log_out.png" />
+    <None Remove="Icons\Moon.png" />
+    <None Remove="Icons\New.png" />
+    <None Remove="Icons\Share.png" />
+    <None Remove="Icons\Trash.png" />
     <None Remove="Moon.png" />
     <None Remove="Refresh.png" />
     <None Remove="Search.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="AccountMore.png">
+    <PackageReference Include="MySql.Data" Version="9.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\AccountMore.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="AppIcon.png" />
-    <Resource Include="ArrowDown.png">
+    <Resource Include="Icons\AppIcon.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Avatar.jpg">
+    <Resource Include="Icons\ArrowDown.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Database.png">
+    <Resource Include="Icons\ArrowUp.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Moon.png">
+    <Resource Include="Icons\Avatar.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Refresh.png">
+    <Resource Include="Icons\Copy.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Search.png">
+    <Resource Include="Icons\Edit.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Log_out.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Moon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\New.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Refresh.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Search.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Share.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Trash.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
