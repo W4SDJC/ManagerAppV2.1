@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Icons\Logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,10 @@
     <None Remove="Moon.png" />
     <None Remove="Refresh.png" />
     <None Remove="Search.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icons\Logo.ico" />
   </ItemGroup>
 
   <ItemGroup>

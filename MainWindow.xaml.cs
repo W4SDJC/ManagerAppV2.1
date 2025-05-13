@@ -23,8 +23,10 @@ namespace ManagerAppV2._1
         public MainWindow()
         {
             InitializeComponent();
+            CreateCheckBoxesForColumns();
             MinimizeElements();
             LoadData();
+            
         }
 
         private void MinimizeElements()
@@ -58,9 +60,6 @@ namespace ManagerAppV2._1
                 MessageBox.Show($"Error loading data: {ex.Message}");
             }
         }
-
-
-
 
         private void DatabaseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -142,6 +141,7 @@ namespace ManagerAppV2._1
             LoginWindow.Show();
         }
 
+        
 
     }
 }

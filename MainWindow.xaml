@@ -88,14 +88,14 @@
                     </StackPanel>
                 </Button>
             </Grid>
-            <Button x:Name="ThemeChangeBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,150,0" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" Width="41">
+            <Button x:Name="ThemeChangeBtn" Background="#333333" Foreground="White" BorderThickness="0" Margin="0,0,150,0" Height="40" VerticalAlignment="Center" HorizontalAlignment="Right" Width="41" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="20"/>
                     </Style>
                 </Button.Resources>
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Moon.png" Width="21" Height="23" VerticalAlignment="Top" />
+                <StackPanel Height="25" Width="25" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Image Source="/Icons/Moon.png" Width="25" Height="25" VerticalAlignment="Top" />
                 </StackPanel>
             </Button>
         </Grid>
@@ -108,14 +108,24 @@
                     <TranslateTransform/>
                 </TransformGroup>
             </Grid.RenderTransform>
-            <TextBlock HorizontalAlignment="Center" Text="Filter" Width="106" TextAlignment="Center" VerticalAlignment="Top" FontSize="20" FontStyle="Normal" Margin="0,10,0,0" Foreground="#FF757575"/>
-            <CheckBox Content="CheckBox" Margin="20,56,10,0" VerticalAlignment="Top" IsChecked="False">
-                <CheckBox.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="4"/>
-                    </Style>
-                </CheckBox.Resources>
-            </CheckBox>
+            <TextBlock x:Name="FilterLabel" HorizontalAlignment="Center" Text="Filter" Width="106" TextAlignment="Center" VerticalAlignment="Top" FontSize="20" FontStyle="Normal" Margin="0,10,0,0" Foreground="#FF757575"/>
+            <StackPanel x:Name="CheckBoxPanel" Margin="0,45,0,25" Orientation="Vertical">
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+                <CheckBox Content="CheckBox" Margin="20,10,20,0" Height="20" FontSize="16" HorizontalAlignment="Stretch"/>
+            </StackPanel>
+            <CheckBox Content="All" HorizontalAlignment="Left" Margin="20,475,0,0" VerticalAlignment="Top"/>
         </Grid>
         <Grid x:Name="DatabaseGrid" Margin="0,50,234,0" RenderTransformOrigin="0.5,0.5" Background="#FFD9D9D9">
             <Grid.RenderTransform>
@@ -194,7 +204,7 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <Grid x:Name="ProfileMenu" Height="65" Margin="0,45,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140">
+        <Grid x:Name="ProfileMenu" Height="65" Margin="0,45,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140" d:IsHidden="True">
             <Rectangle Fill="#FF1F7334" RadiusX="10" RadiusY="10"/>
             <!--Buttons-->
             <Button x:Name="ProfileBtn" Background="WhiteSmoke" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Height="25" Grid.RowSpan="1" VerticalAlignment="Top" Margin="5,5,5,0" Click="ProfileBtn_Click">
@@ -216,6 +226,65 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock x:Name="LogOut" FontSize="14" Width="49" Text="Log out" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" />
                     <Image Source="/Icons/Log_out.png" Width="15" Height="15" Margin="5,0,0,0" />
+                </StackPanel>
+            </Button>
+        </Grid>
+        <Grid x:Name="ManagersMenu" HorizontalAlignment="Left" Height="155" Margin="221,45,0,0" VerticalAlignment="Top" Width="115">
+            <Rectangle x:Name="MenuBackgrnd1" Width="115" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
+            <!--Buttons-->
+            <Button x:Name="NewBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="New" HorizontalAlignment="Center" Foreground="White" />
+                    <Image Source="/Icons/New.png" Width="15" Height="15" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="EditBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,95" Width="105" Height="25" Grid.RowSpan="1" VerticalAlignment="Bottom">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="Edit" HorizontalAlignment="Center" Foreground="White" />
+                    <Image Source="/Icons/Edit.png" Width="15" Height="15" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="DeleteBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,65" Width="105" Height="25" VerticalAlignment="Bottom">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="Delete" HorizontalAlignment="Center" Foreground="White" />
+                    <Image Source="/Icons/Trash.png" Width="15" Height="15" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="CopyBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Width="105" Margin="5,0,5,35" Height="25" VerticalAlignment="Bottom"  >
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="14" Width="62" Text="Copy" Foreground="White" />
+                    <Image Source="/Icons/Copy.png" Width="15" Height="15" />
+                </StackPanel>
+            </Button>
+            <Button x:Name="ExportBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,5" Width="105" VerticalAlignment="Bottom" Height="25">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="14" VerticalAlignment="Top" Width="62" Text="Export" HorizontalAlignment="Center" Foreground="White" />
+                    <Image Source="/Icons/Share.png" Width="15" Height="15" />
                 </StackPanel>
             </Button>
         </Grid>
