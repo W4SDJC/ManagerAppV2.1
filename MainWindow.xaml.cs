@@ -23,9 +23,19 @@ namespace ManagerAppV2._1
         public MainWindow()
         {
             InitializeComponent();
+            RoleControl();
             MinimizeElements();
             LoadDataAndCreateCheckBoxes();
             
+        }
+
+        private void RoleControl()
+        {
+            if (Role.Content.ToString() != "Dev" ||  Role.Content.ToString() != "Admin")
+            {
+                ManagersButton.Visibility = Visibility.Collapsed;
+                FilterAllElements.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void MinimizeElements()
@@ -69,7 +79,7 @@ namespace ManagerAppV2._1
                         {
                             Content = column.ColumnName,
                             IsChecked = true, // Изначально все столбцы выбраны
-                            Margin = new Thickness(10, 5, 5, 0),
+                            Margin = new Thickness(10, 5, 5, 5),
                             FontSize = 15,
                             Style = (Style)FindResource("RoundedCheckBoxStyle"),
                             Tag = column.ColumnName // Используем Tag для хранения имени столбца
@@ -119,45 +129,74 @@ namespace ManagerAppV2._1
     
 
 
-        private void LoadData()
+        private void LoadData(string name = "null")
         {
-            MainDataGrid.ItemsSource = null;
-
-            try
+            if (!string.IsNullOrEmpty(name))
             {
-                using (MySqlConnection connection = new MySqlConnection("server=localhost;port=3306;user=root;password=password;database=database;"))  // MySqlConnection
+                MainDataGrid.ItemsSource = null;
+
+                try
                 {
-                    connection.Open();
-
-                    string query = "SELECT " +
-                        "id," +
-                        "Shipment_date as \"Дата отправки\"," +
-                        "Shipment_warehouse as \"Склад отправки\"," +
-                        "\"Client's_city\" as \"Город покупателя\"," +
-                        "\"Client's_name\" as \"Покупатель\"," +
-                        "Product_name as \"Товар\"," +
-                        "\"Product's_amount\" as \"Количество\"," +
-                        "Unit_of_measurement as \"Ед. изм.\"," +
-                        "Price as \"Цена менеджера\"," +
-                        "Minimum_price as \"Мин. цена\"," +
-                        "Shipment_value as \"Итого менеджера\"," +
-                        "\"Shipment_value_(Minimum_price)\" as \"Итого (Мин)\"," +
-                        "UPD_number as \"Номер УПД\"," +
-                        "Shipment_price as \"Стоимость доставки\"," +
-                        "Reward as Премия FROM `database`.`manager`;";
-                    using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                    using (MySqlConnection connection = new MySqlConnection("server=localhost;port=3306;user=root;password=password;database=database;"))  // MySqlConnection
                     {
-                        MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
-                        DataTable dataTable = new DataTable();
-                        adapter.Fill(dataTable);
+                        connection.Open();
 
-                        MainDataGrid.ItemsSource = dataTable.DefaultView;
+                        string query = $"SELECT * FROM {name}";
+                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                        {
+                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+
+                            MainDataGrid.ItemsSource = dataTable.DefaultView;
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading data: {ex.Message}");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error loading data: {ex.Message}");
+                MainDataGrid.ItemsSource = null;
+
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection("server=localhost;port=3306;user=root;password=password;database=database;"))  // MySqlConnection
+                    {
+                        connection.Open();
+
+                        string query = "SELECT " +
+                            "id," +
+                            "Shipment_date as \"Дата отправки\"," +
+                            "Shipment_warehouse as \"Склад отправки\"," +
+                            "\"Client's_city\" as \"Город покупателя\"," +
+                            "\"Client's_name\" as \"Покупатель\"," +
+                            "Product_name as \"Товар\"," +
+                            "\"Product's_amount\" as \"Количество\"," +
+                            "Unit_of_measurement as \"Ед. изм.\"," +
+                            "Price as \"Цена менеджера\"," +
+                            "Minimum_price as \"Мин. цена\"," +
+                            "Shipment_value as \"Итого менеджера\"," +
+                            "\"Shipment_value_(Minimum_price)\" as \"Итого (Мин)\"," +
+                            "UPD_number as \"Номер УПД\"," +
+                            "Shipment_price as \"Стоимость доставки\"," +
+                            "Reward as Премия FROM `database`.`manager`;";
+                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                        {
+                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+
+                            MainDataGrid.ItemsSource = dataTable.DefaultView;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading data: {ex.Message}");
+                }
             }
         }
 
@@ -168,7 +207,7 @@ namespace ManagerAppV2._1
                 DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
                 DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
                 DatabaseBtnAnimation.To = 0;
-                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.5);
+                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
                 DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
                 BitmapImage bi = new BitmapImage();
                 // BitmapImage.UriSource must be in a BeginInit/EndInit block.
@@ -265,14 +304,41 @@ namespace ManagerAppV2._1
             ApplyColumnVisibility();
         }
 
-        private void GridSplitter_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            //  Сохраните новую ширину столбцов, если это необходимо
-            //  Например, в настройках приложения:
+            LoadData();
+            ApplyColumnVisibility();
+        }
 
-            // double column1Width = ((Grid)this.Content).ColumnDefinitions[0].ActualWidth;
-            // Properties.Settings.Default.Column1Width = column1Width;
-            // Properties.Settings.Default.Save();
+        private double checkBoxWidth = 75;        // Ширина CheckBox
+        private double checkBoxHeight = 10;       // Высота CheckBox
+        private double horizontalMargin = 10;       // Горизонтальный отступ
+        private double verticalMargin = 5;         // Вертикальный отступ
+        private double maxHeight = 1000;
+        private void FilterScrollViewver_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double availableWidth = CheckBoxPanel.ActualWidth;
+            int maxRows = Math.Max(1, (int)(maxHeight / (checkBoxHeight + (verticalMargin * 2))));  // Максимальное количество строк
+            int columnCountByWidth = Math.Max(1, (int)(availableWidth / (checkBoxWidth + (horizontalMargin * 2)))); // Столбцов по ширине
+            int columnCountByHeight = (int)Math.Ceiling((double)CheckBoxPanel.Children.Count / maxRows);  // Столбцов по высоте
+
+            int columnCount = Math.Min(columnCountByWidth, columnCountByHeight); // Выбираем меньшее из двух значений
+
+            CheckBoxPanel.Columns = columnCount;
+        }
+
+        private void CheckBoxGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+        }
+
+        private void FilterAllElements_Checked(object sender, RoutedEventArgs e)
+        {
+            LoadData("manager0");
+        }
+
+        private void NewBtn1_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

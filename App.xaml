@@ -10,6 +10,24 @@
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
         </Style>
+        <Style x:Key="PlaceholderTextBox" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                <VisualBrush.Visual>
+                                    <TextBlock Text="Search" 
+                                           Foreground="Gray"
+                                           Margin="15,0,0,0"
+                                           VerticalAlignment="Center"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="RoundedCheckBoxStyle" TargetType="CheckBox">
             <Setter Property="Template">
                 <Setter.Value>
@@ -72,5 +90,7 @@
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
+        
+        
     </Application.Resources>
 </Application>
