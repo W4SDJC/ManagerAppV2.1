@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="560" Width="1235" MinWidth="830" MinHeight="190" Icon="/Icons/AppIcon.png" WindowStartupLocation="CenterScreen">
+        Title="MainWindow" Height="560" Width="1235" MinWidth="830" MinHeight="190" Icon="/Icons/AppIcon.png" WindowStartupLocation="CenterScreen" PreviewMouseDown="Window_PreviewMouseDown">
     <Window.Resources>
         <Style x:Key="PlaceholderTextBox" TargetType="TextBox">
             <Style.Triggers>
@@ -52,7 +52,7 @@
                         <ImageBrush  ImageSource="/Icons/Avatar.jpg" Stretch="Fill" />
                     </Border.Background>
                 </Border>
-                <Label x:Name="Role" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="70" HorizontalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0,0,0,0" Margin="40,20,0,0" FontSize="10" VerticalContentAlignment="Center" Grid.IsSharedSizeScope="True" Foreground="#FFA0ABA3" Content="Role"/>
+                <Label x:Name="RoleLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="70" HorizontalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0,0,0,0" Margin="40,20,0,0" FontSize="10" VerticalContentAlignment="Center" Grid.IsSharedSizeScope="True" Foreground="#FFA0ABA3" Content="Admin"/>
             </Grid>
             <Grid x:Name="Search" Height="40" Margin="342,0,405,0">
                 <TextBox x:Name="SearchField" TextWrapping="Wrap" Height="40" VerticalContentAlignment="Center" Padding="5,0,5,0">
@@ -66,15 +66,15 @@
             </Grid>
             <Grid x:Name="SellsPlan" Height="40" Margin="0,0,299,0" VerticalAlignment="Center" HorizontalAlignment="Right" Width="106">
                 <Label Content="Sells plan (month)" VerticalAlignment="Top" Height="20" Padding="0,2,0,0" HorizontalContentAlignment="Center" Foreground="#FF757575"/>
-                <Label Content="1.000.000" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FF1E1E1E"/>
+                <Label x:Name="MonthPlanLabel" Content="1.000.000" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FF1E1E1E"/>
             </Grid>
             <Grid x:Name="Sold" Height="40" Margin="0,0,188,0" VerticalAlignment="Center" HorizontalAlignment="Right" Width="106">
                 <Label Content="Sold (month)" VerticalAlignment="Top" Height="20" Padding="0,2,0,0" HorizontalContentAlignment="Center" Foreground="#FF757575"/>
-                <Label Content="468.278" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FFC00F0C"/>
+                <Label x:Name="SoldedLabel" Content="468.278" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20" Padding="0,0,0,0" Width="106" HorizontalContentAlignment="Center" Margin="0,20,0,0" Foreground="#FFC00F0C"/>
             </Grid>
             <Rectangle x:Name="Separator" Margin="0,0,293,0" Fill="#FF989898" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" Width="1"/>
             <Grid x:Name="Button" HorizontalAlignment="Left" Margin="5,5,0,5" Width="332">
-                <Button x:Name="DatabaseButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Width="115" LostFocus="DatabaseButton_LostFocus" Click="DatabaseButton_Click">
+                <Button x:Name="DatabaseButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5" HorizontalAlignment="Left" Width="115" Click="DatabaseMenuOpen">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="8"/>
@@ -122,7 +122,7 @@
         <Grid x:Name="WorkingZone" Margin="0,50,0,0" Background="#FFD9D9D9">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="983*" MinWidth="400"/>
-                <ColumnDefinition Width="2"/>
+                <ColumnDefinition Width="3"/>
                 <ColumnDefinition Width="246*" MaxWidth="350"/>
             </Grid.ColumnDefinitions>
             <Grid x:Name="Filter" RenderTransformOrigin="0.5,0.5" Background="#FFD9D9D9" Grid.Column="2">
@@ -158,13 +158,6 @@
                     </StackPanel>
                 </Button>
             </Grid>
-            <GridSplitter HorizontalAlignment="Stretch" Background="Black" Grid.Column="1" Height="50">
-                <GridSplitter.Resources>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="CornerRadius" Value="1"/>
-                    </Style>
-                </GridSplitter.Resources>
-            </GridSplitter>
             <Grid x:Name="DatabaseGrid" RenderTransformOrigin="0.5,0.5" Background="#FFD9D9D9">
                 <Grid.RenderTransform>
                     <TransformGroup>
@@ -183,11 +176,18 @@
                 <DataGrid x:Name="MainDataGrid" BorderBrush="{x:Null}"/>
 
             </Grid>
+            <GridSplitter HorizontalAlignment="Stretch" Background="Black" Grid.Column="1" Height="50">
+                <GridSplitter.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="1"/>
+                    </Style>
+                </GridSplitter.Resources>
+            </GridSplitter>
         </Grid>
-        <Grid x:Name="DatabaseMenu" HorizontalAlignment="Left" Height="155" Margin="6,45,0,0" VerticalAlignment="Top" Width="115" d:IsHidden="True">
-            <Rectangle x:Name="MenuBackgrnd" Width="115" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
+        <Grid x:Name="DatabaseMenu" HorizontalAlignment="Left" Height="155" Margin="6,45,0,0" VerticalAlignment="Top" Width="115">
+            <Rectangle x:Name="DatabaseMenuBackgrnd" Width="115" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
             <!--Buttons-->
-            <Button x:Name="NewBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom">
+            <Button x:Name="NewBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom" Click="NewBtn_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -198,7 +198,7 @@
                     <Image Source="/Icons/New.png" Width="15" Height="15" />
                 </StackPanel>
             </Button>
-            <Button x:Name="EditBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,95" Width="105" Height="25" Grid.RowSpan="1" VerticalAlignment="Bottom">
+            <Button x:Name="EditBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,95" Width="105" Height="25" Grid.RowSpan="1" VerticalAlignment="Bottom" Click="EditBtn_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -209,7 +209,7 @@
                     <Image Source="/Icons/Edit.png" Width="15" Height="15" />
                 </StackPanel>
             </Button>
-            <Button x:Name="DeleteBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,65" Width="105" Height="25" VerticalAlignment="Bottom">
+            <Button x:Name="DeleteBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,65" Width="105" Height="25" VerticalAlignment="Bottom" Click="DeleteBtn_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>
@@ -330,7 +330,7 @@
 
     </Grid>
 
-    
-    
+
+
 </Window>
 
