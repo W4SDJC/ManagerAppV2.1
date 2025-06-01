@@ -243,10 +243,10 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <Grid x:Name="ProfileMenu" Height="65" Margin="0,45,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140" d:IsHidden="True">
+        <Grid x:Name="ProfileMenu" Height="65" Margin="0,45,5,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="140">
             <Rectangle Fill="#FF1F7334" RadiusX="10" RadiusY="10"/>
             <!--Buttons-->
-            <Button x:Name="ProfileBtn" Background="WhiteSmoke" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Height="25" Grid.RowSpan="1" VerticalAlignment="Bottom" Margin="5,0,5,35" Click="ProfileBtn_Click">
+            <Button x:Name="ProfileBtn" Background="WhiteSmoke" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Grid.RowSpan="1" Margin="5,0,5,35" Click="ProfileBtn_Click" Height="25" VerticalAlignment="Bottom">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>

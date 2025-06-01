@@ -24,13 +24,70 @@ namespace ManagerAppV2._1
     public partial class AddnEdit : Window
     {
         MainWindow MW = new MainWindow();
+        ConnectHelper CH = new ConnectHelper();
         public AddnEdit(string Mode)
         {
             InitializeComponent();
             FormMode(Mode);
-
+            LoadComboBoxData();
         }
-        ConnectHelper CH = new ConnectHelper();
+
+        private void LoadComboBoxData()
+        {
+
+            string connectionString = CH.GetConnectionString();
+            string query = "SELECT Product_name FROM `product price`;"; // DISTINCT для уникальных значений
+            List<string> items = new List<string>();
+            string query2 = "SELECT name FROM warehouse;;"; // DISTINCT для уникальных значений
+            List<string> items2 = new List<string>();
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if (!reader.IsDBNull(0))
+                                {
+                                    items.Add(reader.GetString(0));
+                                }
+                            }
+                        }
+                    }
+                    ProductCB.ItemsSource = items;
+                    ProductCB.SelectedIndex = 0;
+                    using (MySqlCommand command = new MySqlCommand(query2, connection))
+                    {
+                        using (MySqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if (!reader.IsDBNull(0))
+                                {
+                                    items2.Add(reader.GetString(0));
+                                }
+                            }
+                        }
+                    }
+                    WarehouseCB.ItemsSource = items2;
+                    WarehouseCB.SelectedIndex = 0;
+                }
+
+                // Привязка данных к ComboBox
+
+
+
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+            }
+        }
 
         public void FormMode(string Mode)
         {
@@ -94,10 +151,10 @@ namespace ManagerAppV2._1
                         {
                             // Добавляем параметры
                             command.Parameters.AddWithValue("@date", shipmentDate);
-                            command.Parameters.AddWithValue("@warehouse", warehouseTextBox.Text);
+                            command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
                             command.Parameters.AddWithValue("@city", cityTextBox.Text);
                             command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
-                            command.Parameters.AddWithValue("@productName", productNameTextBox.Text);
+                            command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
                             command.Parameters.AddWithValue("@amount", amount);
                             command.Parameters.AddWithValue("@unit", unitTextBox.Text);
                             command.Parameters.AddWithValue("@price", price);
@@ -134,10 +191,8 @@ namespace ManagerAppV2._1
         {
             // Проверка обязательных полей
             if (string.IsNullOrWhiteSpace(shipmentDateTextBox.Text) ||
-                string.IsNullOrWhiteSpace(warehouseTextBox.Text) ||
                 string.IsNullOrWhiteSpace(cityTextBox.Text) ||
                 string.IsNullOrWhiteSpace(clientNameTextBox.Text) ||
-                string.IsNullOrWhiteSpace(productNameTextBox.Text) ||
                 string.IsNullOrWhiteSpace(amountTextBox.Text) ||
                 string.IsNullOrWhiteSpace(unitTextBox.Text) ||
                 string.IsNullOrWhiteSpace(priceTextBox.Text) ||
@@ -190,10 +245,8 @@ namespace ManagerAppV2._1
         private void ClearForm()
         {
             shipmentDateTextBox.Text = "";
-            warehouseTextBox.Text = "";
             cityTextBox.Text = "";
             clientNameTextBox.Text = "";
-            productNameTextBox.Text = "";
             amountTextBox.Text = "";
             unitTextBox.Text = "";
             priceTextBox.Text = "";
@@ -205,6 +258,33 @@ namespace ManagerAppV2._1
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void ProductCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string connectionString = CH.GetConnectionString();
+            string query = $"SELECT Product_price FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
+            string query2 = $"SELECT Unit_of_measurement FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
+
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    object Price= command.ExecuteScalar();
+                    priceTextBox.Text = Price.ToString();
+                    MySqlCommand command2 = new MySqlCommand(query2, connection);
+                    object UofM= command2.ExecuteScalar();
+                    unitTextBox.Text = UofM.ToString();
+
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+            }
         }
     }
 }

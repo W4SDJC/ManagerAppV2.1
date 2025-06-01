@@ -476,7 +476,7 @@ namespace ManagerAppV2._1
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                     {
                         connection.Open();
-                        string deleteQuery = $"DELETE FROM `database`.`manager0` WHERE (`id` = @id);\r\n";
+                        string deleteQuery = $"DELETE FROM `database`.`manager` WHERE (`id` = @id);\r\n";
                         MySqlCommand command = new MySqlCommand(deleteQuery, connection);
                         command.Parameters.AddWithValue("@id", id);
 
@@ -493,6 +493,8 @@ namespace ManagerAppV2._1
                     MessageBox.Show(ex.Message);
                 }
             }
+            LoadData("manager");
+            ApplyColumnVisibility();
         }
         private void UpdateUser(int id, string name, string email)
         {
@@ -527,6 +529,8 @@ namespace ManagerAppV2._1
             
             AddnEdit addnEdit = new AddnEdit("Add");
             addnEdit.ShowDialog();
+            LoadData("manager");
+            ApplyColumnVisibility();
         }
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {

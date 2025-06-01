@@ -19,7 +19,7 @@
 
                 <!-- Склад отгрузки -->
                 <TextBlock Text="Склад отгрузки:"/>
-                <TextBox x:Name="warehouseTextBox" Margin="0,0,0,10"/>
+                <ComboBox x:Name="WarehouseCB" SelectionChanged="ProductCB_SelectionChanged"/>
 
                 <!-- Город клиента -->
                 <TextBlock Text="Город клиента:"/>
@@ -31,7 +31,7 @@
 
                 <!-- Название продукта -->
                 <TextBlock Text="Название продукта:"/>
-                <TextBox x:Name="productNameTextBox" Margin="0,0,0,10"/>
+                <ComboBox x:Name="ProductCB" SelectionChanged="ProductCB_SelectionChanged"/>
 
                 <!-- Количество -->
                 <TextBlock Text="Количество:"/>

@@ -100,7 +100,7 @@ namespace ManagerAppV2._1
                 //MessageBox.Show(dbname);
             if (ConfirmingPassword(PasswordTextBox.Text, ConfirmPasswordTextBox.Text))
             {
-                string query = $"CREATE TABLE `{NameTextBox.Text}` (" +
+                string query = $"CREATE TABLE if not exists `{dbname}` (" +
                 $"`id` int NOT NULL AUTO_INCREMENT," +
                 $"`ShipmentDate` date DEFAULT NULL," +
                 $"`ShipmentWarehouse` varchar(60) DEFAULT NULL," +
@@ -130,8 +130,7 @@ namespace ManagerAppV2._1
                         using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
                             int result = command.ExecuteNonQuery();
-                            MessageBox.Show($"Таблица {dbname} успешно создана!", "Успех",
-                                            MessageBoxButton.OK, MessageBoxImage.Information);
+                            MessageBox.Show($"Таблица {dbname} успешно создана!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
                 }
