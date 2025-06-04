@@ -188,7 +188,7 @@
         <Grid x:Name="DatabaseMenu" HorizontalAlignment="Left" Height="155" Margin="6,45,0,0" VerticalAlignment="Top" Width="115">
             <Rectangle x:Name="DatabaseMenuBackgrnd" Width="115" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
             <!--Buttons-->
-            <Button x:Name="NewBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom" Click="NewBtn_Click">
+            <Button x:Name="NewBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom" Click="NewBtn1_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>

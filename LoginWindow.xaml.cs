@@ -61,10 +61,10 @@ namespace ManagerAppV2._1
                     string DBname = DBNameGetter.ExecuteScalar().ToString();
 
 
-                    MainWindow MW = new MainWindow(role.ToString(), login, name);
-                    MW.LoggedInUsername = login;
-                    MW.LoggedInRole = role.ToString();
-                    MW.DatabaseName = DBname;
+                    MainWindow MW = new MainWindow(/*role.ToString(), login, name*/);
+                    //MW.LoggedInUsername = login;
+                    //MW.LoggedInRole = role.ToString();
+                    //MW.DatabaseName = DBname;
                     MessageBox.Show(DBname);
                     MW.Show();
                     this.Close();

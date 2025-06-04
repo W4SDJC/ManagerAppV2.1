@@ -25,6 +25,7 @@ namespace ManagerAppV2._1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool _isCtrlPressed = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -63,16 +64,17 @@ namespace ManagerAppV2._1
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
                     object result = command.ExecuteScalar();
-                    int convResult = Convert.ToInt32(result);
                     var culture = new CultureInfo("en-US");
 
-                    if (result != null)
+                    // Модифицированная проверка на null и DBNull
+                    if (result == null || result == DBNull.Value)
                     {
-                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
+                        MonthPlanLabel.Content = "0";
                     }
                     else
                     {
-                        MonthPlanLabel.Content = "Данные не найдены";
+                        int convResult = Convert.ToInt32(result);
+                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
                     }
                 }
                 SoldControl();
@@ -80,8 +82,10 @@ namespace ManagerAppV2._1
             catch (MySqlException ex)
             {
                 MessageBox.Show(ex.Message);
+                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
             }
         }
+
         private void SoldControl()
         {
             string connectionString = CH.GetConnectionString();
@@ -96,35 +100,35 @@ namespace ManagerAppV2._1
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
                     MySqlCommand command2 = new MySqlCommand(query2, connection);
-                    
+
                     object MonthPlan = command.ExecuteScalar();
                     object result = command2.ExecuteScalar();
-                    int ConvMonthPlan = Convert.ToInt32(MonthPlan);
-                    int ConvResult = Convert.ToInt32(result);
+
+                    // Обработка пустых значений
+                    int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
+                    int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+
+                    // Логика изменения цвета
                     if (ConvResult < ConvMonthPlan / 2)
                     {
-                        var color = (Color)ColorConverter.ConvertFromString("#FFC00F0C");
-                        SoldedLabel.Foreground = new SolidColorBrush(color);
+                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
+                    }
+                    else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
+                    {
+                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
                     }
                     else
                     {
-                        if (ConvResult > ConvMonthPlan / 2&& ConvResult < ConvMonthPlan)
-                        {
-                            var color = (Color)ColorConverter.ConvertFromString("#FFD324");
-                            SoldedLabel.Foreground = new SolidColorBrush(color);
-                        }
-                        else {
-                            var color = (Color)ColorConverter.ConvertFromString("#14AE5C");
-                            SoldedLabel.Foreground = new SolidColorBrush(color);
-                        }
+                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
                     }
 
                     SoldedLabel.Content = ConvResult.ToString("N0", culture);
                 }
             }
-            catch (MySqlException ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
             }
         }
         // Вспомогательная функция для проверки принадлежности элемента
@@ -359,15 +363,17 @@ namespace ManagerAppV2._1
             ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
         }
 
-        private void ProfileButton_Click(object sender, RoutedEventArgs e)
+        private void ProfileMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)ProfileMenu.ActualHeight) > 0) {
+            if (((int)ProfileMenu.ActualHeight) > 0)
+            {
                 DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
                 ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
                 ProfileBtnAnimation.To = 0;
                 ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
                 ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
-            } else
+            }
+            else
             {
                 DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
                 ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
@@ -488,7 +494,8 @@ namespace ManagerAppV2._1
                             LoadData();
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
@@ -521,12 +528,12 @@ namespace ManagerAppV2._1
             }
         }
 
-        
 
-        public void NewBtn_Click(object sender, RoutedEventArgs e)
+
+        public void AddManagerBtn_Click(object sender, RoutedEventArgs e)
         {
-            
-            
+
+
             AddnEdit addnEdit = new AddnEdit("Add");
             addnEdit.ShowDialog();
             LoadData("manager");
@@ -537,5 +544,44 @@ namespace ManagerAppV2._1
             AddnEdit addnEdit = new AddnEdit("Edit");
             addnEdit.ShowDialog();
         }
+
+
+        private void MyDataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (_isCtrlPressed)
+            {
+                if (e.Delta > 0) // Колесо мыши вверх (увеличение)
+                {
+                    MainDataGrid.FontSize += 1; // Шаг изменения размера шрифта
+                }
+                else // Колесо мыши вниз (уменьшение)
+                {
+                    if (MainDataGrid.FontSize > 4) // Минимальный размер шрифта (чтобы не уйти в ноль или отрицательное значение)
+                    {
+                        MainDataGrid.FontSize -= 1;
+                    }
+                }
+
+                e.Handled = true; // Предотвращаем прокрутку DataGrid
+            }
+        }
+
+        private void MyDataGrid_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+            {
+                _isCtrlPressed = true;
+            }
+        }
+
+        private void MyDataGrid_KeyUp(object sender, KeyEventArgs e) // Важно!
+        {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+            {
+                _isCtrlPressed = false;
+            }
+        }
+
+
     }
 }
