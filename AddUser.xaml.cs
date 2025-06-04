@@ -1,5 +1,6 @@
 ﻿using Kursovaya2;
 using MySql.Data.MySqlClient;
+using System.Security.Cryptography;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Reflection.PortableExecutable;
 
 
 namespace ManagerAppV2._1
@@ -35,14 +37,13 @@ namespace ManagerAppV2._1
         private void LoadComboBoxData()
         {
 
-            string connectionString = "server=localhost;port=3306;user=root;password=password;database=database;";
             string query = "SELECT DISTINCT role FROM `database`.`roles` WHERE id != 0;"; // DISTINCT для уникальных значений
 
             List<string> items = new List<string>();
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                 {
                     connection.Open();
 
@@ -76,8 +77,6 @@ namespace ManagerAppV2._1
             if (string.IsNullOrWhiteSpace(textBox.Text))
             {
                 textBox.BorderBrush = Brushes.Red;
-    
-
                 return $"Please, fill the field {fieldName}.\n";
             }
             return "";
@@ -120,7 +119,7 @@ namespace ManagerAppV2._1
                 $"UNIQUE KEY `id_UNIQUE` (`id`)," +
                 $"UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`)" +
                 $") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
-                $"INSERT INTO users(`login`, `password`, `role`, `databasename`) VALUES ('{LoginTextBox.Text}', '{ConfirmPasswordTextBox.Text}', '{RoleComboBox.SelectedItem}', '{dbname}');";
+                $"INSERT INTO users(`login`, `password`, `role`, `databasename`) VALUES ('{LoginTextBox.Text}', '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', '{RoleComboBox.SelectedItem}', '{dbname}');";
                 try
                 {
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
@@ -158,7 +157,36 @@ namespace ManagerAppV2._1
             this.Close();
         }
 
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            string password = PasswordTextBox.Text;
+            string confirmPassword = ConfirmPasswordTextBox.Text;
 
+            if (password != confirmPassword)
+            {
+                MessageBox.Show("Пароли не совпадают");
+                return;
+            }
+
+            string hashedPassword = PasswordHasher.HashPassword(password);
+
+            // Сохраняем в БД
+            SaveUserToDatabase(LoginTextBox.Text, hashedPassword);
+        }
+
+        private void SaveUserToDatabase(string username, string hashedPassword)
+        {
+            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+            {
+                var cmd = new MySqlCommand("INSERT INTO Users (Username, PasswordHash) VALUES (@username, @passwordHash)",connection);
+
+                cmd.Parameters.AddWithValue("@username", username);
+                cmd.Parameters.AddWithValue("@passwordHash", hashedPassword);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
 
     }
 }

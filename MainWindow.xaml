@@ -27,11 +27,12 @@
         </Style>
     </Window.Resources>
     <Grid x:Name="MainGrid">
+        <Label x:Name="loginLabel" HorizontalAlignment="Left" Margin="170,-35,0,0" VerticalAlignment="Top"/>
         <Grid x:Name="Top" RenderTransformOrigin="0.5,0.5" Background="#FFB3B3B3" Height="50" VerticalAlignment="Top">
             <Grid x:Name="Profile" Margin="0,5,5,5" HorizontalAlignment="Right" Width="140">
                 <Rectangle x:Name="ProfileBackgrnd" RadiusX="10" RadiusY="10" Fill="#FF1F7334" HorizontalAlignment="Center" Width="140"/>
-                <Label x:Name="Name" Content="Pavel Durov" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="68" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Padding="0,0,0,0" Margin="40,5,0,0" Foreground="White" FontFamily="Segoe UI Symbol"/>
-                <Button x:Name="ProfileButton" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="108,5,5,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="ProfileButton_Click">
+                <Label x:Name="NameLabel" Content="Pavel Durov" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Padding="0,0,0,0" Margin="40,5,0,0" Foreground="White" FontFamily="Segoe UI Symbol"/>
+                <Button x:Name="ProfileButton" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="108,5,5,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="ProfileMenu_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="20"/>
@@ -142,7 +143,7 @@
                         </Style>
                     </Border.Resources>
                     <ScrollViewer x:Name="FilterScrollViewver" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
-                        <UniformGrid x:Name="CheckBoxPanel" Columns="1" SizeChanged="CheckBoxGrid_SizeChanged"/>
+                        <UniformGrid x:Name="CheckBoxPanel" Columns="1"/>
                     </ScrollViewer>
                 </Border>
 
@@ -173,7 +174,7 @@
                         <ImageBrush/>
                     </Rectangle.OpacityMask>
                 </Rectangle>
-                <DataGrid x:Name="MainDataGrid" BorderBrush="{x:Null}"/>
+                <DataGrid x:Name="MainDataGrid" BorderBrush="{x:Null}" FontSize="16" PreviewMouseWheel="MyDataGrid_PreviewMouseWheel" KeyDown="MyDataGrid_KeyDown" KeyUp="MyDataGrid_KeyUp"/>
 
             </Grid>
             <GridSplitter HorizontalAlignment="Stretch" Background="Black" Grid.Column="1" Height="50">
@@ -271,7 +272,7 @@
         <Grid x:Name="ManagersMenu" HorizontalAlignment="Left" Height="155" Margin="221,45,0,0" VerticalAlignment="Top" Width="115">
             <Rectangle x:Name="MenuBackgrnd1" Width="115" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
             <!--Buttons-->
-            <Button x:Name="NewBtn1" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom" Click="NewBtn1_Click">
+            <Button x:Name="AddManagerBtn" Background="#333333" Foreground="White" BorderThickness="0" Padding="0,0,0,0" Margin="5,0,5,125" Width="105" Grid.RowSpan="1" Height="25" VerticalAlignment="Bottom" Click="AddManagerBtn_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="5"/>
