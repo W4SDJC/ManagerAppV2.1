@@ -9,6 +9,7 @@ namespace ManagerAppV2._1
     /// </summary>
     public partial class App : Application
     {
+
     }
 
 }

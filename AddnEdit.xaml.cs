@@ -170,7 +170,7 @@ namespace ManagerAppV2._1
                             if (result > 0)
                             {
                                 MessageBox.Show("Отгрузка успешно добавлена!");
-                                MW.LoadData("manager");
+                                MW.ReLoadData(DataSource.DBname);
                                 ClearForm();
                             }
                         }

@@ -48,6 +48,7 @@ namespace ManagerAppV2._1
                 using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                 {
                     connection.Open();
+
                     string getrole = $"SELECT role FROM users WHERE login = '{login}'";
                     MySqlCommand RoleGetter = new MySqlCommand(getrole, connection);
                     object role = RoleGetter.ExecuteScalar();
@@ -60,12 +61,12 @@ namespace ManagerAppV2._1
                     MySqlCommand DBNameGetter = new MySqlCommand(getdbname, connection);
                     string DBname = DBNameGetter.ExecuteScalar().ToString();
 
+                    DataSource.UserName = name.ToString();
+                    DataSource.Role = role.ToString();
+                    DataSource.Login = login;
+                    DataSource.DBname = DBname;
 
-                    MainWindow MW = new MainWindow(/*role.ToString(), login, name*/);
-                    //MW.LoggedInUsername = login;
-                    //MW.LoggedInRole = role.ToString();
-                    //MW.DatabaseName = DBname;
-                    MessageBox.Show(DBname);
+                    MainWindow MW = new MainWindow();
                     MW.Show();
                     this.Close();
                     connection.Close();

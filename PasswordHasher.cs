@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ManagerAppV2._1
 {
@@ -39,24 +40,31 @@ namespace ManagerAppV2._1
 
         public static bool VerifyPassword(string password, string hashedPassword)
         {
-            // Конвертируем обратно из base64
-            byte[] hashBytes = Convert.FromBase64String(hashedPassword);
+            try {
+                // Конвертируем обратно из base64
+                byte[] hashBytes = Convert.FromBase64String(hashedPassword);
 
-            // Извлекаем соль
-            byte[] salt = new byte[SaltSize];
-            Array.Copy(hashBytes, 0, salt, 0, SaltSize);
+                // Извлекаем соль
+                byte[] salt = new byte[SaltSize];
+                Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
-            // Создаем хеш введенного пароля
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
-            byte[] hash = pbkdf2.GetBytes(HashSize);
+                // Создаем хеш введенного пароля
+                var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
+                byte[] hash = pbkdf2.GetBytes(HashSize);
 
-            // Сравниваем хеши
-            for (int i = 0; i < HashSize; i++)
-            {
-                if (hashBytes[i + SaltSize] != hash[i])
-                    return false;
+                // Сравниваем хеши
+                for (int i = 0; i < HashSize; i++)
+                {
+                    if (hashBytes[i + SaltSize] != hash[i])
+                        return false;
+                }
+                return true;
             }
-            return true;
+            catch(Exception ex)
+            {
+                MessageBox.Show("Ошибка расшифровки пароля: " + ex.Message);
+                return false;
+            }
         }
     }
 }

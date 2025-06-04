@@ -25,7 +25,13 @@ namespace ManagerAppV2._1
     /// </summary>
     public partial class MainWindow : Window
     {
+        ConnectHelper CH = new ConnectHelper();
+        private string Name = DataSource.UserName;
+        private string Login = DataSource.Login;
+        private string Role = DataSource.Role;
+        private string DBname = DataSource.DBname;
         private bool _isCtrlPressed = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,8 +39,8 @@ namespace ManagerAppV2._1
             MinimizeElements();
             LoadDataAndCreateCheckBoxes();
             LoadDataToLabel();
+
         }
-        ConnectHelper CH = new ConnectHelper();
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -55,7 +61,7 @@ namespace ManagerAppV2._1
         private void LoadDataToLabel()
         {
             string connectionString = CH.GetConnectionString();
-            string query = "SELECT MonthPlan FROM roles WHERE role = 'Manager'";
+            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
 
             try
             {
@@ -89,8 +95,8 @@ namespace ManagerAppV2._1
         private void SoldControl()
         {
             string connectionString = CH.GetConnectionString();
-            string query = "SELECT MonthPlan FROM roles WHERE role = 'Manager'";
-            string query2 = "SELECT SUM(ShipmentPrice) from manager";
+            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
+            string query2 = $"SELECT SUM(ShipmentPrice) from {DBname}";
             var culture = new CultureInfo("en-US");
 
             try
@@ -154,19 +160,20 @@ namespace ManagerAppV2._1
         }
         private void RoleControl()
         {
+            NameLabel.Content = Name;
             string labelText = RoleLabel.Content?.ToString(); // Получаем текст из Label, безопасно обрабатывая null
 
             if (labelText != "Dev" && labelText != "Admin")
             {
                 ManagersButton.Visibility = Visibility.Collapsed;
-                FilterAllElements.Visibility = Visibility.Collapsed;
+                DevElements.Visibility = Visibility.Collapsed;
 
             }
             else
             {
                 if (labelText == "Dev") { MessageBox.Show("Welcome back Developer! All systems online", "Welcome back", MessageBoxButton.OK, MessageBoxImage.Information); }
                 ManagersButton.Visibility = Visibility.Visible;
-                FilterAllElements.Visibility = Visibility.Visible;
+                DevElements.Visibility = Visibility.Visible;
 
             }
         }
@@ -177,15 +184,16 @@ namespace ManagerAppV2._1
             ManagersMenu.Height = 0;
             ProfileMenu.Height = 0;
         }
-        private void LoadDataAndCreateCheckBoxes()
+        private void LoadDataAndCreateCheckBoxes(int mode = 0)
         {
+
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                 {
                     connection.Open();
 
-                    string query = CH.ManagerData("manager"); // Замените YourTableName на имя вашей таблицы
+                    string query = CH.ManagerData(DBname); // Замените YourTableName на имя вашей таблицы
                     MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
                     var allData = new DataTable();
                     adapter.Fill(allData);
@@ -247,7 +255,7 @@ namespace ManagerAppV2._1
 
 
 
-        public void LoadData(string name = null)
+        public void ReLoadData(string name = null)
         {
             SoldControl();
             if (name != null)
@@ -260,7 +268,7 @@ namespace ManagerAppV2._1
                     {
                         connection.Open();
 
-                        string query = CH.ManagerData("manager");
+                        string query = CH.ManagerData(DBname);
                         using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
                         {
                             MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
@@ -430,7 +438,7 @@ namespace ManagerAppV2._1
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadData("manager");
+            ReLoadData(DBname);
             ApplyColumnVisibility();
         }
 
@@ -449,16 +457,14 @@ namespace ManagerAppV2._1
             CheckBoxPanel.Columns = columnCount;
         }
 
-        private void CheckBoxGrid_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-        }
 
         private void FilterAllElements_Checked(object sender, RoutedEventArgs e)
         {
-            LoadData("manager0");
+            LoadDataAndCreateCheckBoxes();
+            ReLoadData(DBname);
         }
 
-        private void NewBtn1_Click(object sender, RoutedEventArgs e)
+        private void AddManagerBtn_Click(object sender, RoutedEventArgs e)
         {
             AddUser ad = new AddUser();
             ad.ShowDialog();
@@ -482,7 +488,7 @@ namespace ManagerAppV2._1
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                     {
                         connection.Open();
-                        string deleteQuery = $"DELETE FROM `database`.`manager` WHERE (`id` = @id);\r\n";
+                        string deleteQuery = $"DELETE FROM {DBname} WHERE (`id` = @id);\r\n";
                         MySqlCommand command = new MySqlCommand(deleteQuery, connection);
                         command.Parameters.AddWithValue("@id", id);
 
@@ -491,7 +497,7 @@ namespace ManagerAppV2._1
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Запись успешно удалена");
-                            LoadData();
+                            ReLoadData();
                         }
                     }
                 }
@@ -500,7 +506,7 @@ namespace ManagerAppV2._1
                     MessageBox.Show(ex.Message);
                 }
             }
-            LoadData("manager");
+            ReLoadData(DBname);
             ApplyColumnVisibility();
         }
         private void UpdateUser(int id, string name, string email)
@@ -530,13 +536,11 @@ namespace ManagerAppV2._1
 
 
 
-        public void AddManagerBtn_Click(object sender, RoutedEventArgs e)
+        public void AddData_Click(object sender, RoutedEventArgs e)
         {
-
-
             AddnEdit addnEdit = new AddnEdit("Add");
             addnEdit.ShowDialog();
-            LoadData("manager");
+            ReLoadData(DBname);
             ApplyColumnVisibility();
         }
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -546,41 +550,96 @@ namespace ManagerAppV2._1
         }
 
 
-        private void MyDataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private bool _isMouseOverDataGrid = false;
+
+        private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (_isCtrlPressed)
+            if (_isCtrlPressed && _isMouseOverDataGrid)
             {
-                if (e.Delta > 0) // Колесо мыши вверх (увеличение)
+                double newSize = MainDataGrid.FontSize + (e.Delta > 0 ? 1 : -1);
+
+                if (newSize < 8 || newSize > 24)
                 {
-                    MainDataGrid.FontSize += 1; // Шаг изменения размера шрифта
-                }
-                else // Колесо мыши вниз (уменьшение)
-                {
-                    if (MainDataGrid.FontSize > 4) // Минимальный размер шрифта (чтобы не уйти в ноль или отрицательное значение)
+                    // Анимация "отскока" при достижении границ
+                    DoubleAnimation anim = new DoubleAnimation
                     {
-                        MainDataGrid.FontSize -= 1;
-                    }
+                        To = newSize < 8 ? 9 : 23,
+                        Duration = TimeSpan.FromMilliseconds(200),
+                        AutoReverse = true,
+                        EasingFunction = new ElasticEase { Oscillations = 2 }
+                    };
+                    MainDataGrid.BeginAnimation(Control.FontSizeProperty, anim);
+                    ReLoadData(DBname);
+
+                }
+                else
+                {
+                    // Обычная плавная анимация
+                    DoubleAnimation anim = new DoubleAnimation
+                    {
+                        To = newSize,
+                        Duration = TimeSpan.FromMilliseconds(300),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    MainDataGrid.BeginAnimation(Control.FontSizeProperty, anim);
+                    ReLoadData(DBname);
+
                 }
 
-                e.Handled = true; // Предотвращаем прокрутку DataGrid
+                e.Handled = true;
             }
         }
 
-        private void MyDataGrid_KeyDown(object sender, KeyEventArgs e)
+        private void DataGrid_MouseEnter(object sender, MouseEventArgs e)
+        {
+            _isMouseOverDataGrid = true;
+        }
+
+        private void DataGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            _isMouseOverDataGrid = false;
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
                 _isCtrlPressed = true;
             }
+            base.OnKeyDown(e);
         }
 
-        private void MyDataGrid_KeyUp(object sender, KeyEventArgs e) // Важно!
+        protected override void OnKeyUp(KeyEventArgs e)
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
                 _isCtrlPressed = false;
             }
+            base.OnKeyUp(e);
         }
+
+        private void MainDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            var dataGrid = (DataGrid)sender;
+
+            // Создаем стиль программно
+            var cellStyle = new Style(typeof(DataGridCell));
+            cellStyle.Setters.Add(new Setter(Control.FontSizeProperty, 12.0));
+
+            // Триггер при наведении
+            var trigger = new Trigger()
+            {
+                Property = UIElement.IsMouseOverProperty,
+                Value = true
+            };
+            trigger.Setters.Add(new Setter(Control.FontSizeProperty, 14.0));
+
+            cellStyle.Triggers.Add(trigger);
+            dataGrid.CellStyle = cellStyle;
+        }
+
+
 
 
     }

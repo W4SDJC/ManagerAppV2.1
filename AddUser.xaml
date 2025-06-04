@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="ProfilePage" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid Height="245" Width="510" Margin="0,0,0,0" >
-        <Border CornerRadius="45,45,45,45" Margin="10,41,0,0" Width="85" HorizontalAlignment="Left" Height="84" VerticalAlignment="Top">
+        <Border CornerRadius="45,45,45,45" Margin="24,49,0,0" Width="86" HorizontalAlignment="Left" Height="84" VerticalAlignment="Top">
             <Border.Background>
                 <ImageBrush  ImageSource="/Icons/Avatar.jpg" Stretch="Fill" />
             </Border.Background>
@@ -40,7 +40,7 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="NameTextBox" Margin="297,41,8,184" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="NameTextBox" Margin="297,41,20,184" TextWrapping="Wrap" Padding="5,0,0,0">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
@@ -54,7 +54,7 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="DataBaseNameTextBox" Margin="297,83,8,142" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="DataBaseNameTextBox" Margin="297,83,20,142" TextWrapping="Wrap" Padding="5,0,0,0">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
