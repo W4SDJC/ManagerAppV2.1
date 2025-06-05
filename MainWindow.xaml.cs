@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -35,12 +36,185 @@ namespace ManagerAppV2._1
         public MainWindow()
         {
             InitializeComponent();
-            RoleControl();
-            MinimizeElements();
-            LoadDataAndCreateCheckBoxes();
-            LoadDataToLabel();
+            MainLoad();
 
         }
+
+
+        // =========================== DATABASE MENU ===========================
+
+        private void DatabaseMenuOpen(object sender, RoutedEventArgs e)
+        {
+            if (((int)DatabaseMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
+                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
+                DatabaseBtnAnimation.To = 0;
+                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
+                BitmapImage bi = new BitmapImage();
+                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+                bi.BeginInit();
+                bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
+                bi.EndInit();
+                // Set the image source.
+                DataBaseBtnimg.Source = bi;
+            }
+            else
+            {
+                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
+                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
+                DatabaseBtnAnimation.To = 155;
+                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
+                BitmapImage bi = new BitmapImage();
+                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+                bi.BeginInit();
+                bi.UriSource = new Uri(@"/Icons/ArrowUp.png", UriKind.RelativeOrAbsolute);
+                bi.EndInit();
+                // Set the image source.
+                DataBaseBtnimg.Source = bi;
+            }
+        }
+
+        // ======================== ADD DATA TO DATABASE ========================
+        public void AddData_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEdit addnEdit = new AddnEdit("Add");
+            addnEdit.ShowDialog();
+            ReLoadData(DBname);
+            ApplyColumnVisibility();
+        }
+        // ============================= EDIT DATA =============================
+        private void EditBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEdit addnEdit = new AddnEdit("Edit");
+            addnEdit.ShowDialog();
+        }
+        // ============================ DELETE DATA ============================
+        private void DeleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataSource.Role == "Admin" || DataSource.Role == "Developer")
+            {
+                AdminDelete();
+                MessageBox.Show(RoleLabel.Content.ToString()+"first");
+
+            }
+            else
+            {
+                DeleteData();
+                MessageBox.Show(RoleLabel.Content.ToString());
+
+            }
+        }
+        // ================================= = =================================
+        private void DatabaseMenuClose()
+        {
+            DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
+            DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
+            DatabaseBtnAnimation.To = 0;
+            DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
+            BitmapImage bi = new BitmapImage();
+            // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+            bi.BeginInit();
+            bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
+            bi.EndInit();
+            // Set the image source.
+            DataBaseBtnimg.Source = bi;
+        }
+
+        // =========================== UPDATE BUTTON ===========================
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            ReLoadData(DBname);
+            ApplyColumnVisibility();
+        }
+
+        // =========================== MANAGERS MENU ===========================
+
+        private void ManagersButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (((int)ManagersMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
+                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+                ManagersBtnAnimation.To = 0;
+                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+            }
+            else
+            {
+                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
+                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+                ManagersBtnAnimation.To = 155;
+                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+            }
+        }
+        // ============================ CREATE USER ============================
+        private void AddUserBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AddUser ad = new AddUser();
+            ad.ShowDialog();
+        }
+        // ================================= = =================================
+
+        // ================================= = =================================
+        private void ManagersMenuClose()
+        {
+            DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
+            ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+            ManagersBtnAnimation.To = 0;
+            ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+        }
+        // ============================ PROFILE MENU ============================
+
+        private void ProfileMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (((int)ProfileMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
+                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
+                ProfileBtnAnimation.To = 0;
+                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+            }
+            else
+            {
+                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
+                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
+                ProfileBtnAnimation.To = 65;
+                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+            }
+        }
+        // ============================ EDIT PROFILE ============================
+        private void ProfileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ProfilePage ProfilePageWindow = new ProfilePage();
+            ProfilePageWindow.ShowDialog();
+        }
+        // ============================== LOG OUT ==============================
+        private void LogOut_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow LoginWindow = new LoginWindow();
+            LoginWindow.Show();
+            this.Close();
+            DataSource.Clear();
+
+        }
+        // ================================= = =================================
+        private void ProfileMenuClose()
+        {
+            DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
+            ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
+            ProfileBtnAnimation.To = 0;
+            ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+        }
+        // ================================= = =================================
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -57,46 +231,47 @@ namespace ManagerAppV2._1
                 ProfileMenuClose();
             }
         }
-
-        private void LoadDataToLabel()
+        // =========================== FILTER BUTTON ===========================
+        private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            string connectionString = CH.GetConnectionString();
-            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(query, connection);
-                    object result = command.ExecuteScalar();
-                    var culture = new CultureInfo("en-US");
-
-                    // Модифицированная проверка на null и DBNull
-                    if (result == null || result == DBNull.Value)
-                    {
-                        MonthPlanLabel.Content = "0";
-                    }
-                    else
-                    {
-                        int convResult = Convert.ToInt32(result);
-                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
-                    }
-                }
-                SoldControl();
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show(ex.Message);
-                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
-            }
+            ApplyColumnVisibility();
         }
 
+
+
+        // ================================ LOAD ================================
+        private void MainLoad()
+        {
+            RoleControl();
+            MinimizeElements();
+            LoadDataAndCreateCheckBoxes();
+            LoadDataToLabel();
+
+        }
+        // ============================ DATA CONTROL ============================
+        private void RoleControl()
+        {
+            NameLabel.Content = Name;
+            RoleLabel.Content = Role;
+            string labelText = RoleLabel.Content?.ToString(); // Получаем текст из Label, безопасно обрабатывая null
+
+            if (labelText != "Developer" && labelText != "Admin")
+            {
+                ManagersButton.Visibility = Visibility.Collapsed;
+                AdminTabControl.Visibility = Visibility.Collapsed;
+
+            }
+            else
+            {
+                if (labelText == "Developer") { MessageBox.Show("Welcome back Developer! All systems online", "Welcome back", MessageBoxButton.OK, MessageBoxImage.Information); }
+                AdminControls();
+            }
+        }
         private void SoldControl()
         {
             string connectionString = CH.GetConnectionString();
             string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
-            string query2 = $"SELECT SUM(ShipmentPrice) from {DBname}";
+            string query2 = $"SELECT SUM(ShipmentPrice) from `{DBname}`";
             var culture = new CultureInfo("en-US");
 
             try
@@ -133,10 +308,136 @@ namespace ManagerAppV2._1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
                 SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
             }
         }
+
+        // ============================ ADMIN LOGIN ============================
+
+        private void AdminControls()
+        {
+            ManagersButton.Visibility = Visibility.Visible;
+            AdminTabControl.Visibility = Visibility.Visible;
+            MainDataGrid.Visibility = Visibility.Collapsed;
+            GetMySQLTables(CH.GetConnectionString());
+            LoadTablesIntoTabControl();
+        }
+
+        private void AdminDelete()
+        {
+            if (AdminMainDataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите строку для удаления");
+                return;
+            }
+            DataRowView selectedRow = (DataRowView)AdminMainDataGrid.SelectedItem;
+            int id = Convert.ToInt32(selectedRow["id"]);
+            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                    {
+                        connection.Open();
+                        string deleteQuery = $"DELETE FROM {DBname} WHERE (`id` = @id);";
+                        MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                        command.Parameters.AddWithValue("@id", id);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Запись успешно удалена");
+                            ReLoadData();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            ReLoadData(DBname);
+            ApplyColumnVisibility();
+
+        }
+
+
+        // =========================== MANAGER LOGIN ===========================
+        private void DeleteData()
+        {
+            if (MainDataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите строку для удаления");
+                return;
+            }
+            DataRowView selectedRow = (DataRowView)MainDataGrid.SelectedItem;
+            int id = Convert.ToInt32(selectedRow["id"]);
+            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                    {
+                        connection.Open();
+                        string deleteQuery = $"DELETE FROM {DBname} WHERE (`id` = @id);";
+                        MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                        command.Parameters.AddWithValue("@id", id);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Запись успешно удалена");
+                            ReLoadData();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            ReLoadData(DBname);
+            ApplyColumnVisibility();
+        }
+
+        // ========================== SYSTEM FUNCTIONS ==========================
+        private void LoadDataToLabel()
+        {
+            string connectionString = CH.GetConnectionString();
+            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    object result = command.ExecuteScalar();
+                    var culture = new CultureInfo("en-US");
+
+                    // Модифицированная проверка на null и DBNull
+                    if (result == null || result == DBNull.Value)
+                    {
+                        MonthPlanLabel.Content = "0";
+                    }
+                    else
+                    {
+                        int convResult = Convert.ToInt32(result);
+                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
+                    }
+                }
+                SoldControl();
+            }
+            catch (MySqlException ex)
+            {
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}"); ;
+                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
+            }
+        }
+        
         // Вспомогательная функция для проверки принадлежности элемента
         private bool IsDescendantOf(DependencyObject element, DependencyObject parent)
         {
@@ -158,37 +459,153 @@ namespace ManagerAppV2._1
 
             return false;
         }
-        private void RoleControl()
+
+        public List<string> GetMySQLTables(string connectionString)
         {
-            NameLabel.Content = Name;
-            string labelText = RoleLabel.Content?.ToString(); // Получаем текст из Label, безопасно обрабатывая null
+            List<string> tables = new List<string>();
 
-            if (labelText != "Dev" && labelText != "Admin")
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                ManagersButton.Visibility = Visibility.Collapsed;
-                DevElements.Visibility = Visibility.Collapsed;
+                connection.Open();
 
+                // Запрос для получения списка таблиц
+                string query = "SHOW TABLES";
+
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            tables.Add(reader.GetString(0));
+                        }
+                    }
+                }
             }
-            else
-            {
-                if (labelText == "Dev") { MessageBox.Show("Welcome back Developer! All systems online", "Welcome back", MessageBoxButton.OK, MessageBoxImage.Information); }
-                ManagersButton.Visibility = Visibility.Visible;
-                DevElements.Visibility = Visibility.Visible;
+            return tables;
+        }
+        private void LoadTablesIntoTabControl()
+        {
+            string connectionString = CH.GetConnectionString();
+            var tables = GetMySQLTables(connectionString);
 
+            foreach (string tableName in tables)
+            {
+                // Создаем новую вкладку
+                TabItem newTab = new TabItem();
+                newTab.Header = tableName;
+
+                // Можно добавить содержимое для каждой вкладки
+                // Например, DataGrid для отображения данных таблицы
+                DataGrid dataGrid = new DataGrid();
+                dataGrid.AutoGenerateColumns = true;
+
+                // Загружаем данные таблицы в DataGrid
+                LoadTableData(dataGrid, connectionString, tableName);
+
+                newTab.Content = dataGrid;
+
+                // Добавляем вкладку в TabControl
+                AdminTabControl.Items.Add(newTab);
             }
         }
 
+        private void LoadTableData(DataGrid dataGrid, string connectionString, string tableName)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = $"SELECT * FROM `{tableName}`";
+                    MySqlCommand command = new MySqlCommand(query, connection);
+
+                    MySqlDataAdapter adapter = new MySqlDataAdapter(command);
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+
+                    // Привязываем DataTable к DataGrid
+                    dataGrid.ItemsSource = dataTable.DefaultView;
+                }
+            }
+            catch (Exception ex)
+            {
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+            }
+        }
         private void MinimizeElements()
         {
             DatabaseMenu.Height = 0;
             ManagersMenu.Height = 0;
             ProfileMenu.Height = 0;
         }
-        private void LoadDataAndCreateCheckBoxes(int mode = 0)
-        {
 
+        public void ReLoadData(string name = null)
+        {
+            SoldControl();
+            if (name != null)
+            {
+                MainDataGrid.ItemsSource = null;
+
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))  // MySqlConnection
+                    {
+                        connection.Open();
+
+                        string query = CH.ManagerData(DBname);
+                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                        {
+                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+
+                            MainDataGrid.ItemsSource = dataTable.DefaultView;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                }
+            }
+            else
+            {
+                MainDataGrid.ItemsSource = null;
+
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))  // MySqlConnection
+                    {
+                        connection.Open();
+
+                        string query = CH.ManagerData("manager");
+                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                        {
+                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+
+                            MainDataGrid.ItemsSource = dataTable.DefaultView;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                }
+            }
+        }
+
+        private void LoadDataAndCreateCheckBoxes()
+        {
             try
             {
+                while (CheckBoxPanel.Children.Count > 0)
+                {
+                    CheckBoxPanel.Children.RemoveAt(0);
+                }
                 using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                 {
                     connection.Open();
@@ -223,13 +640,14 @@ namespace ManagerAppV2._1
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка при подключении к базе данных: {ex.Message}");
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка: {ex.Message}");
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
             }
         }
+
 
         private void ApplyColumnVisibility()
         {
@@ -252,195 +670,46 @@ namespace ManagerAppV2._1
                 }
             }
         }
-
-
-
-        public void ReLoadData(string name = null)
+        // ==================== ERROR CONTROL (RUNNING LINE) ====================
+        public enum ErrorLevel { Info, Warning, Error }
+        public void AddErrorMessage(string message)
         {
-            SoldControl();
-            if (name != null)
+            if (!string.IsNullOrEmpty(ErrorMarquee.Text))
             {
-                MainDataGrid.ItemsSource = null;
-
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))  // MySqlConnection
-                    {
-                        connection.Open();
-
-                        string query = CH.ManagerData(DBname);
-                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
-                        {
-                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
-                            DataTable dataTable = new DataTable();
-                            adapter.Fill(dataTable);
-
-                            MainDataGrid.ItemsSource = dataTable.DefaultView;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error loading data: {ex.Message}");
-                }
+                ErrorMarquee.Text += " • " + message;
             }
             else
             {
-                MainDataGrid.ItemsSource = null;
-
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))  // MySqlConnection
-                    {
-                        connection.Open();
-
-                        string query = CH.ManagerData("manager");
-                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
-                        {
-                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
-                            DataTable dataTable = new DataTable();
-                            adapter.Fill(dataTable);
-
-                            MainDataGrid.ItemsSource = dataTable.DefaultView;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error loading data: {ex.Message}");
-                }
+                ErrorMarquee.Text = message;
             }
+
+            // Перезапуск анимации
+            RestartMarqueeAnimation();
         }
 
-        private void DatabaseMenuOpen(object sender, RoutedEventArgs e)
+        // Очистка сообщений
+        public void ClearErrorMessages()
         {
-            if (((int)DatabaseMenu.ActualHeight) > 0)
+            ErrorMarquee.Text = "Готов к работе...";
+            RestartMarqueeAnimation();
+        }
+
+        // Перезапуск анимации
+        private void RestartMarqueeAnimation()
+        {
+            var animation = new DoubleAnimation
             {
-                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-                DatabaseBtnAnimation.To = 0;
-                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                DataBaseBtnimg.Source = bi;
-            }
-            else
-            {
-                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-                DatabaseBtnAnimation.To = 155;
-                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/ArrowUp.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                DataBaseBtnimg.Source = bi;
-            }
+                From = ActualWidth,
+                To = -ErrorMarquee.ActualWidth,
+                Duration = TimeSpan.FromSeconds(60),
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            MarqueeTransform.BeginAnimation(TranslateTransform.XProperty, animation);
         }
 
-        private void DatabaseMenuClose()
-        {
-            DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-            DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-            DatabaseBtnAnimation.To = 0;
-            DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-            BitmapImage bi = new BitmapImage();
-            // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-            bi.BeginInit();
-            bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
-            bi.EndInit();
-            // Set the image source.
-            DataBaseBtnimg.Source = bi;
-        }
 
-        private void ProfileMenuClose()
-        {
-            DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-            ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-            ProfileBtnAnimation.To = 0;
-            ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
-        }
-
-        private void ProfileMenu_Click(object sender, RoutedEventArgs e)
-        {
-            if (((int)ProfileMenu.ActualHeight) > 0)
-            {
-                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-                ProfileBtnAnimation.To = 0;
-                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
-            }
-            else
-            {
-                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-                ProfileBtnAnimation.To = 65;
-                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
-            }
-        }
-        private void ProfileBtn_Click(object sender, RoutedEventArgs e)
-        {
-            ProfilePage ProfilePageWindow = new ProfilePage();
-            ProfilePageWindow.ShowDialog();
-        }
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-
-            LoginWindow LoginWindow = new LoginWindow();
-            LoginWindow.Show();
-        }
-
-        private void ManagersMenuClose()
-        {
-            DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-            ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
-            ManagersBtnAnimation.To = 0;
-            ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
-        }
-
-        private void ManagersButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (((int)ManagersMenu.ActualHeight) > 0)
-            {
-                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
-                ManagersBtnAnimation.To = 0;
-                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
-            }
-            else
-            {
-                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
-                ManagersBtnAnimation.To = 155;
-                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
-            }
-        }
-
-        private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            ApplyColumnVisibility();
-        }
-
-        private void UpdateButton_Click(object sender, RoutedEventArgs e)
-        {
-            ReLoadData(DBname);
-            ApplyColumnVisibility();
-        }
+        // =============================== FILTER ===============================
 
         private double horizontalMargin = 10;       // Горизонтальный отступ
         private double verticalMargin = 5;         // Вертикальный отступ
@@ -457,58 +726,13 @@ namespace ManagerAppV2._1
             CheckBoxPanel.Columns = columnCount;
         }
 
-
         private void FilterAllElements_Checked(object sender, RoutedEventArgs e)
         {
             LoadDataAndCreateCheckBoxes();
             ReLoadData(DBname);
         }
+        
 
-        private void AddManagerBtn_Click(object sender, RoutedEventArgs e)
-        {
-            AddUser ad = new AddUser();
-            ad.ShowDialog();
-        }
-
-
-
-        private void DeleteBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (MainDataGrid.SelectedItem == null)
-            {
-                MessageBox.Show("Выберите строку для удаления");
-                return;
-            }
-            DataRowView selectedRow = (DataRowView)MainDataGrid.SelectedItem;
-            int id = Convert.ToInt32(selectedRow["id"]);
-            if (MessageBox.Show("Вы уверены, что хотите удалить эту запись?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
-                    {
-                        connection.Open();
-                        string deleteQuery = $"DELETE FROM {DBname} WHERE (`id` = @id);\r\n";
-                        MySqlCommand command = new MySqlCommand(deleteQuery, connection);
-                        command.Parameters.AddWithValue("@id", id);
-
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Запись успешно удалена");
-                            ReLoadData();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-            ReLoadData(DBname);
-            ApplyColumnVisibility();
-        }
         private void UpdateUser(int id, string name, string email)
         {
             using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
@@ -533,22 +757,6 @@ namespace ManagerAppV2._1
                 }
             }
         }
-
-
-
-        public void AddData_Click(object sender, RoutedEventArgs e)
-        {
-            AddnEdit addnEdit = new AddnEdit("Add");
-            addnEdit.ShowDialog();
-            ReLoadData(DBname);
-            ApplyColumnVisibility();
-        }
-        private void EditBtn_Click(object sender, RoutedEventArgs e)
-        {
-            AddnEdit addnEdit = new AddnEdit("Edit");
-            addnEdit.ShowDialog();
-        }
-
 
         private bool _isMouseOverDataGrid = false;
 
@@ -641,6 +849,22 @@ namespace ManagerAppV2._1
 
 
 
+        private void AdminTabControl_Selected(object sender, SelectionChangedEventArgs e)
+        {
+            if (AdminTabControl.SelectedItem is TabItem selectedTab)
+            {
+                DBname = selectedTab.Header.ToString();
+                LoadDataAndCreateCheckBoxes();
+                LoadDataToLabel();
+            }
+        }
 
+        private void AdminMainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is FrameworkElement element)
+            {
+                MessageBox.Show($"Имя элемента: {element.Name}", "Информация об элементе");
+            }
+        }
     }
 }

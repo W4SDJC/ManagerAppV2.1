@@ -55,7 +55,7 @@ namespace Kursovaya2
                             "`ShipmentValue(Minimum_price)` as \"Итого (Мин)\"," +
                             "UPDNumber as \"Номер УПД\"," +
                             "ShipmentPrice as \"Стоимость доставки\"," +
-                            $"Reward as Премия FROM {DBName};";
+                            $"Reward as Премия FROM `{DBName}`;";
             return Query;
         }
         public ObservableCollection<string> GetColumnData(string tableName, string columnName)

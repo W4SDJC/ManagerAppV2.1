@@ -119,7 +119,7 @@ namespace ManagerAppV2._1
                 $"UNIQUE KEY `id_UNIQUE` (`id`)," +
                 $"UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`)" +
                 $") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
-                $"INSERT INTO users(`login`, `password`, `role`, `databasename`) VALUES ('{LoginTextBox.Text}', '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', '{RoleComboBox.SelectedItem}', '{dbname}');";
+                $"INSERT INTO users(`name`, `login`, `password`, `role`, `databasename`) VALUES ('{NameTextBox.Text}','{LoginTextBox.Text}', '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', '{RoleComboBox.SelectedItem}', '{dbname}');";
                 try
                 {
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))

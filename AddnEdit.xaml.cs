@@ -110,7 +110,7 @@ namespace ManagerAppV2._1
                 if (!ValidateInput()) return;
 
                 // SQL запрос с параметрами
-                string query = @"INSERT INTO manager (
+                string query = @$"INSERT INTO {DataSource.DBname} (
                             ShipmentDate, 
                             ShipmentWarehouse, 
                             `ClientCity`, 
