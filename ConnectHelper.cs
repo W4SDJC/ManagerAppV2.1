@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
 
-namespace Kursovaya2
+namespace ManagerAppV2
 {
     public class ConnectHelper
     {

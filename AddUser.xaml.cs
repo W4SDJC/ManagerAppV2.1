@@ -1,4 +1,4 @@
-﻿using Kursovaya2;
+﻿using ManagerAppV2;
 using MySql.Data.MySqlClient;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -37,7 +37,7 @@ namespace ManagerAppV2._1
         private void LoadComboBoxData()
         {
 
-            string query = "SELECT DISTINCT role FROM `database`.`roles` WHERE id != 0;"; // DISTINCT для уникальных значений
+            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;"; // DISTINCT для уникальных значений
 
             List<string> items = new List<string>();
 

@@ -1,4 +1,4 @@
-﻿using Kursovaya2;
+﻿using ManagerAppV2;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;

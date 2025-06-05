@@ -39,7 +39,7 @@
 
                 <!-- Единица измерения -->
                 <TextBlock Text="Единица измерения:"/>
-                <TextBox x:Name="unitTextBox" Margin="0,0,0,10"/>
+                <TextBox x:Name="unitTextBox" Margin="0,0,0,10" IsReadOnly="True" Foreground="#FF616161"/>
 
                 <!-- Цена -->
                 <TextBlock Text="Цена:"/>

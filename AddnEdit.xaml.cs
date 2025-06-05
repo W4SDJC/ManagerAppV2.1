@@ -1,4 +1,4 @@
-﻿using Kursovaya2;
+﻿using ManagerAppV2;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -23,15 +23,31 @@ namespace ManagerAppV2._1
     /// </summary>
     public partial class AddnEdit : Window
     {
+        public string db = "";
+
         MainWindow MW = new MainWindow();
         ConnectHelper CH = new ConnectHelper();
-        public AddnEdit(string Mode)
+        public AddnEdit(string Mode, string database, DataRow data = null)
         {
             InitializeComponent();
-            FormMode(Mode);
+            FormMode(Mode, database, data);
             LoadComboBoxData();
         }
+        public void FormMode(string Mode, string dbase, DataRow data = null)
+        {
 
+            if (Mode == "Add")
+            {
+                MainWindow.Title = "Add";
+                AddnSaveTextBlock.Text = "Add";
+                db = dbase;
+            }
+            else
+            {
+                AddnSaveTextBlock.Text = "Save";
+                fill(data);
+            }
+        }
         private void LoadComboBoxData()
         {
 
@@ -89,19 +105,7 @@ namespace ManagerAppV2._1
             }
         }
 
-        public void FormMode(string Mode)
-        {
-
-            if (Mode == "Add")
-            {
-                MainWindow.Title = "Add";
-                AddnSaveTextBlock.Text = "Add";
-            }
-            else
-            {
-                AddnSaveTextBlock.Text = "Save";
-            }
-        }
+        // ============================== ADD MODE ==============================
         private void AddShipment_Click(object sender, RoutedEventArgs e)
         {
             if (AddnSaveTextBlock.Text == "Add")
@@ -110,7 +114,11 @@ namespace ManagerAppV2._1
                 if (!ValidateInput()) return;
 
                 // SQL запрос с параметрами
-                string query = @$"INSERT INTO {DataSource.DBname} (
+                if (MW.AdminTabControl.SelectedItem is TabItem selectedTab)
+                {
+                    MessageBox.Show(db);
+
+                    string query = @$"INSERT INTO `{db}` (
                             ShipmentDate, 
                             ShipmentWarehouse, 
                             `ClientCity`, 
@@ -131,54 +139,55 @@ namespace ManagerAppV2._1
                             @value, @minValue, @reward, @updNumber, @shipmentPrice
                         )";
 
-                try
-                {
-                    // Парсим и вычисляем значения
-                    DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text,"dd.MM.yyyy",CultureInfo.InvariantCulture);
-                    decimal price = decimal.Parse(priceTextBox.Text);
-                    decimal minPrice = decimal.Parse(minPriceTextBox.Text);
-                    decimal amount = decimal.Parse(amountTextBox.Text);
-                    decimal shipmentValue = price * amount;
-                    decimal minShipmentValue = minPrice * amount;
-                    decimal reward = shipmentValue - minShipmentValue;
-                    decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
-
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                    try
                     {
-                        connection.Open();
+                        // Парсим и вычисляем значения
+                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                        decimal price = decimal.Parse(priceTextBox.Text);
+                        decimal minPrice = decimal.Parse(minPriceTextBox.Text);
+                        decimal amount = decimal.Parse(amountTextBox.Text);
+                        decimal shipmentValue = price * amount;
+                        decimal minShipmentValue = minPrice * amount;
+                        decimal reward = shipmentValue - minShipmentValue;
+                        decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
 
-                        using (MySqlCommand command = new MySqlCommand(query, connection))
+                        using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                         {
-                            // Добавляем параметры
-                            command.Parameters.AddWithValue("@date", shipmentDate);
-                            command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
-                            command.Parameters.AddWithValue("@city", cityTextBox.Text);
-                            command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
-                            command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
-                            command.Parameters.AddWithValue("@amount", amount);
-                            command.Parameters.AddWithValue("@unit", unitTextBox.Text);
-                            command.Parameters.AddWithValue("@price", price);
-                            command.Parameters.AddWithValue("@minPrice", minPrice);
-                            command.Parameters.AddWithValue("@value", shipmentValue);
-                            command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                            command.Parameters.AddWithValue("@reward", reward);
-                            command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
-                            command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+                            connection.Open();
 
-                            int result = command.ExecuteNonQuery();
-
-                            if (result > 0)
+                            using (MySqlCommand command = new MySqlCommand(query, connection))
                             {
-                                MessageBox.Show("Отгрузка успешно добавлена!");
-                                MW.ReLoadData(DataSource.DBname);
-                                ClearForm();
+                                // Добавляем параметры
+                                command.Parameters.AddWithValue("@date", shipmentDate);
+                                command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
+                                command.Parameters.AddWithValue("@city", cityTextBox.Text);
+                                command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
+                                command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
+                                command.Parameters.AddWithValue("@amount", amount);
+                                command.Parameters.AddWithValue("@unit", unitTextBox.Text);
+                                command.Parameters.AddWithValue("@price", price);
+                                command.Parameters.AddWithValue("@minPrice", minPrice);
+                                command.Parameters.AddWithValue("@value", shipmentValue);
+                                command.Parameters.AddWithValue("@minValue", minShipmentValue);
+                                command.Parameters.AddWithValue("@reward", reward);
+                                command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
+                                command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+
+                                int result = command.ExecuteNonQuery();
+
+                                if (result > 0)
+                                {
+                                    MessageBox.Show("Отгрузка успешно добавлена!");
+                                    MW.ReLoadData(DataSource.DBname);
+                                    ClearForm();
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                    }
                 }
             }
             else
@@ -187,6 +196,60 @@ namespace ManagerAppV2._1
             }
         }
 
+        
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void ProductCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string query = $"SELECT Product_price FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
+            string query2 = $"SELECT Unit_of_measurement FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(query, connection);
+                    object Price= command.ExecuteScalar();
+                    priceTextBox.Text = Price.ToString();
+                    MySqlCommand command2 = new MySqlCommand(query2, connection);
+                    object UofM= command2.ExecuteScalar();
+                    unitTextBox.Text = UofM.ToString();
+
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+            }
+        }
+
+        // ============================= EDIT MODE =============================
+
+        public void fill(DataRow data)
+        {
+            InitializeComponent();
+
+            // Заполняем поля
+            shipmentDateTextBox.Text = DateTime.TryParse(data["ShipmentDate"]?.ToString(), out var dt)? dt.ToString("dd.MM.yyyy"): "";
+            WarehouseCB.Text = data["ShipmentWarehouse"]?.ToString();
+            cityTextBox.Text = data["ClientCity"]?.ToString();
+            clientNameTextBox.Text = data["ClientName"]?.ToString();
+            ProductCB.Text = data["ProductName"]?.ToString();
+            amountTextBox.Text = data["ProductAmount"]?.ToString();
+            unitTextBox.Text = data["UnitOfMeasurement"]?.ToString();
+            priceTextBox.Text = data["Price"]?.ToString();
+            minPriceTextBox.Text = data["MinimumPrice"]?.ToString();
+            updNumberTextBox.Text = data["ShipmentValue(Minimum_price)"]?.ToString();
+            shipmentPriceTextBox.Text = data["ShipmentValue"]?.ToString();
+        }
+
+
+        // ========================== SYSTEM FUNCTIONS ==========================
         private bool ValidateInput()
         {
             // Проверка обязательных полей
@@ -253,38 +316,6 @@ namespace ManagerAppV2._1
             minPriceTextBox.Text = "";
             updNumberTextBox.Text = "";
             shipmentPriceTextBox.Text = "";
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ProductCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            string connectionString = CH.GetConnectionString();
-            string query = $"SELECT Product_price FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
-            string query2 = $"SELECT Unit_of_measurement FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
-
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(query, connection);
-                    object Price= command.ExecuteScalar();
-                    priceTextBox.Text = Price.ToString();
-                    MySqlCommand command2 = new MySqlCommand(query2, connection);
-                    object UofM= command2.ExecuteScalar();
-                    unitTextBox.Text = UofM.ToString();
-
-                }
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
-            }
         }
     }
 }
