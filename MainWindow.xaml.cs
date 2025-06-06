@@ -396,7 +396,10 @@ namespace ManagerAppV2._1
                 }
                 catch (Exception ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ) ADMIN: {ex.Message}");
+                    if (ex.Message != "Unknown column 'ShipmentPrice' in 'field list'")
+                    {
+                        AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ) ADMIN: {ex.Message}");
+                    }
                     SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
                 }
             }
@@ -544,22 +547,54 @@ namespace ManagerAppV2._1
         }
 
         // ========================== SYSTEM FUNCTIONS ==========================
-        
+
         // ========================= ADMIN TABLES LOAD =========================
         private DataGrid CreateDataGridForTable(string connectionString, string tableName)
         {
             var dataGrid = new DataGrid
             {
-                AutoGenerateColumns = true,
+                AutoGenerateColumns = false,
                 SelectionMode = DataGridSelectionMode.Single,
                 SelectionUnit = DataGridSelectionUnit.FullRow,
                 IsReadOnly = true,
                 Margin = new Thickness(5)
             };
 
-            LoadTableData(dataGrid, connectionString, tableName);
+            var tableData = new DataTable();
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                var adapter = new MySqlDataAdapter($"SELECT * FROM `{tableName}`", connection);
+                adapter.Fill(tableData);
+            }
+
+            dataGrid.Columns.Clear();
+
+            foreach (DataColumn column in tableData.Columns)
+            {
+                var binding = new Binding($"[{column.ColumnName}]");
+
+                var gridColumn = new DataGridTextColumn
+                {
+                    Header = column.ColumnName,
+                    Binding = binding
+                };
+
+                if (column.ColumnName.Equals("ShipmentDate", StringComparison.OrdinalIgnoreCase))
+                {
+                    gridColumn.Binding.StringFormat = "dd.MM.yyyy";
+                }
+
+                dataGrid.Columns.Add(gridColumn);
+            }
+
+            dataGrid.ItemsSource = tableData.DefaultView;
             return dataGrid;
         }
+
+
+
+
 
         // Метод загрузки данных в DataGrid (без изменений)
         private void LoadTableData(DataGrid dataGrid, string connectionString, string tableName)
@@ -669,8 +704,7 @@ namespace ManagerAppV2._1
             string connectionString = CH.GetConnectionString();
             var tables = GetMySQLTables(connectionString);
 
-            // Создаем новый список вкладок
-            var newTabs = new List<TabItem>();
+            AdminTabControl.Items.Clear();
 
             foreach (string tableName in tables)
             {
@@ -679,14 +713,8 @@ namespace ManagerAppV2._1
                     Header = tableName,
                     Content = CreateDataGridForTable(connectionString, tableName)
                 };
-                newTabs.Add(newTab);
-            }
 
-            // Добавляем все вкладки за одну операцию
-            AdminTabControl.Items.Clear();
-            foreach (var tab in newTabs)
-            {
-                AdminTabControl.Items.Add(tab);
+                AdminTabControl.Items.Add(newTab);
             }
 
             if (AdminTabControl.Items.Count > 0)
@@ -694,6 +722,7 @@ namespace ManagerAppV2._1
                 AdminTabControl.SelectedIndex = 0;
             }
         }
+
 
         // Создание DataGrid для таблицы
 
@@ -708,13 +737,11 @@ namespace ManagerAppV2._1
         {
             if (AdminMode1)
             {
-                SoldControl(CH.GetRole(GetTabName()));
-
                 // Сохраняем индекс текущей вкладки
                 int currentIndex = AdminTabControl.SelectedIndex;
 
                 // Полностью очищаем TabControl
-                AdminTabControl.Items.Clear();
+                AdminTabControl.ItemsSource = null;
 
                 // Перезагружаем данные
                 LoadTablesIntoTabControl();
@@ -724,6 +751,17 @@ namespace ManagerAppV2._1
                 {
                     AdminTabControl.SelectedIndex = currentIndex;
                 }
+
+                // 👉 Теперь безопасно получаем имя таблицы и вызываем SoldControl
+                string tableName = GetTabName();
+                if (!string.IsNullOrWhiteSpace(tableName) && tableName != "error")
+                {
+                    SoldControl(CH.GetRole(tableName));
+                }
+                else
+                {
+                    AddErrorMessage("Ошибка: не удалось определить имя таблицы для вкладки.");
+                }
             }
             else
             {
@@ -731,14 +769,14 @@ namespace ManagerAppV2._1
                 MainDataGrid.ItemsSource = null;
                 try
                 {
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))  // MySqlConnection
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                     {
                         connection.Open();
 
                         string query = CH.ManagerData(DBname);
-                        using (MySqlCommand command = new MySqlCommand(query, connection))  // MySqlCommand
+                        using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
-                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);  // MySqlDataAdapter
+                            MySqlDataAdapter adapter = new MySqlDataAdapter(command);
                             DataTable dataTable = new DataTable();
                             adapter.Fill(dataTable);
 
@@ -752,6 +790,7 @@ namespace ManagerAppV2._1
                 }
             }
         }
+
 
 
 
@@ -806,31 +845,60 @@ namespace ManagerAppV2._1
 
         // ==================== ERROR CONTROL (RUNNING LINE) ====================
         public enum ErrorLevel { Info, Warning, Error }
-        public void AddErrorMessage(string message)
+
+        public void AddErrorMessage(string message, ErrorLevel level = ErrorLevel.Error)
         {
-            if (!string.IsNullOrEmpty(ErrorMarquee.Text))
+            if (ErrorMarquee == null || MarqueeTransform == null)
+                return;
+
+            // Префикс уровня
+            string prefix = level switch
             {
-                ErrorMarquee.Text += " • " + message;
+                ErrorLevel.Info => "[ИНФО]",
+                ErrorLevel.Warning => "[ВНИМАНИЕ]",
+                ErrorLevel.Error => "[ОШИБКА]",
+                _ => ""
+            };
+
+            string fullMessage = $"{prefix} {message}";
+
+            // Добавление сообщения
+            if (!string.IsNullOrWhiteSpace(ErrorMarquee.Text))
+            {
+                ErrorMarquee.Text += " • " + fullMessage;
             }
             else
             {
-                ErrorMarquee.Text = message;
+                ErrorMarquee.Text = fullMessage;
             }
 
-            // Перезапуск анимации
+            // Изменение цвета в зависимости от уровня
+            ErrorMarquee.Foreground = level switch
+            {
+                ErrorLevel.Info => Brushes.LightGreen,
+                ErrorLevel.Warning => Brushes.Gold,
+                ErrorLevel.Error => Brushes.OrangeRed,
+                _ => Brushes.White
+            };
+
             RestartMarqueeAnimation();
         }
 
-        // Очистка сообщений
         public void ClearErrorMessages()
         {
+            if (ErrorMarquee == null || MarqueeTransform == null)
+                return;
+
             ErrorMarquee.Text = "Готов к работе...";
+            ErrorMarquee.Foreground = Brushes.LightGray;
             RestartMarqueeAnimation();
         }
 
-        // Перезапуск анимации
         private void RestartMarqueeAnimation()
         {
+            if (ErrorMarquee == null || MarqueeTransform == null)
+                return;
+
             var animation = new DoubleAnimation
             {
                 From = ActualWidth,
@@ -841,6 +909,7 @@ namespace ManagerAppV2._1
 
             MarqueeTransform.BeginAnimation(TranslateTransform.XProperty, animation);
         }
+
 
 
         // =============================== FILTER ===============================
@@ -868,104 +937,105 @@ namespace ManagerAppV2._1
 
         private void LoadDataAndCreateCheckBoxes(bool AdminMode = false)
         {
-            if (AdminMode)
+            try
             {
-                try
+                CheckBoxPanel.Children.Clear(); // Очистка CheckBox'ов
+
+                using (var connection = new MySqlConnection(CH.GetConnectionString()))
                 {
-                    while (CheckBoxPanel.Children.Count > 0)
-                    {
-                        CheckBoxPanel.Children.RemoveAt(0);
-                    }
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
-                    {
-                        connection.Open();
+                    connection.Open();
 
-                        string query = $"SELECT * FROM `{GetTabName()}`"; // Замените YourTableName на имя вашей таблицы
-                        MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
-                        var allData = new DataTable();
-                        adapter.Fill(allData);
+                    string query;
+                    DataTable allData = new DataTable();
 
-                        // Создаем CheckBox'ы для каждого столбца
-                        foreach (DataColumn column in allData.Columns)
+                    if (AdminMode)
+                    {
+                        string tableName = GetTabName();
+                        if (string.IsNullOrWhiteSpace(tableName) || tableName.ToLower() == "error")
                         {
-                            CheckBox checkBox = new CheckBox
-                            {
-                                Content = column.ColumnName,
-                                IsChecked = true, // Изначально все столбцы выбраны
-                                Margin = new Thickness(10, 5, 5, 5),
-                                FontSize = 15,
-                                Style = (Style)FindResource("RoundedCheckBoxStyle"),
-                                Tag = column.ColumnName // Используем Tag для хранения имени столбца
-                            };
-                            CheckBoxPanel.Children.Add(checkBox);
+                            //AddErrorMessage("Ошибка: имя таблицы не определено или содержит ошибку.");
+                            return;
                         }
 
-                        // Отображаем все данные в DataGrid
-                        AdminTabControl.ItemsSource = allData.DefaultView;
-
-                        // Автоматически генерируем столбцы, а потом скрываем ненужные
-                        ApplyColumnVisibility(); // Применяем видимость столбцов сразу после загрузки
+                        query = $"SELECT * FROM `{tableName}`";
                     }
-                }
-                catch (MySqlException ex)
-                {
-                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes) ADMIN: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes) ADMIN: {ex.Message}");
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(DBname))
+                        {
+                            AddErrorMessage("Ошибка: имя базы данных не указано.");
+                            return;
+                        }
+
+                        query = CH.ManagerData(DBname);
+                    }
+
+                    var adapter = new MySqlDataAdapter(query, connection);
+                    adapter.Fill(allData);
+
+                    // Создание чекбоксов по столбцам
+                    foreach (DataColumn column in allData.Columns)
+                    {
+                        CheckBox checkBox = new CheckBox
+                        {
+                            Content = column.ColumnName,
+                            IsChecked = true,
+                            Margin = new Thickness(10, 5, 5, 5),
+                            FontSize = 15,
+                            Style = (Style)FindResource("RoundedCheckBoxStyle"),
+                            Tag = column.ColumnName
+                        };
+                        CheckBoxPanel.Children.Add(checkBox);
+                    }
+
+                    if (AdminMode)
+                    {
+                        // Получение текущего DataGrid внутри активной вкладки
+                        if (AdminTabControl.SelectedItem is TabItem selectedTab && selectedTab.Content is DataGrid dataGrid)
+                        {
+                            dataGrid.ItemsSource = allData.DefaultView;
+                            ApplyColumnVisibility();
+                        }
+                        else
+                        {
+                            AddErrorMessage("Не удалось найти DataGrid во вкладке администратора.");
+                        }
+                    }
+                    else
+                    {
+                        MainDataGrid.ItemsSource = allData.DefaultView;
+                        MainDataGrid.AutoGenerateColumns = true;
+                        ApplyColumnVisibility();
+                    }
                 }
             }
-            else
+            catch (MySqlException ex)
             {
-                try
-                {
-                    while (CheckBoxPanel.Children.Count > 0)
-                    {
-                        CheckBoxPanel.Children.RemoveAt(0);
-                    }
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
-                    {
-                        connection.Open();
-
-                        string query = CH.ManagerData(DBname); // Замените YourTableName на имя вашей таблицы
-                        MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection);
-                        var allData = new DataTable();
-                        adapter.Fill(allData);
-
-                        // Создаем CheckBox'ы для каждого столбца
-                        foreach (DataColumn column in allData.Columns)
-                        {
-                            CheckBox checkBox = new CheckBox
-                            {
-                                Content = column.ColumnName,
-                                IsChecked = true, // Изначально все столбцы выбраны
-                                Margin = new Thickness(10, 5, 5, 5),
-                                FontSize = 15,
-                                Style = (Style)FindResource("RoundedCheckBoxStyle"),
-                                Tag = column.ColumnName // Используем Tag для хранения имени столбца
-                            };
-                            CheckBoxPanel.Children.Add(checkBox);
-                        }
-
-                        // Отображаем все данные в DataGrid
-                        MainDataGrid.ItemsSource = allData.DefaultView;
-
-                        // Автоматически генерируем столбцы, а потом скрываем ненужные
-                        MainDataGrid.AutoGenerateColumns = true;
-                        ApplyColumnVisibility(); // Применяем видимость столбцов сразу после загрузки
-                    }
-                }
-                catch (MySqlException ex)
-                {
-                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes): {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes): {ex.Message}");
-                }
+                AddErrorMessage($"Ошибка загрузки данных (MySQL): {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
             }
         }
+
+        private T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null) return null;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T found)
+                    return found;
+
+                var result = FindChild<T>(child);
+                if (result != null)
+                    return result;
+            }
+            return null;
+        }
+
 
         private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -1106,9 +1176,9 @@ namespace ManagerAppV2._1
             }catch (Exception ex) { }
         }
 
-        private void DeleteBtn1_Click(object sender, RoutedEventArgs e)
+        private void CreateProduct_Click(object sender, RoutedEventArgs e)
         {
-            AddnEditProduct AEP = new AddnEditProduct("Edit");
+            AddnEditProduct AEP = new AddnEditProduct("Add");
             AEP.ShowDialog();
         }
 
@@ -1133,6 +1203,12 @@ namespace ManagerAppV2._1
                     }
                 }
             }
+        }
+
+        private void EditProductButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEditProduct AEP = new AddnEditProduct("Edit");
+            AEP.ShowDialog();
         }
     }
 }

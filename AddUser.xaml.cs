@@ -188,5 +188,10 @@ namespace ManagerAppV2._1
             }
         }
 
+        private void AddRole_Click(object sender, RoutedEventArgs e)
+        {
+            AddRole AR = new AddRole();
+            AR.ShowDialog();
+        }
     }
 }

@@ -255,14 +255,7 @@ namespace ManagerAppV2._1
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            string id;
-            using (MySqlConnection con = new MySqlConnection(CH.GetConnectionString()))
-            {
-                con.Open();
-                string getID = $"SELECT id FROM `product price` where Product_name = '{ProductCB.SelectedItem.ToString()}';";
-                MySqlCommand IDGetter = new MySqlCommand(getID, con);
-                id = IDGetter.ExecuteScalar().ToString();
-            }
+
             if (SaveButton.Content == "Добавить")
             {
                 string query =
@@ -309,6 +302,14 @@ namespace ManagerAppV2._1
             }
             else
             {
+                string id;
+                using (MySqlConnection con = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    con.Open();
+                    string getID = $"SELECT id FROM `product price` where Product_name = '{ProductCB.SelectedItem.ToString()}';";
+                    MySqlCommand IDGetter = new MySqlCommand(getID, con);
+                    id = IDGetter.ExecuteScalar().ToString();
+                }
                 string query = $"UPDATE `product price` SET Product_name = @Pname, Product_price = @Pprice, Minimum_price = @MinPrice, Unit_of_measurement = @UOM, Role = @Role WHERE id = { id }";
                 try
                 {

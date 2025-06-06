@@ -69,6 +69,13 @@
             </TextBox.Resources>
         </TextBox>
         <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="297,133,0,0" VerticalAlignment="Top" Width="140" Height="20"/>
+        <Button x:Name="AddRole" Content="Доб." Background="#FF333333" Foreground="White" Width="48" Height="20" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,92" Click="AddRole_Click" >
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
 
     </Grid>
 </Window>

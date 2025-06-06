@@ -332,7 +332,7 @@
                         <Image Source="/Icons/Edit.png" Width="20" Height="15" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="DeleteBtn1" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Click="DeleteBtn1_Click" Width="144" Margin="0,5,0,0">
+                <Button x:Name="CreateProduct" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Click="CreateProduct_Click" Width="144" Margin="0,5,0,0">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -343,7 +343,7 @@
                         <Image Source="/Icons/New.png" Width="15" Height="15" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="CopyBtn1" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Width="144" Margin="0,5,0,0"  >
+                <Button x:Name="EditProductButton" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Width="144" Margin="0,5,0,0" Click="EditProductButton_Click"  >
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
