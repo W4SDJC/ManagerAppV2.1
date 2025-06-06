@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Windows;
 
 namespace ManagerAppV2
@@ -58,121 +59,49 @@ namespace ManagerAppV2
                             $"Reward as Премия FROM `{DBName}`;";
             return Query;
         }
-        public ObservableCollection<string> GetColumnData(string tableName, string columnName)
+        public string GetRole(string tableName)
         {
-            ObservableCollection<string> data = new ObservableCollection<string>();
+            // Проверка входного параметра
+            if (string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Имя таблицы не может быть пустым", nameof(tableName));
+            }
+
+            string role = null;
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection("server=localhost;port=3306;user=root;password=password;database=database;"))
+                using (var con = new MySqlConnection(GetConnectionString()))
                 {
-                    connection.Open();
+                    // Используем параметризованный запрос для безопасности
+                    string query = "SELECT role FROM users WHERE databasename = @TableName LIMIT 1";
 
-                    string query = $"SELECT `{columnName}` FROM `{tableName}`"; // Обязательно используйте обратные кавычки для имен таблиц и столбцов
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    using (var cmd = new MySqlCommand(query, con))
                     {
-                        using (MySqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                // Преобразуйте значение в строку и добавьте его в коллекцию
-                                data.Add(reader.GetString(0));
-                            }
-                        }
+                        cmd.Parameters.AddWithValue("@TableName", tableName);
+
+                        con.Open();
+                        var result = cmd.ExecuteScalar();
+
+                        // Безопасное преобразование результата
+                        role = result?.ToString();
                     }
                 }
             }
             catch (MySqlException ex)
             {
-                // Обработка ошибок подключения или запроса к базе данных
-                System.Windows.MessageBox.Show($"Ошибка подключения к базе данных: {ex.Message}");
-                // Запись в лог:  лучше использовать более продвинутые методы логирования (например, NLog или Serilog)
+                // Логирование ошибки
+                Debug.WriteLine($"Ошибка при получении роли: {ex.Message}");
+                throw new ApplicationException("Ошибка доступа к базе данных", ex);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Неожиданная ошибка: {ex.Message}");
+                throw;
             }
 
-            return data;
+            // Возвращаем null если роль не найдена (вместо исключения)
+            return role;
         }
-        // Метод для открытия подключения
-        //public void OpenConnection()
-        //{
-        //    if (connection.State == ConnectionState.Closed)
-        //    {
-        //        connection.Open();
-        //    }
-        //}
-
-        //// Метод для закрытия подключения
-        //public void CloseConnection()
-        //{
-        //    if (connection.State == ConnectionState.Open)
-        //    {
-        //        connection.Close();
-        //    }
-        //}
-
-        // Метод для выполнения запросов, которые не возвращают данные (например, INSERT, UPDATE, DELETE)
-        //public void ExecuteQuery(string query)
-        //{
-        //    try
-        //    {
-        //        OpenConnection();
-        //        MySqlCommand command = new MySqlCommand(query, connection);
-        //        command.ExecuteNonQuery();
-        //    }
-        //    catch (MySqlException ex)
-        //    {
-        //        // Обработка ошибок
-        //        Console.WriteLine("Ошибка при выполнении запроса: " + ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        CloseConnection();
-        //    }
-        //}
-
-        //// Метод для выполнения запросов, которые возвращают данные (например, SELECT)
-        //public DataTable GetDataTable(string query)
-        //{
-        //    DataTable dataTable = new DataTable();
-        //    try
-        //    {
-        //        OpenConnection();
-        //        MySqlCommand command = new MySqlCommand(query, connection);
-        //        MySqlDataAdapter adapter = new MySqlDataAdapter(command);
-        //        adapter.Fill(dataTable);
-        //    }
-        //    catch (MySqlException ex)
-        //    {
-        //        // Обработка ошибок
-        //        Console.WriteLine("Ошибка при выполнении запроса: " + ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        CloseConnection();
-        //    }
-        //    return dataTable;
-        //}
-
-        //public DataTable GetSchemaTable(string tableName)
-        //{
-        //    DataTable schemaTable = new DataTable();
-        //    string query = $"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, EXTRA FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{tableName}'";
-        //    try
-        //    {
-        //        OpenConnection();
-        //        MySqlCommand command = new MySqlCommand(query, connection);
-        //        MySqlDataAdapter adapter = new MySqlDataAdapter(command);
-        //        adapter.Fill(schemaTable);
-        //    }
-        //    catch (MySqlException ex)
-        //    {
-        //        // Обработка ошибок
-        //        Console.WriteLine("Ошибка при получении схемы таблицы: " + ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        CloseConnection();
-        //    }
-        //    return schemaTable;
-        //}
     }
 }

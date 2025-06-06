@@ -9,10 +9,11 @@
     <Grid>
         <TextBox x:Name="LoginTextBox" TextWrapping="Wrap" VerticalAlignment="Top" Margin="72,197,72,0" Height="30" FontSize="16" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"/>
         <PasswordBox x:Name="Passwordbox" Margin="72,254,72,0" VerticalAlignment="Top" Height="30" VerticalContentAlignment="Center"/>
-        <Label Content="Login" HorizontalAlignment="Left" Margin="72,170,0,0" VerticalAlignment="Top"/>
-        <Label Content="Password" HorizontalAlignment="Left" Margin="72,228,0,0" VerticalAlignment="Top"/>
+        <Label Content="Логин" HorizontalAlignment="Left" Margin="72,170,0,0" VerticalAlignment="Top"/>
+        <Label Content="Пароль" HorizontalAlignment="Left" Margin="72,228,0,0" VerticalAlignment="Top"/>
         <Image Margin="85,29,85,264" Source="/Icons/AppIcon.png" Stretch="Fill"/>
-        <Button x:Name="LoginButton" Content="Login" Margin="72,289,72,0" VerticalAlignment="Top" Height="35" Background="#FF333333" Foreground="White" Click="LoginButton_Click"/>
+        <Button x:Name="LoginButton" Content="Войти" Margin="72,289,72,0" VerticalAlignment="Top" Height="35" Background="#FF333333" Foreground="White" Click="LoginButton_Click"/>
+        <Button x:Name="LoginButton_Копировать" Content="Первый запуск" Margin="72,329,72,0" VerticalAlignment="Top" Height="35" Background="#FF333333" Foreground="White" Click="RegButton_Click"/>
 
     </Grid>
 </Window>

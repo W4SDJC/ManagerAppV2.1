@@ -23,29 +23,36 @@ namespace ManagerAppV2._1
     /// </summary>
     public partial class AddnEdit : Window
     {
-        public string db = "";
+        public string db = DataSource.DBname;
+        public string ID;
+        public bool AdminMode = false;
 
         MainWindow MW = new MainWindow();
         ConnectHelper CH = new ConnectHelper();
-        public AddnEdit(string Mode, string database, DataRow data = null)
+        public AddnEdit(string Mode, string database = null, DataRow data = null, string id = null, bool adminmode = false)
         {
             InitializeComponent();
-            FormMode(Mode, database, data);
+            FormMode(Mode, database, data, id, adminmode);
             LoadComboBoxData();
         }
-        public void FormMode(string Mode, string dbase, DataRow data = null)
+        public void FormMode(string Mode, string dbase, DataRow data = null, string id = null, bool adminmode = false)
         {
-
+            AdminMode = adminmode;
             if (Mode == "Add")
             {
-                MainWindow.Title = "Add";
-                AddnSaveTextBlock.Text = "Add";
+                MainWindow.Title = "Добавить";
+                AddnSaveTextBlock.Text = "Добавить";
                 db = dbase;
+
             }
             else
             {
-                AddnSaveTextBlock.Text = "Save";
-                fill(data);
+                MainWindow.Title = "Изменить";
+                mainLabel.Text = "Изменение существующей отгрузки";
+                AddnSaveTextBlock.Text = "Сохранить";
+                ID = id;
+                if (id == null) { fill(data); }
+                else { FillbyID(dbase, id); }
             }
         }
         private void LoadComboBoxData()
@@ -106,19 +113,20 @@ namespace ManagerAppV2._1
         }
 
         // ============================== ADD MODE ==============================
-        private void AddShipment_Click(object sender, RoutedEventArgs e)
+
+        private void AddShipment(string db, string id, bool adminmode)
         {
-            if (AddnSaveTextBlock.Text == "Add")
+            if (adminmode)
             {
-                // Проверка обязательных полей
-                if (!ValidateInput()) return;
-
-                // SQL запрос с параметрами
-                if (MW.AdminTabControl.SelectedItem is TabItem selectedTab)
+                if (AddnSaveTextBlock.Text == "Добавить")
                 {
-                    MessageBox.Show(db);
+                    // Проверка обязательных полей
+                    if (!ValidateInput()) return;
 
-                    string query = @$"INSERT INTO `{db}` (
+                    // SQL запрос с параметрами
+                    if (MW.AdminTabControl.SelectedItem is TabItem selectedTab)
+                    {
+                        string query = @$"INSERT INTO `{db}` (
                             ShipmentDate, 
                             ShipmentWarehouse, 
                             `ClientCity`, 
@@ -138,6 +146,166 @@ namespace ManagerAppV2._1
                             @amount, @unit, @price, @minPrice, 
                             @value, @minValue, @reward, @updNumber, @shipmentPrice
                         )";
+
+                        try
+                        {
+                            // Парсим и вычисляем значения
+                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                            decimal price = decimal.Parse(priceTextBox.Text);
+                            decimal minPrice = decimal.Parse(minPriceTextBox.Text);
+                            decimal amount = decimal.Parse(amountTextBox.Text);
+                            decimal shipmentValue = price * amount;
+                            decimal minShipmentValue = minPrice * amount;
+                            decimal reward = shipmentValue - minShipmentValue;
+                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+
+                            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                            {
+                                connection.Open();
+
+                                using (MySqlCommand command = new MySqlCommand(query, connection))
+                                {
+                                    // Добавляем параметры
+                                    command.Parameters.AddWithValue("@date", shipmentDate);
+                                    command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@city", cityTextBox.Text);
+                                    command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
+                                    command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@amount", amount);
+                                    command.Parameters.AddWithValue("@unit", unitTextBox.Text);
+                                    command.Parameters.AddWithValue("@price", price);
+                                    command.Parameters.AddWithValue("@minPrice", minPrice);
+                                    command.Parameters.AddWithValue("@value", shipmentValue);
+                                    command.Parameters.AddWithValue("@minValue", minShipmentValue);
+                                    command.Parameters.AddWithValue("@reward", reward);
+                                    command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
+                                    command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+
+                                    int result = command.ExecuteNonQuery();
+
+                                    if (result > 0)
+                                    {
+                                        MessageBox.Show("Отгрузка успешно добавлена!");
+                                        MW.ReLoadData(DataSource.DBname);
+                                        ClearForm();
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    // Проверка обязательных полей
+                    if (!ValidateInput()) return;
+
+                    // SQL запрос с параметрами
+                    if (MW.AdminTabControl.SelectedItem is TabItem selectedTab)
+                    {
+                        string query = @$"UPDATE `{db}` SET
+                            ShipmentDate = @date, 
+                            ShipmentWarehouse = @warehouse, 
+                            `ClientCity` = @city, 
+                            `ClientName` = @clientName, 
+                            ProductName = @productName, 
+                            `ProductAmount` = @amount, 
+                            UnitOfMeasurement = @unit, 
+                            Price = @price, 
+                            MinimumPrice =  @minPrice, 
+                            ShipmentValue = @value, 
+                            `ShipmentValue(Minimum_price)` = @minValue, 
+                            Reward = @reward, 
+                            UPDNumber = @updNumber, 
+                            ShipmentPrice = @shipmentPrice
+                         WHERE id = {id}";
+
+                        try
+                        {
+                            // Парсим и вычисляем значения
+                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                            decimal price = decimal.Parse(priceTextBox.Text);
+                            decimal minPrice = decimal.Parse(minPriceTextBox.Text);
+                            decimal amount = decimal.Parse(amountTextBox.Text);
+                            decimal shipmentValue = price * amount;
+                            decimal minShipmentValue = minPrice * amount;
+                            decimal reward = shipmentValue - minShipmentValue;
+                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+
+                            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                            {
+                                connection.Open();
+
+                                using (MySqlCommand command = new MySqlCommand(query, connection))
+                                {
+                                    // Добавляем параметры
+                                    command.Parameters.AddWithValue("@date", shipmentDate);
+                                    command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@city", cityTextBox.Text);
+                                    command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
+                                    command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@amount", amount);
+                                    command.Parameters.AddWithValue("@unit", unitTextBox.Text);
+                                    command.Parameters.AddWithValue("@price", price);
+                                    command.Parameters.AddWithValue("@minPrice", minPrice);
+                                    command.Parameters.AddWithValue("@value", shipmentValue);
+                                    command.Parameters.AddWithValue("@minValue", minShipmentValue);
+                                    command.Parameters.AddWithValue("@reward", reward);
+                                    command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
+                                    command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+
+                                    int result = command.ExecuteNonQuery();
+
+                                    if (result > 0)
+                                    {
+                                        MessageBox.Show("Отгрузка успешно добавлена!");
+                                        MW.ReLoadData(DataSource.DBname);
+                                        ClearForm();
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                if (AddnSaveTextBlock.Text == "Добавить")
+                {
+
+                    // Проверка обязательных полей
+                    if (!ValidateInput()) return;
+
+                    // SQL запрос с параметрами
+                    
+                    string query = @$"INSERT INTO `{db}` (
+                        ShipmentDate, 
+                        ShipmentWarehouse, 
+                        `ClientCity`, 
+                        `ClientName`, 
+                        ProductName, 
+                        `ProductAmount`, 
+                        UnitOfMeasurement, 
+                        Price, 
+                        MinimumPrice, 
+                        ShipmentValue, 
+                        `ShipmentValue(Minimum_price)`, 
+                        Reward, 
+                        UPDNumber, 
+                        ShipmentPrice
+                    ) VALUES (
+                        @date, @warehouse, @city, @clientName, @productName, 
+                        @amount, @unit, @price, @minPrice, 
+                        @value, @minValue, @reward, @updNumber, @shipmentPrice
+                    )";
 
                     try
                     {
@@ -188,15 +356,94 @@ namespace ManagerAppV2._1
                     {
                         MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
                     }
+                    
+                }
+                else
+                {
+                    // Проверка обязательных полей
+                    if (!ValidateInput()) return;
+
+                    // SQL запрос с параметрами
+
+                    string query = @$"UPDATE `{db}` SET
+                            ShipmentDate = @date, 
+                            ShipmentWarehouse = @warehouse, 
+                            `ClientCity` = @city, 
+                            `ClientName` = @clientName, 
+                            ProductName = @productName, 
+                            `ProductAmount` = @amount, 
+                            UnitOfMeasurement = @unit, 
+                            Price = @price, 
+                            MinimumPrice =  @minPrice, 
+                            ShipmentValue = @value, 
+                            `ShipmentValue(Minimum_price)` = @minValue, 
+                            Reward = @reward, 
+                            UPDNumber = @updNumber, 
+                            ShipmentPrice = @shipmentPrice
+                         WHERE id = {id}";
+
+                        try
+                        {
+                            // Парсим и вычисляем значения
+                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                            decimal price = decimal.Parse(priceTextBox.Text);
+                            decimal minPrice = decimal.Parse(minPriceTextBox.Text);
+                            decimal amount = decimal.Parse(amountTextBox.Text);
+                            decimal shipmentValue = price * amount;
+                            decimal minShipmentValue = minPrice * amount;
+                            decimal reward = shipmentValue - minShipmentValue;
+                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+
+                            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                            {
+                                connection.Open();
+
+                                using (MySqlCommand command = new MySqlCommand(query, connection))
+                                {
+                                    // Добавляем параметры
+                                    command.Parameters.AddWithValue("@date", shipmentDate);
+                                    command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@city", cityTextBox.Text);
+                                    command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
+                                    command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
+                                    command.Parameters.AddWithValue("@amount", amount);
+                                    command.Parameters.AddWithValue("@unit", unitTextBox.Text);
+                                    command.Parameters.AddWithValue("@price", price);
+                                    command.Parameters.AddWithValue("@minPrice", minPrice);
+                                    command.Parameters.AddWithValue("@value", shipmentValue);
+                                    command.Parameters.AddWithValue("@minValue", minShipmentValue);
+                                    command.Parameters.AddWithValue("@reward", reward);
+                                    command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
+                                    command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+
+                                    int result = command.ExecuteNonQuery();
+
+                                    if (result > 0)
+                                    {
+                                        MessageBox.Show("Отгрузка успешно добавлена!");
+                                        MW.ReLoadData(DataSource.DBname);
+                                        ClearForm();
+                                        this.Close();
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                        }
+                    }
+
                 }
             }
-            else
-            {
+        
 
-            }
+        private void AddShipment_Click(object sender, RoutedEventArgs e)
+        {
+            AddShipment(db,ID,AdminMode);
         }
 
-        
+
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -244,8 +491,39 @@ namespace ManagerAppV2._1
             unitTextBox.Text = data["UnitOfMeasurement"]?.ToString();
             priceTextBox.Text = data["Price"]?.ToString();
             minPriceTextBox.Text = data["MinimumPrice"]?.ToString();
-            updNumberTextBox.Text = data["ShipmentValue(Minimum_price)"]?.ToString();
+            updNumberTextBox.Text = data["UPDNumber"]?.ToString();
             shipmentPriceTextBox.Text = data["ShipmentValue"]?.ToString();
+        }
+
+        private void FillbyID(string table, string id)
+        {
+            string connStr = CH.GetConnectionString();
+            string query = $"SELECT ShipmentDate, ShipmentWarehouse, ClientCity, ClientName, ProductName, ProductAmount, UnitOfMeasurement, Price, MinimumPrice, UPDNumber, ShipmentValue FROM {table} WHERE id = @id";
+
+
+            using var conn = new MySqlConnection(connStr);
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            conn.Open();
+            using var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+
+
+                shipmentDateTextBox.Text = DateTime.TryParse(reader["ShipmentDate"]?.ToString(), out var dt) ? dt.ToString("dd.MM.yyyy") : "";
+                WarehouseCB.SelectedItem = reader["ShipmentWarehouse"]?.ToString();
+                cityTextBox.Text = reader["ClientCity"]?.ToString();
+                clientNameTextBox.Text = reader["ClientName"]?.ToString();
+                ProductCB.Text = reader["ProductName"]?.ToString();
+                amountTextBox.Text = reader["ProductAmount"]?.ToString();
+                unitTextBox.Text = reader["UnitOfMeasurement"]?.ToString();
+                priceTextBox.Text = reader["Price"]?.ToString();
+                minPriceTextBox.Text = reader["MinimumPrice"]?.ToString();
+                updNumberTextBox.Text = reader["UPDNumber"]?.ToString();
+                shipmentPriceTextBox.Text = reader["ShipmentValue"]?.ToString();
+            }
         }
 
 

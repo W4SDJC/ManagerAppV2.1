@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
@@ -86,8 +87,17 @@ namespace ManagerAppV2._1
         // ======================== ADD DATA TO DATABASE ========================
         public void AddData_Click(object sender, RoutedEventArgs e)
         {
-            AddnEdit addnEdit = new AddnEdit("Add", GetTabName());
-            addnEdit.ShowDialog();
+            if (AdminMode)
+            {
+
+                AddnEdit addnEdit = new AddnEdit("Add", GetTabName());
+                addnEdit.ShowDialog();
+            }
+            else
+            {
+                AddnEdit addnEdit = new AddnEdit("Add",DBname);
+                addnEdit.ShowDialog();
+            }
             ReLoadData(DBname);
             ApplyColumnVisibility();
         }
@@ -95,15 +105,32 @@ namespace ManagerAppV2._1
         // ============================= EDIT DATA =============================
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            TabItem selectedTab = AdminTabControl.SelectedItem as TabItem;
-            if (selectedTab?.Content is DataGrid dataGrid && dataGrid.SelectedItem is DataRowView row)
+            if (AdminMode)
             {
-                var selectedData = row.Row; // DataRow с доступом по именам колонок
-                var editWindow = new AddnEdit("Edit", GetTabName(), row.Row); // передаём DataRow
-                editWindow.ShowDialog();
+                TabItem selectedTab = AdminTabControl.SelectedItem as TabItem;
+                if (selectedTab?.Content is DataGrid dataGrid && dataGrid.SelectedItem is DataRowView row)
+                {
+                    var selectedData = row.Row; // DataRow с доступом по именам колонок
+                    var editWindow = new AddnEdit("Edit", GetTabName(), row.Row, null, true); // передаём DataRow
+                    editWindow.ShowDialog();
+                }
+
             }
-            //AddnEdit addnEdit = new AddnEdit("Edit", GetTabName());
-            //addnEdit.ShowDialog();
+            else
+            {
+                if (MainDataGrid.SelectedItem == null)
+                {
+                    MessageBox.Show("Выберите строку для изменения");
+                    return;
+                }
+                MessageBox.Show(AdminMode.ToString());
+                DataRowView selectedRow = (DataRowView)MainDataGrid.SelectedItem;
+                string id = (selectedRow["id"]).ToString();
+
+                var editWindow = new AddnEdit("Edit",DBname, null, id); // передаём DataRow
+                editWindow.ShowDialog();
+                ReLoadData(DBname);
+            }
         }
         // ============================ DELETE DATA ============================
         private void DeleteBtn_Click(object sender, RoutedEventArgs e)
@@ -128,7 +155,6 @@ namespace ManagerAppV2._1
             else
             {
                 DeleteData();
-                MessageBox.Show(RoleLabel.Content.ToString());
             }
         }
         // ================================= = =================================
@@ -153,6 +179,7 @@ namespace ManagerAppV2._1
         {
             ReLoadData(DBname, AdminMode);
             ApplyColumnVisibility();
+            LoadDataToLabel();
         }
 
         // =========================== MANAGERS MENU ===========================
@@ -183,7 +210,11 @@ namespace ManagerAppV2._1
             ad.ShowDialog();
         }
         // ================================= = =================================
-
+        private void EditUserBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EditUser EU = new EditUser();
+            EU.Show();
+        }
         // ================================= = =================================
         private void ManagersMenuClose()
         {
@@ -267,6 +298,7 @@ namespace ManagerAppV2._1
             MinimizeElements();
             LoadDataToLabel();
             ReLoadData(DBname);
+            //LoadMonth();
         }
         // ============================ DATA CONTROL ============================
         private void RoleControl()
@@ -286,12 +318,11 @@ namespace ManagerAppV2._1
                 AdminControls();
             }
         }
-        private void SoldControl()
+
+        private void LoadDataToLabel(string role = null)
         {
             string connectionString = CH.GetConnectionString();
-            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
-            string query2 = $"SELECT SUM(ShipmentPrice) from `{DBname}`";
-            var culture = new CultureInfo("en-US");
+            string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
 
             try
             {
@@ -299,36 +330,120 @@ namespace ManagerAppV2._1
                 {
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
-                    MySqlCommand command2 = new MySqlCommand(query2, connection);
+                    object result = command.ExecuteScalar();
+                    var culture = new CultureInfo("en-US");
 
-                    object MonthPlan = command.ExecuteScalar();
-                    object result = command2.ExecuteScalar();
-
-                    // Обработка пустых значений
-                    int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
-                    int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
-
-                    // Логика изменения цвета
-                    if (ConvResult < ConvMonthPlan / 2)
+                    // Модифицированная проверка на null и DBNull
+                    if (result == null || result == DBNull.Value)
                     {
-                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
-                    }
-                    else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
-                    {
-                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
+                        MonthPlanLabel.Content = "0";
                     }
                     else
                     {
-                        SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
+                        int convResult = Convert.ToInt32(result);
+                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
                     }
+                }
+                SoldControl(role);
+            }
+            catch (MySqlException ex)
+            {
+                AddErrorMessage($"Ошибка загрузки данных (LOADDATATOLABEL): {ex.Message}"); ;
+                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
+            }
+        }
 
-                    SoldedLabel.Content = ConvResult.ToString("N0", culture);
+        private void SoldControl(string role = null)
+        {
+            if (AdminMode)
+            {
+                string connectionString = CH.GetConnectionString();
+                string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
+                string query2 = $"SELECT SUM(ShipmentPrice) from `{GetTabName()}`";
+                var culture = new CultureInfo("en-US");
+
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySqlCommand command = new MySqlCommand(query, connection);
+                        MySqlCommand command2 = new MySqlCommand(query2, connection);
+
+                        object MonthPlan = command.ExecuteScalar();
+                        object result = command2.ExecuteScalar();
+
+                        // Обработка пустых значений
+                        int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
+                        int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+
+                        // Логика изменения цвета
+                        if (ConvResult < ConvMonthPlan / 2)
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
+                        }
+                        else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
+                        }
+                        else
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
+                        }
+
+                        SoldedLabel.Content = ConvResult.ToString("N0", culture);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ) ADMIN: {ex.Message}");
+                    SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
                 }
             }
-            catch (Exception ex)
+            else
             {
-                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
-                SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
+                string connectionString = CH.GetConnectionString();
+                string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
+                string query2 = $"SELECT SUM(ShipmentPrice) from `{DBname}`";
+                var culture = new CultureInfo("en-US");
+
+                try
+                {
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySqlCommand command = new MySqlCommand(query, connection);
+                        MySqlCommand command2 = new MySqlCommand(query2, connection);
+
+                        object MonthPlan = command.ExecuteScalar();
+                        object result = command2.ExecuteScalar();
+
+                        // Обработка пустых значений
+                        int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
+                        int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+
+                        // Логика изменения цвета
+                        if (ConvResult < ConvMonthPlan / 2)
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
+                        }
+                        else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
+                        }
+                        else
+                        {
+                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
+                        }
+
+                        SoldedLabel.Content = ConvResult.ToString("N0", culture);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ): {ex.Message}");
+                    SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
+                }
             }
         }
 
@@ -386,9 +501,9 @@ namespace ManagerAppV2._1
             AdminTabControl.Visibility = Visibility.Collapsed;
             AdminDatabaseGrid.Visibility = Visibility.Collapsed;
             MainDataGrid.Visibility = Visibility.Visible;
-            GetMySQLTables(CH.GetConnectionString());
             LoadTablesIntoTabControl();
             LoadDataAndCreateCheckBoxes();
+            LoadDataToLabel(Role);
         }
         private void DeleteData()
         {
@@ -429,39 +544,7 @@ namespace ManagerAppV2._1
         }
 
         // ========================== SYSTEM FUNCTIONS ==========================
-        private void LoadDataToLabel()
-        {
-            string connectionString = CH.GetConnectionString();
-            string query = $"SELECT MonthPlan FROM roles WHERE role = '{Role}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(query, connection);
-                    object result = command.ExecuteScalar();
-                    var culture = new CultureInfo("en-US");
-
-                    // Модифицированная проверка на null и DBNull
-                    if (result == null || result == DBNull.Value)
-                    {
-                        MonthPlanLabel.Content = "0";
-                    }
-                    else
-                    {
-                        int convResult = Convert.ToInt32(result);
-                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
-                    }
-                }
-                SoldControl();
-            }
-            catch (MySqlException ex)
-            {
-                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}"); ;
-                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
-            }
-        }
+        
         // ========================= ADMIN TABLES LOAD =========================
         private DataGrid CreateDataGridForTable(string connectionString, string tableName)
         {
@@ -498,7 +581,7 @@ namespace ManagerAppV2._1
             }
             catch (Exception ex)
             {
-                AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                AddErrorMessage($"Ошибка загрузки данных (TABCONTROL): {ex.Message}");
             }
         }
 
@@ -549,7 +632,7 @@ namespace ManagerAppV2._1
             return tables;
         }
 
-        
+
 
         // Метод для обновления базы данных после удаления
         private void UpdateDatabase(string tableName, DataTable dataTable)
@@ -574,7 +657,7 @@ namespace ManagerAppV2._1
             }
             catch (Exception ex)
             {
-                AddErrorMessage($"Ошибка при удалении данных: {ex.Message}");
+                AddErrorMessage($"Ошибка при удалении данных (TAB CONTROL) ADMIN: {ex.Message}");
             }
         }
         // Метод для обновления данных
@@ -613,7 +696,7 @@ namespace ManagerAppV2._1
         }
 
         // Создание DataGrid для таблицы
-        
+
         private void MinimizeElements()
         {
             DatabaseMenu.Height = 0;
@@ -621,11 +704,12 @@ namespace ManagerAppV2._1
             ProfileMenu.Height = 0;
         }
 
-        public void ReLoadData(string name = null, bool AdminMode = false)
+        public void ReLoadData(string name = null, bool AdminMode1 = false)
         {
-            SoldControl();
-            if (AdminMode)
+            if (AdminMode1)
             {
+                SoldControl(CH.GetRole(GetTabName()));
+
                 // Сохраняем индекс текущей вкладки
                 int currentIndex = AdminTabControl.SelectedIndex;
 
@@ -643,6 +727,7 @@ namespace ManagerAppV2._1
             }
             else
             {
+                SoldControl(CH.GetRole(DBname));
                 MainDataGrid.ItemsSource = null;
                 try
                 {
@@ -663,34 +748,58 @@ namespace ManagerAppV2._1
                 }
                 catch (Exception ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                    AddErrorMessage($"Ошибка загрузки данных (RELOADDATA): {ex.Message}");
                 }
             }
         }
 
-        
+
 
 
         private void ApplyColumnVisibility()
         {
-            // Получаем список выбранных столбцов
-            List<string> selectedColumns = new List<string>();
-            foreach (UIElement element in CheckBoxPanel.Children)
+            if (AdminMode)
             {
-                if (element is CheckBox checkBox && checkBox.IsChecked == true)
+                // Получаем список выбранных столбцов
+                List<string> selectedColumns = new List<string>();
+                foreach (UIElement element in CheckBoxPanel.Children)
                 {
-                    selectedColumns.Add(checkBox.Tag.ToString());
+                    if (element is CheckBox checkBox && checkBox.IsChecked == true)
+                    {
+                        selectedColumns.Add(checkBox.Tag.ToString());
+                    }
+                }
+
+                // Обновляем видимость столбцов в DataGrid
+                DataGrid AMDG = GetSelectedDataGrid(AdminTabControl);
+                foreach (DataGridColumn column in AMDG.Columns)
+                {
+                    if (column.Header != null)
+                    {
+                        column.Visibility = selectedColumns.Contains(column.Header.ToString()) ? Visibility.Visible : Visibility.Collapsed;
+                    }
                 }
             }
-
-            // Обновляем видимость столбцов в DataGrid
-            DataGrid AMDG = GetSelectedDataGrid(AdminTabControl);
-            foreach (DataGridColumn column in AMDG.Columns)
-            {
-                if (column.Header != null)
+            else {
+                // Получаем список выбранных столбцов
+                List<string> selectedColumns = new List<string>();
+                foreach (UIElement element in CheckBoxPanel.Children)
                 {
-                    column.Visibility = selectedColumns.Contains(column.Header.ToString()) ? Visibility.Visible : Visibility.Collapsed;
+                    if (element is CheckBox checkBox && checkBox.IsChecked == true)
+                    {
+                        selectedColumns.Add(checkBox.Tag.ToString());
+                    }
                 }
+
+                // Обновляем видимость столбцов в DataGrid
+                foreach (DataGridColumn column in MainDataGrid.Columns)
+                {
+                    if (column.Header != null)
+                    {
+                        column.Visibility = selectedColumns.Contains(column.Header.ToString()) ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                }
+
             }
         }
 
@@ -800,11 +909,11 @@ namespace ManagerAppV2._1
                 }
                 catch (MySqlException ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes) ADMIN: {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes) ADMIN: {ex.Message}");
                 }
             }
             else
@@ -849,11 +958,11 @@ namespace ManagerAppV2._1
                 }
                 catch (MySqlException ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes): {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    AddErrorMessage($"Ошибка загрузки данных: {ex.Message}");
+                    AddErrorMessage($"Ошибка загрузки данных (LoadDataAndCreateCheckBoxes): {ex.Message}");
                 }
             }
         }
@@ -968,7 +1077,7 @@ namespace ManagerAppV2._1
         {
             // Запоминаем имя текущей таблицы при смене вкладки
             LoadDataAndCreateCheckBoxes(true);
-            LoadDataToLabel();
+            LoadDataToLabel(CH.GetRole(GetTabName()));
         }
         public DataGrid GetSelectedDataGrid(TabControl tabControl)
         {
@@ -980,11 +1089,50 @@ namespace ManagerAppV2._1
             return null;
         }
 
-        private void EditUserBtn_Click(object sender, RoutedEventArgs e)
+
+        private void LoadMonth()
         {
-            EditUser EU = new EditUser();
-            EU.Show();
+            try
+            {
+                string query = "SELECT month FROM monthplan where id = 1";
+                using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    conn.Open();
+                    MySqlCommand monthGetter = new MySqlCommand(query, conn);
+                    string MP = monthGetter.ExecuteScalar().ToString();
+                    MonthPLabel.Content = $"План ({MP})";
+                    SoldedMLabel.Content = $"Продано ({MP})";
+                }
+            }catch (Exception ex) { }
+        }
+
+        private void DeleteBtn1_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEditProduct AEP = new AddnEditProduct("Edit");
+            AEP.ShowDialog();
+        }
+
+        private void ExportBtn1_Click(object sender, RoutedEventArgs e)
+        {
+            var DialogResult = MessageBox.Show("Создать все базовые таблицы?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            string query1 = "CREATE TABLE `monthplan` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  `Month` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idMonthPlan_UNIQUE` (`id`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `product price` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Product_name` varchar(45) DEFAULT NULL,\r\n  `Product_price` int DEFAULT NULL,\r\n  `Minimum_price` varchar(45) DEFAULT NULL,\r\n  `Unit_of_measurement` varchar(45) DEFAULT NULL,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `Product name_UNIQUE` (`Product_name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='\t\t\t';\r\n\r\nCREATE TABLE `roles` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `MonthPlan` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `role_UNIQUE` (`role`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `users` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `login` varchar(45) NOT NULL,\r\n  `password` varchar(128) NOT NULL,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `databasename` varchar(45) DEFAULT NULL,\r\n  `image` longtext,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `login_UNIQUE` (`login`),\r\n  UNIQUE KEY `databasename_UNIQUE` (`databasename`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `warehouse` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `adress` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idwarehouse_UNIQUE` (`id`),\r\n  UNIQUE KEY `name_UNIQUE` (`name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n";
+            if (DialogResult == MessageBoxResult.Yes)
+            {
+                using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    conn.Open();
+                    using (MySqlCommand command = new MySqlCommand(query1, conn))
+                    {
+                        int result = command.ExecuteNonQuery();
+
+                        if (result > 0)
+                        {
+                            MessageBox.Show("Таблицы успешно созданы!");
+                            //ClearUserForm();
+                        }
+                    }
+                }
+            }
         }
     }
-
 }

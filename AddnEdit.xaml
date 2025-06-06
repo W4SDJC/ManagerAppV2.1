@@ -12,7 +12,7 @@
     <Grid x:Name="MainGrid" Background="#FFD9D9D9" Margin="0,0,0,0">
         <ScrollViewer VerticalScrollBarVisibility="Auto" Width="490" Height="600">
             <StackPanel Margin="20" Width="435" Height="560">
-                <TextBlock Text="Добавление новой отгрузки" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock x:Name="mainLabel" Text="Добавление новой отгрузки" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
                 <!-- Дата отгрузки -->
                 <TextBlock Text="Дата отгрузки (DD.MM.YYYY):"/>
                 <TextBox x:Name="shipmentDateTextBox" Margin="0,0,0,10"/>
@@ -65,7 +65,7 @@
                 </Style>
             </Button.Resources>
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="CancelTB" Margin="0,0,0,0" FontSize="14" VerticalAlignment="Center" Width="Auto" Text="Cancel" Foreground="White" HorizontalAlignment="Center" />
+                <TextBlock x:Name="CancelTB" Margin="0,0,0,0" FontSize="14" VerticalAlignment="Center" Width="Auto" Text="Отмена" Foreground="White" HorizontalAlignment="Center" />
             </StackPanel>
         </Button>
         <Button x:Name="ApplyFilters" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5,10,5" Click="AddShipment_Click" ScrollViewer.CanContentScroll="True" Width="116" Height="30" Margin="0,0,98,25" HorizontalAlignment="Right" VerticalAlignment="Bottom">

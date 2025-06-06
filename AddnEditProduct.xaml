@@ -5,8 +5,65 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="AddnEditProduct" Height="450" Width="800">
+        Title="AddnEditProduct" Height="260" Width="401" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid>
-        
+
+        <Label x:Name="NameLabel" Content="Название" Margin="19,45,220,174" Padding="5,5,5,0"/>
+        <Label x:Name="MinPriceLabel" Content="Минимальная цена" HorizontalAlignment="Left" Margin="19,130,0,93" Padding="5,5,5,0"/>
+        <Button x:Name="Cancel" Content="Отмена" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Click="Cancel_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="SaveButton" Content="Сохранить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,95,10" Click="SaveButton_Click" >
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Label x:Name="UnitLabel" Content="Единица измерения" Margin="188,45,73,174" Padding="5,5,5,0"/>
+        <Label x:Name="RoleLabel" Content="Role" HorizontalAlignment="Left" Margin="188,129,0,92" Padding="5,5,5,0"/>
+        <TextBox x:Name="NameTextBox" Margin="19,71,220,154" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+        <TextBox x:Name="UnitTextBox" Margin="188,71,73,154" TextWrapping="Wrap" Padding="5,0,0,0">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+        <TextBox x:Name="MinPriceTextBox" Margin="19,152,220,73" TextWrapping="Wrap" Padding="5,0,0,0">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+        <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="188,151,0,0" VerticalAlignment="Top" Width="140" Height="20"/>
+        <ComboBox x:Name="ProductCB"  HorizontalAlignment="Left" Margin="19,20,0,0" VerticalAlignment="Top" Width="162" Height="20" SelectionChanged="ProductCB_SelectionChanged" />
+        <Button x:Name="DeleteButton" Content="Удалить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,10" >
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Label x:Name="MinPriceLabel_Копировать" Content="Розничная цена" HorizontalAlignment="Left" Margin="19,90,0,132" Padding="5,5,5,0"/>
+        <TextBox x:Name="PriceTextBox" Margin="19,112,220,112" TextWrapping="Wrap" Padding="5,0,0,0">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
     </Grid>
 </Window>

@@ -178,7 +178,7 @@ namespace ManagerAppV2._1
             {
                 MessageBox.Show("Passwords don't match", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
+            LoadComboBoxDataAsync();
         }
 
         private bool ConfirmingPassword(string password, string confirmPassword)
