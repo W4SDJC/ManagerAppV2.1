@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="EditPage" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid Height="245" Width="510" Margin="0,0,0,0" >
-        <Border CornerRadius="45,45,45,45" Margin="24,49,0,0" Width="86" HorizontalAlignment="Left" Height="84" VerticalAlignment="Top">
+        <Border CornerRadius="45,45,45,45" Margin="24,49,0,0" Width="86" HorizontalAlignment="Left" Height="84" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="3">
             <Border.Background>
-                <ImageBrush  ImageSource="/Icons/Avatar.jpg" Stretch="Fill" />
+                <ImageBrush  ImageSource="/Icons/AppLogo.png" Stretch="Fill" />
             </Border.Background>
         </Border>
 

@@ -1,0 +1,28 @@
+﻿<Window x:Class="ManagerAppV2._1.ConnectionSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ManagerAppV2._1"
+        mc:Ignorable="d"
+        Title="ConnectionSettings" Height="300" Width="312">
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock Text="Сервер:"/>
+            <TextBox x:Name="ServerTextBox"/>
+            <TextBlock TextWrapping="Wrap"><Run Language="ru-ru" Text="Порт"/></TextBlock>
+            <TextBox x:Name="PortTextBox" />
+
+            <TextBlock Text="База данных:"/>
+            <TextBox x:Name="DatabaseTextBox"/>
+
+            <TextBlock Text="Пользователь:"/>
+            <TextBox x:Name="UserTextBox"/>
+
+            <TextBlock Text="Пароль:"/>
+            <PasswordBox x:Name="PasswordBox"/>
+            <Button Content="Сохранить" Height="35" Background="#FF333333" Foreground="White" Click="SaveButton_Click" Width="186" Margin="0,5,0,0"/>
+            <TextBlock x:Name="ErrorTextBlock" TextWrapping="Wrap" Foreground="Red" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

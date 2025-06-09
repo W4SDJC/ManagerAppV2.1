@@ -25,10 +25,10 @@ namespace ManagerAppV2._1
         public ProfilePage()
         {
             InitializeComponent();
-            Loaded();
+            Load();
         }
 
-        private void Loaded()
+        private void Load()
         {
             NameTextBox.Text = DataSource.UserName;
             RoleTextBox.Text = DataSource.Role;

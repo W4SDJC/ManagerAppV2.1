@@ -15,13 +15,19 @@
     <None Remove="AppIcon.png" />
     <None Remove="ArrowDown.png" />
     <None Remove="Avatar.jpg" />
+    <None Remove="Config.json" />
     <None Remove="Database.png" />
+    <None Remove="Icons\AppLogo.png" />
+    <None Remove="Icons\ArrowLeft.png" />
     <None Remove="Icons\ArrowUp.png" />
     <None Remove="Icons\Avatar.jpg" />
     <None Remove="Icons\Copy.png" />
     <None Remove="Icons\Log_out.png" />
+    <None Remove="Icons\MainLogo.png" />
     <None Remove="Icons\Moon.png" />
     <None Remove="Icons\New.png" />
+    <None Remove="Icons\Setting.png" />
+    <None Remove="Icons\SettingError.png" />
     <None Remove="Icons\Share.png" />
     <None Remove="Icons\Trash.png" />
     <None Remove="Moon.png" />
@@ -34,18 +40,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
     <PackageReference Include="MySql.Data" Version="9.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.5" />
     <PackageReference Include="System.Security.Cryptography.Cng" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Icons\AccountMore.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Icons\AppIcon.png">
+    <Resource Include="Icons\AppLogo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\ArrowDown.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\ArrowLeft.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\ArrowUp.png">
@@ -63,6 +80,9 @@
     <Resource Include="Icons\Log_out.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Icons\MainLogo.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Icons\Moon.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
@@ -73,6 +93,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\Search.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\Setting.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\SettingError.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Icons\Share.png">

@@ -1,14 +1,59 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.IO;
 
 namespace ManagerAppV2
 {
     public class ConnectHelper
     {
+        public string Server { get; set; }
+        public int Port { get; set; }
+        public string Database { get; set; }
+        public string User { get; set; }
+        public string Password { get; set; }
+        public string CurrentUserLogin { get; set; }
+        private static string filePath = "Config.json";
+
+
+        public void Load()
+        {
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                var loadedConfig = JsonConvert.DeserializeObject<ConnectHelper>(json);
+                if (loadedConfig != null)
+                {
+                    this.Server = loadedConfig.Server;
+                    this.Port = loadedConfig.Port;
+                    this.Database = loadedConfig.Database;
+                    this.User = loadedConfig.User;
+                    this.Password = loadedConfig.Password;
+                }
+            }
+            else
+            {
+                // Файл не найден — создаём с настройками по умолчанию
+                MessageBox.Show("Файл конфигурации не найден. Будет создан новый файл с настройками по умолчанию.",
+                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Настройки по умолчанию
+                this.Server = "localhost";
+                this.Port = 3306;
+                this.Database = "default_db";
+                this.User = "root";
+                this.Password = "";
+
+                // Сохраняем в файл
+                string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+            }
+        }
 
         // Конструктор класса, который инициализирует подключение к базе данных
         public string GetDbName(string login)
@@ -35,10 +80,10 @@ namespace ManagerAppV2
         // Метод для получения строки подключения
         public string GetConnectionString()
         {
-
-            return "server=localhost;port=3306;user=root;password=password;database=database;";
+            Load();
+            return $"server={Server};port={Port.ToString()};user={User};password={Password};database={Database};";
         }
-        
+
         public string ManagerData(string DBName)
         {
             string Query = "SELECT " +

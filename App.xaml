@@ -8,6 +8,14 @@
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
         </Style>
         
+        <Style x:Key="DisabledButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="Gray"/>
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="BorderBrush" Value="DarkGray"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
         <Style x:Key="RoundedTextBox" TargetType="{x:Type TextBox}">
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="#FFABADB3"/>
@@ -48,26 +56,6 @@
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
         </Style>
-        
-        <Style x:Key="PlaceholderTextBox" TargetType="TextBox">
-            <Style.Triggers>
-                <Trigger Property="Text" Value="">
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <VisualBrush Stretch="None" AlignmentX="Left">
-                                <VisualBrush.Visual>
-                                    <TextBlock Text="Search" 
-                                           Foreground="Gray"
-                                           Margin="15,0,0,0"
-                                           VerticalAlignment="Center"/>
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
 
         <Style x:Key="RoundedCheckBoxStyle" TargetType="CheckBox">
             <Setter Property="Template">

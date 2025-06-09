@@ -44,12 +44,10 @@ namespace ManagerAppV2._1
         {
             InitializeComponent();
             MainLoad();
-
         }
 
 
         // =========================== DATABASE MENU ===========================
-
         private void DatabaseMenuOpen(object sender, RoutedEventArgs e)
         {
             if (((int)DatabaseMenu.ActualHeight) > 0)
@@ -157,7 +155,6 @@ namespace ManagerAppV2._1
                 DeleteData();
             }
         }
-        // ================================= = =================================
         private void DatabaseMenuClose()
         {
             DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
@@ -173,6 +170,7 @@ namespace ManagerAppV2._1
             // Set the image source.
             DataBaseBtnimg.Source = bi;
         }
+        // ========================= DATABASE MENU END =========================
 
         // =========================== UPDATE BUTTON ===========================
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -182,50 +180,231 @@ namespace ManagerAppV2._1
             LoadDataToLabel();
         }
 
-        // =========================== MANAGERS MENU ===========================
+        // ============================= EDIT MENU =============================
 
         private void ManagersButton_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)ManagersMenu.ActualHeight) > 0)
+            if (((int)EditMenu.ActualHeight) > 0)
             {
                 DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+                ManagersBtnAnimation.From = EditMenu.ActualHeight;
                 ManagersBtnAnimation.To = 0;
                 ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+                EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
             }
             else
             {
                 DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+                ManagersBtnAnimation.From = EditMenu.ActualHeight;
                 ManagersBtnAnimation.To = 155;
                 ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+                EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+            }
+        }
+
+        // ============================= USER MENU =============================
+        private void UsersMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (((int)UserMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation UserBtnAnimation = new DoubleAnimation();
+                UserBtnAnimation.From = UserMenu.ActualHeight;
+                UserBtnAnimation.To = 0;
+                UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
+            }
+            else
+            {
+                ProductMenuClose();
+                WarehouseMenuClose();
+                DoubleAnimation UserBtnAnimation = new DoubleAnimation();
+                UserBtnAnimation.From = UserMenu.ActualHeight;
+                UserBtnAnimation.To = 65;
+                UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
             }
         }
         // ============================ CREATE USER ============================
+        
         private void AddUserBtn_Click(object sender, RoutedEventArgs e)
         {
             AddUser ad = new AddUser();
             ad.ShowDialog();
         }
-        // ================================= = =================================
+        // ============================= EDIT USER =============================
         private void EditUserBtn_Click(object sender, RoutedEventArgs e)
         {
             EditUser EU = new EditUser();
             EU.Show();
         }
-        // ================================= = =================================
-        private void ManagersMenuClose()
+        // =========================== USER MENU END ===========================
+
+        private void UserMenuClose()
+        {
+            DoubleAnimation UserBtnAnimation = new DoubleAnimation();
+            UserBtnAnimation.From = UserMenu.ActualHeight;
+            UserBtnAnimation.To = 0;
+            UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
+        }
+        // ============================ PRODUCT MENU ============================
+        private void ProductMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (((int)ProductMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
+                ProductBtnAnimation.From = ProductMenu.ActualHeight;
+                ProductBtnAnimation.To = 0;
+                ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+            }
+            else
+            {
+                UserMenuClose();
+                WarehouseMenuClose();
+                DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
+                ProductBtnAnimation.From = ProductMenu.ActualHeight;
+                ProductBtnAnimation.To = 65;
+                ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+            }
+        }
+        // ============================ ADD PRODUCT ============================
+        private void CreateProduct_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEditProduct AEP = new AddnEditProduct("Add");
+            AEP.ShowDialog();
+        }
+        // ============================ EDIT PRODUCT ============================
+        private void EditProductButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddnEditProduct AEP = new AddnEditProduct("Edit");
+            AEP.ShowDialog();
+        }
+
+        private void ProductMenuClose()
+        {
+            DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
+            ProductBtnAnimation.From = ProductMenu.ActualHeight;
+            ProductBtnAnimation.To = 0;
+            ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+        }
+        // ========================== PRODUCT MENU END ==========================
+
+
+        // =========================== WAREHOUSE MENU ===========================
+        private void WarehouseMenuBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (((int)WarehouseMenu.ActualHeight) > 0)
+            {
+                DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
+                WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
+                WarehouseBtnAnimation.To = 0;
+                WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+            }
+            else
+            {
+                UserMenuClose();
+                ProductMenuClose();
+                DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
+                WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
+                WarehouseBtnAnimation.To = 65;
+                WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+                WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+            }
+        }
+        // =========================== ADD WAREHOUSE ===========================
+        private void AddWarehouse_Click(object sender, RoutedEventArgs e)
+        {
+            AddWarehouse addWarehouse = new AddWarehouse();
+            addWarehouse.Show();
+        }
+        // =========================== EDIT WAREHOUSE ===========================
+        private void EditWarehouse_Click(object sender, RoutedEventArgs e)
+        {
+            EditWarehouse EW = new EditWarehouse();
+            EW.Show();
+        }
+        private void WarehouseMenuClose()
+        {
+            DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
+            WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
+            WarehouseBtnAnimation.To = 0;
+            WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
+            WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+        }
+        // ========================= WAREHOUSE MENU END =========================
+
+        // =========================== SET MONTH PLAN ===========================
+        private void SetMonthPlan_Click(object sender, RoutedEventArgs e)
+        {
+            SetMonthPlan SMP = new SetMonthPlan();
+            SMP.Show();
+        }
+
+        private void EditMenuClose()
         {
             DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-            ManagersBtnAnimation.From = ManagersMenu.ActualHeight;
+            ManagersBtnAnimation.From = EditMenu.ActualHeight;
             ManagersBtnAnimation.To = 0;
             ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            ManagersMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+            EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
         }
-        // ============================ PROFILE MENU ============================
+        // =========================== EDIT MENU END ===========================
 
+        // ============================ SEARCH FIELD ============================
+        private void SearchField_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (AdminMode)
+            {
+                string searchText = SearchTextBox.Text.Trim().ToLower();
+
+                // Получаем выбранную вкладку
+                if (AdminTabControl.SelectedItem is TabItem selectedTab)
+                {
+                    // Получаем DataGrid из содержимого вкладки
+                    if (selectedTab.Content is DataGrid dataGrid)
+                    {
+                        // Источник должен быть DataView
+                        if (dataGrid.ItemsSource is DataView dataView)
+                        {
+                            List<string> filterConditions = new List<string>();
+
+                            foreach (DataColumn column in dataView.Table.Columns)
+                            {
+                                // Строим условие для фильтрации всех столбцов
+                                filterConditions.Add($"CONVERT([{column.ColumnName}], 'System.String') LIKE '%{searchText}%'");
+                            }
+
+                            // Устанавливаем фильтр
+                            dataView.RowFilter = string.Join(" OR ", filterConditions);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                string searchText = SearchTextBox.Text.Trim().ToLower();
+
+                if (MainDataGrid.ItemsSource is DataView dataView)
+                {
+                    List<string> filterConditions = new List<string>();
+
+                    foreach (DataColumn column in dataView.Table.Columns)
+                    {
+                        // Фильтрация абсолютно всех типов данных через строковое преобразование
+                        filterConditions.Add($"CONVERT([{column.ColumnName}], 'System.String') LIKE '%{searchText}%'");
+                    }
+
+                    dataView.RowFilter = string.Join(" OR ", filterConditions);
+                }
+            }
+        }
+        // ========================== SEARCH FIELD END ==========================
+
+        // ============================ PROFILE MENU ============================
         private void ProfileMenu_Click(object sender, RoutedEventArgs e)
         {
             if (((int)ProfileMenu.ActualHeight) > 0)
@@ -260,7 +439,6 @@ namespace ManagerAppV2._1
             DataSource.Clear();
 
         }
-        // ================================= = =================================
         private void ProfileMenuClose()
         {
             DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
@@ -269,7 +447,7 @@ namespace ManagerAppV2._1
             ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
             ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
         }
-        // ================================= = =================================
+        // ========================== PROFILE MENU END ==========================
 
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -278,11 +456,14 @@ namespace ManagerAppV2._1
 
             // Проверяем, был ли клик вне всех меню
             if (!IsDescendantOf(clickedElement, DatabaseMenu) &&
-                !IsDescendantOf(clickedElement, ManagersMenu) &&
+                !IsDescendantOf(clickedElement, EditMenu) &&
                 !IsDescendantOf(clickedElement, ProfileMenu))
             {
                 DatabaseMenuClose();
-                ManagersMenuClose();
+                EditMenuClose();
+                UserMenuClose(); 
+                ProductMenuClose();
+                WarehouseMenuClose();
                 ProfileMenuClose();
             }
         }
@@ -298,7 +479,6 @@ namespace ManagerAppV2._1
             MinimizeElements();
             LoadDataToLabel();
             ReLoadData(DBname);
-            //LoadMonth();
         }
         // ============================ DATA CONTROL ============================
         private void RoleControl()
@@ -309,10 +489,12 @@ namespace ManagerAppV2._1
 
             if (labelText != "Developer" && labelText != "Admin")
             {
+                this.Title = "Главное окно";
                 ManagerControls();
             }
             else
             {
+                this.Title = "Главное окно (ADMIN)";
                 if (labelText == "Developer") { MessageBox.Show("Welcome back Developer! All systems online", "Welcome back", MessageBoxButton.OK, MessageBoxImage.Information); }
                 AdminMode = true;
                 AdminControls();
@@ -322,7 +504,8 @@ namespace ManagerAppV2._1
         private void LoadDataToLabel(string role = null)
         {
             string connectionString = CH.GetConnectionString();
-            string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
+            string query = $"SELECT monthPlan FROM users WHERE login = '{Login}'";
+            string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
 
             try
             {
@@ -341,6 +524,8 @@ namespace ManagerAppV2._1
                     else
                     {
                         int convResult = Convert.ToInt32(result);
+                        MonthPLabel.Content = $"План ({monthName})";
+                        SoldedMLabel.Content = $"Продано ({monthName})";
                         MonthPlanLabel.Content = convResult.ToString("N0", culture);
                     }
                 }
@@ -358,7 +543,7 @@ namespace ManagerAppV2._1
             if (AdminMode)
             {
                 string connectionString = CH.GetConnectionString();
-                string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
+                string query = $"SELECT monthplan FROM users WHERE login = '{Login}'";
                 string query2 = $"SELECT SUM(ShipmentPrice) from `{GetTabName()}`";
                 var culture = new CultureInfo("en-US");
 
@@ -454,7 +639,7 @@ namespace ManagerAppV2._1
 
         private void AdminControls()
         {
-            ManagersButton.Visibility = Visibility.Visible;
+            AdminEditButton.Visibility = Visibility.Visible;
             AdminTabControl.Visibility = Visibility.Visible;
             MainDataGrid.Visibility = Visibility.Collapsed;
             GetMySQLTables(CH.GetConnectionString());
@@ -500,7 +685,7 @@ namespace ManagerAppV2._1
         // =========================== MANAGER LOGIN ===========================
         private void ManagerControls()
         {
-            ManagersButton.Visibility = Visibility.Collapsed;
+            AdminEditButton.Visibility = Visibility.Collapsed;
             AdminTabControl.Visibility = Visibility.Collapsed;
             AdminDatabaseGrid.Visibility = Visibility.Collapsed;
             MainDataGrid.Visibility = Visibility.Visible;
@@ -553,11 +738,10 @@ namespace ManagerAppV2._1
         {
             var dataGrid = new DataGrid
             {
-                AutoGenerateColumns = false,
+                AutoGenerateColumns = false, // Отключаем авто-генерацию столбцов
                 SelectionMode = DataGridSelectionMode.Single,
                 SelectionUnit = DataGridSelectionUnit.FullRow,
-                IsReadOnly = true,
-                Margin = new Thickness(5)
+                CanUserSortColumns = true // Разрешаем сортировку
             };
 
             var tableData = new DataTable();
@@ -568,56 +752,38 @@ namespace ManagerAppV2._1
                 adapter.Fill(tableData);
             }
 
+            // Очистка столбцов (хотя при AutoGenerateColumns=false это не обязательно)
             dataGrid.Columns.Clear();
 
             foreach (DataColumn column in tableData.Columns)
             {
-                var binding = new Binding($"[{column.ColumnName}]");
+                // Создаем правильную привязку для DataTable
+                var binding = new Binding(column.ColumnName);
 
                 var gridColumn = new DataGridTextColumn
                 {
                     Header = column.ColumnName,
-                    Binding = binding
+                    Binding = binding,
+                    CanUserSort = true // Разрешаем сортировку для столбца
                 };
 
-                if (column.ColumnName.Equals("ShipmentDate", StringComparison.OrdinalIgnoreCase))
+                // Форматирование для даты
+                if (column.DataType == typeof(DateTime) ||
+                    column.ColumnName.Equals("ShipmentDate", StringComparison.OrdinalIgnoreCase))
                 {
-                    gridColumn.Binding.StringFormat = "dd.MM.yyyy";
+                    gridColumn.Binding = new Binding(column.ColumnName)
+                    {
+                        StringFormat = "dd.MM.yyyy"
+                    };
                 }
 
                 dataGrid.Columns.Add(gridColumn);
             }
 
+            // Устанавливаем источник данных
             dataGrid.ItemsSource = tableData.DefaultView;
+
             return dataGrid;
-        }
-
-
-
-
-
-        // Метод загрузки данных в DataGrid (без изменений)
-        private void LoadTableData(DataGrid dataGrid, string connectionString, string tableName)
-        {
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string query = $"SELECT * FROM `{tableName}`";
-                    MySqlCommand command = new MySqlCommand(query, connection);
-
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(command);
-                    DataTable dataTable = new DataTable();
-                    adapter.Fill(dataTable);
-
-                    dataGrid.ItemsSource = dataTable.DefaultView;
-                }
-            }
-            catch (Exception ex)
-            {
-                AddErrorMessage($"Ошибка загрузки данных (TABCONTROL): {ex.Message}");
-            }
         }
 
         // Вспомогательная функция для проверки принадлежности элемента
@@ -666,8 +832,6 @@ namespace ManagerAppV2._1
             }
             return tables;
         }
-
-
 
         // Метод для обновления базы данных после удаления
         private void UpdateDatabase(string tableName, DataTable dataTable)
@@ -723,13 +887,13 @@ namespace ManagerAppV2._1
             }
         }
 
-
-        // Создание DataGrid для таблицы
-
         private void MinimizeElements()
         {
             DatabaseMenu.Height = 0;
-            ManagersMenu.Height = 0;
+            EditMenu.Height = 0;
+            UserMenu.Height = 0;
+            ProductMenu.Height = 0;
+            WarehouseMenu.Height = 0;
             ProfileMenu.Height = 0;
         }
 
@@ -752,7 +916,6 @@ namespace ManagerAppV2._1
                     AdminTabControl.SelectedIndex = currentIndex;
                 }
 
-                // 👉 Теперь безопасно получаем имя таблицы и вызываем SoldControl
                 string tableName = GetTabName();
                 if (!string.IsNullOrWhiteSpace(tableName) && tableName != "error")
                 {
@@ -790,11 +953,6 @@ namespace ManagerAppV2._1
                 }
             }
         }
-
-
-
-
-
         private void ApplyColumnVisibility()
         {
             if (AdminMode)
@@ -909,8 +1067,6 @@ namespace ManagerAppV2._1
 
             MarqueeTransform.BeginAnimation(TranslateTransform.XProperty, animation);
         }
-
-
 
         // =============================== FILTER ===============================
 
@@ -1145,9 +1301,17 @@ namespace ManagerAppV2._1
         }
         private void AdminTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Запоминаем имя текущей таблицы при смене вкладки
-            LoadDataAndCreateCheckBoxes(true);
-            LoadDataToLabel(CH.GetRole(GetTabName()));
+            // Проверяем, что изменение действительно связано с выбором вкладки
+            if (e.Source is TabControl tabControl)
+            {
+                // Получаем выбранную вкладку
+                if (tabControl.SelectedItem is TabItem selectedTab)
+                {
+                    LoadDataAndCreateCheckBoxes(true);
+                    LoadDataToLabel(CH.GetRole(GetTabName()));
+                }
+            }
+
         }
         public DataGrid GetSelectedDataGrid(TabControl tabControl)
         {
@@ -1158,57 +1322,21 @@ namespace ManagerAppV2._1
             }
             return null;
         }
-
-
-        private void LoadMonth()
+        
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
         {
-            try
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
-                string query = "SELECT month FROM monthplan where id = 1";
-                using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
-                {
-                    conn.Open();
-                    MySqlCommand monthGetter = new MySqlCommand(query, conn);
-                    string MP = monthGetter.ExecuteScalar().ToString();
-                    MonthPLabel.Content = $"План ({MP})";
-                    SoldedMLabel.Content = $"Продано ({MP})";
-                }
-            }catch (Exception ex) { }
-        }
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
 
-        private void CreateProduct_Click(object sender, RoutedEventArgs e)
-        {
-            AddnEditProduct AEP = new AddnEditProduct("Add");
-            AEP.ShowDialog();
-        }
+                if (child is T correctlyTyped)
+                    return correctlyTyped;
 
-        private void ExportBtn1_Click(object sender, RoutedEventArgs e)
-        {
-            var DialogResult = MessageBox.Show("Создать все базовые таблицы?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            string query1 = "CREATE TABLE `monthplan` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  `Month` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idMonthPlan_UNIQUE` (`id`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `product price` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Product_name` varchar(45) DEFAULT NULL,\r\n  `Product_price` int DEFAULT NULL,\r\n  `Minimum_price` varchar(45) DEFAULT NULL,\r\n  `Unit_of_measurement` varchar(45) DEFAULT NULL,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `Product name_UNIQUE` (`Product_name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='\t\t\t';\r\n\r\nCREATE TABLE `roles` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `MonthPlan` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `role_UNIQUE` (`role`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `users` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `login` varchar(45) NOT NULL,\r\n  `password` varchar(128) NOT NULL,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `databasename` varchar(45) DEFAULT NULL,\r\n  `image` longtext,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `login_UNIQUE` (`login`),\r\n  UNIQUE KEY `databasename_UNIQUE` (`databasename`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE `warehouse` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `adress` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idwarehouse_UNIQUE` (`id`),\r\n  UNIQUE KEY `name_UNIQUE` (`name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n";
-            if (DialogResult == MessageBoxResult.Yes)
-            {
-                using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
-                {
-                    conn.Open();
-                    using (MySqlCommand command = new MySqlCommand(query1, conn))
-                    {
-                        int result = command.ExecuteNonQuery();
-
-                        if (result > 0)
-                        {
-                            MessageBox.Show("Таблицы успешно созданы!");
-                            //ClearUserForm();
-                        }
-                    }
-                }
+                T descendent = FindVisualChild<T>(child);
+                if (descendent != null)
+                    return descendent;
             }
-        }
-
-        private void EditProductButton_Click(object sender, RoutedEventArgs e)
-        {
-            AddnEditProduct AEP = new AddnEditProduct("Edit");
-            AEP.ShowDialog();
+            return null;
         }
     }
 }

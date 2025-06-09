@@ -1,87 +1,181 @@
 ﻿using ManagerAppV2;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
 
 namespace ManagerAppV2._1
 {
     /// <summary>
     /// Логика взаимодействия для LoginWindow.xaml
     /// </summary>
+
     public partial class LoginWindow : Window
     {
-        ConnectHelper CH = new ConnectHelper();
+        public string ConnectionErrorText { get; private set; } = string.Empty;
 
+        private readonly ConnectHelper CH = new ConnectHelper();
+        private readonly string filePath = "Config.json";
+
+        // Конструктор окна
         public LoginWindow()
         {
             InitializeComponent();
+            CheckConfigFile(filePath, SettingButton);
+            Load();
         }
 
+        private void StartErrorAnimation(Button button)
+        {
+            // Установка текста ошибки
+            ConnectionErrorText = "Ошибка наличия таблиц, проверьте данные и нажмите Сохранить";
+
+            ColorAnimation animation = new ColorAnimation
+            {
+                From = Colors.LightGray,
+                To = Colors.Red,
+                Duration = TimeSpan.FromSeconds(0.5),
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            SolidColorBrush brush = new SolidColorBrush(Colors.LightGray);
+            button.Background = brush;
+            brush.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+        }
+        public void StopErrorAnimation(Button button)
+        {
+            // Остановка текущей анимации
+            if (button.Background is SolidColorBrush brush)
+            {
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, null);
+            }
+
+            Color hexColor = (Color)ColorConverter.ConvertFromString("#333333");
+            button.Background = new SolidColorBrush(hexColor);
+        }
+        private void Load()
+        {
+            MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
+
+            if (!checker.AreRequiredTablesPresent())
+            {
+                BitmapImage bi = new BitmapImage();
+                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+                bi.BeginInit();
+                bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
+                bi.EndInit();
+                // Set the image source.
+                SettingButtonImage.Source = bi;
+                StartErrorAnimation(SettingButton);
+                LoginButton.IsEnabled = false;
+            }
+            else
+            {
+                BitmapImage bi = new BitmapImage();
+                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+                bi.BeginInit();
+                bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
+                bi.EndInit();
+                // Set the image source.
+                SettingButtonImage.Source = bi;
+                StopErrorAnimation(SettingButton);
+                LoginButton.IsEnabled = true;
+            }
+        }
+
+        // Обработчик кнопки "Войти"
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string login = LoginTextBox.Text.Trim();
             string password = Passwordbox.Password;
-
 
             if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
                 MessageBox.Show("Введите логин и пароль");
                 return;
             }
-            string storedHash = GetPasswordHashFromDatabase(login);
-            if (storedHash != null && PasswordHasher.VerifyPassword(password, storedHash))
+
+            bool isConnected = CheckMySQLConnection(filePath);
+
+            if (isConnected)
             {
-                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                MessageBox.Show("Успешное подключение к базе данных!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                CH.Load();
+
+                string storedHash = GetPasswordHashFromDatabase(login);
+                if (storedHash != null && PasswordHasher.VerifyPassword(password, storedHash))
                 {
-                    connection.Open();
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                    {
+                        connection.Open();
 
-                    string getrole = $"SELECT role FROM users WHERE login = '{login}'";
-                    MySqlCommand RoleGetter = new MySqlCommand(getrole, connection);
-                    object role = RoleGetter.ExecuteScalar();
+                        // Получение роли пользователя
+                        string getRole = $"SELECT role FROM users WHERE login = '{login}'";
+                        MySqlCommand roleCmd = new MySqlCommand(getRole, connection);
+                        object role = roleCmd.ExecuteScalar();
 
-                    string getname = $"SELECT name FROM users where login = '{login}';";
-                    MySqlCommand NameGetter = new MySqlCommand(getname, connection);
-                    string name = NameGetter.ExecuteScalar().ToString();
+                        // Получение имени пользователя
+                        string getName = $"SELECT name FROM users WHERE login = '{login}'";
+                        MySqlCommand nameCmd = new MySqlCommand(getName, connection);
+                        string name = nameCmd.ExecuteScalar()?.ToString();
 
-                    string getdbname = $"SELECT databasename FROM users where login = '{login}';";
-                    MySqlCommand DBNameGetter = new MySqlCommand(getdbname, connection);
-                    string DBname = DBNameGetter.ExecuteScalar().ToString();
+                        // Получение имени базы данных
+                        string getDbName = $"SELECT databasename FROM users WHERE login = '{login}'";
+                        MySqlCommand dbCmd = new MySqlCommand(getDbName, connection);
+                        string dbName = dbCmd.ExecuteScalar()?.ToString();
 
-                    DataSource.UserName = name.ToString();
-                    DataSource.Role = role.ToString();
-                    DataSource.Login = login;
-                    DataSource.DBname = DBname;
+                        // Установка глобальных данных
+                        DataSource.UserName = name;
+                        DataSource.Role = role?.ToString();
+                        DataSource.Login = login;
+                        DataSource.DBname = dbName;
 
-                    MainWindow MW = new MainWindow();
-                    MW.Show();
-                    this.Close();
-                    connection.Close();
+                        // Переход в главное окно
+                        MainWindow mainWindow = new MainWindow();
+                        mainWindow.Show();
+                        this.Close();
+
+                        connection.Close();
+                    }
                 }
+                else
+                {
+                    MessageBox.Show("Неверный логин или пароль");
+                }
+            }
+            // Ошибки уже обработаны внутри CheckMySQLConnection
+        }
 
+        // Проверка наличия конфигурационного файла и активация кнопки входа
+        private void CheckConfigFile(string path, Button settingButton)
+        {
+            if (File.Exists(path))
+            {
+                LoginButton.IsEnabled = true;
             }
             else
             {
-                MessageBox.Show("Неверный логин или пароль");
+                LoginButton.Style = (Style)FindResource("DisabledButtonStyle");
+                LoginButton.IsEnabled = false;
+                settingButton.Background = new SolidColorBrush(Colors.Red);
             }
         }
-  
 
+        // Получение хеша пароля из базы данных по логину
         private string GetPasswordHashFromDatabase(string username)
         {
-            // Пример получения хеша из БД
             using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
             {
                 var cmd = new MySqlCommand("SELECT password FROM users WHERE login = @username", connection);
@@ -91,42 +185,60 @@ namespace ManagerAppV2._1
             }
         }
 
-        private void RegButton_Click(object sender, RoutedEventArgs e)
+        // Включение или отключение кнопки входа из других окон
+        public void UpdateLoginButtonState(bool isEnabled)
         {
-            var DialogResult = MessageBox.Show("Создать все базовые таблицы?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            string query1 = "CREATE TABLE  if not exists `monthplan` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  `Month` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idMonthPlan_UNIQUE` (`id`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE  if not exists `product price` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `Product_name` varchar(45) DEFAULT NULL,\r\n  `Product_price` int DEFAULT NULL,\r\n  `Minimum_price` varchar(45) DEFAULT NULL,\r\n  `Unit_of_measurement` varchar(45) DEFAULT NULL,\r\n  `Role` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `Product name_UNIQUE` (`Product_name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='\t\t\t';\r\n\r\nCREATE TABLE  if not exists `roles` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `MonthPlan` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `role_UNIQUE` (`role`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE  if not exists `users` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `login` varchar(45) NOT NULL,\r\n  `password` varchar(128) NOT NULL,\r\n  `role` varchar(45) DEFAULT NULL,\r\n  `databasename` varchar(45) DEFAULT NULL,\r\n  `image` longtext,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `id_UNIQUE` (`id`),\r\n  UNIQUE KEY `login_UNIQUE` (`login`),\r\n  UNIQUE KEY `databasename_UNIQUE` (`databasename`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n\r\nCREATE TABLE  if not exists `warehouse` (\r\n  `id` int NOT NULL AUTO_INCREMENT,\r\n  `name` varchar(45) DEFAULT NULL,\r\n  `adress` varchar(45) DEFAULT NULL,\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `idwarehouse_UNIQUE` (`id`),\r\n  UNIQUE KEY `name_UNIQUE` (`name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\r\n CREATE TABLE if not exists `admin` ( \r\n                `id` int NOT NULL AUTO_INCREMENT, \r\n                `ShipmentDate` date DEFAULT NULL, \r\n                `ShipmentWarehouse` varchar(60) DEFAULT NULL, \r\n                `ClientCity` varchar(45) DEFAULT NULL, \r\n                `ClientName` varchar(45) DEFAULT NULL, \r\n                `ProductName` varchar(45) DEFAULT NULL, \r\n                `ProductAmount` varchar(45) DEFAULT NULL, \r\n                `UnitOfMeasurement` varchar(45) DEFAULT NULL, \r\n                `Price` int DEFAULT NULL, \r\n                `MinimumPrice` int DEFAULT NULL, \r\n                `ShipmentValue` int DEFAULT NULL, \r\n                `ShipmentValue(Minimum_price)` int DEFAULT NULL, \r\n                `Reward` int DEFAULT NULL, \r\n                `UPDNumber` int DEFAULT NULL, \r\n                `ShipmentPrice` int DEFAULT NULL, \r\n                PRIMARY KEY (`id`), \r\n                UNIQUE KEY `id_UNIQUE` (`id`), \r\n                UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`) \r\n                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
-            string query2 = $"INSERT INTO users(`name`, `login`, `password`, `role`, `databasename`) VALUES ('Admin','admin', '{PasswordHasher.HashPassword("admin")}', 'Admin', 'admin');";
-            if (DialogResult == MessageBoxResult.Yes)
+            LoginButton.IsEnabled = isEnabled;
+        }
+
+        // Обработчик кнопки настроек подключения
+        private void SettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            ConnectionSettings CS = new ConnectionSettings(this); // передаем ссылку на главное окно
+            CS.ShowDialog();
+        }
+
+        // Проверка подключения к MySQL через конфигурационный файл
+        public bool CheckMySQLConnection(string configFilePath)
+        {
+            try
             {
-                try
+                if (!File.Exists(configFilePath))
                 {
-                    using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
-                    {
-                        conn.Open();
-                        using (MySqlCommand command = new MySqlCommand(query1, conn))
-                        {
-                            int result = command.ExecuteNonQuery();
-
-                            if (result > 0)
-                            {
-                                MessageBox.Show("Таблицы успешно созданы!");
-                                //ClearUserForm();
-                            }
-                        }
-                        using (MySqlCommand command = new MySqlCommand(query2, conn))
-                        {
-                            int result = command.ExecuteNonQuery();
-
-                            if (result > 0)
-                            {
-                                MessageBox.Show("Admin пользователь создан!\nЛогин: admin Пароль: admin");
-                                //ClearUserForm();
-                            }
-                        }
-                    }
+                    MessageBox.Show("Файл конфигурации не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
-                catch (Exception ex) { }
+
+                string json = File.ReadAllText(configFilePath);
+                ConnectHelper config = JsonConvert.DeserializeObject<ConnectHelper>(json);
+
+                if (config == null)
+                {
+                    MessageBox.Show("Ошибка чтения конфигурации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                string connectionString = $"Server={config.Server};Port={config.Port};Database={config.Database};Uid={config.User};Pwd={config.Password};";
+
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    connection.Close();
+                    return true;
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show($"Ошибка подключения к MySQL: {ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Общая ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
+
+
     }
 }

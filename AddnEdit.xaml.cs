@@ -61,7 +61,7 @@ namespace ManagerAppV2._1
             string connectionString = CH.GetConnectionString();
             string query = "SELECT Product_name FROM `product price`;"; // DISTINCT для уникальных значений
             List<string> items = new List<string>();
-            string query2 = "SELECT name FROM warehouse;;"; // DISTINCT для уникальных значений
+            string query2 = "SELECT name FROM warehouses;"; // DISTINCT для уникальных значений
             List<string> items2 = new List<string>();
 
             try
@@ -462,10 +462,10 @@ namespace ManagerAppV2._1
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
                     object Price= command.ExecuteScalar();
-                    priceTextBox.Text = Price.ToString();
+                    priceTextBox.Text = Price?.ToString() ?? string.Empty;
                     MySqlCommand command2 = new MySqlCommand(query2, connection);
                     object UofM= command2.ExecuteScalar();
-                    unitTextBox.Text = UofM.ToString();
+                    unitTextBox.Text = UofM.ToString() ?? string.Empty;
 
                 }
             }
