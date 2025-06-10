@@ -1,26 +1,12 @@
-﻿using Google.Protobuf.Compiler;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ManagerAppV2._1
 {
-    /// <summary>
-    /// Логика взаимодействия для ConnectionSettings.xaml
-    /// </summary>
     public partial class ConnectionSettings : Window
     {
         private string filePath = "Config.json";

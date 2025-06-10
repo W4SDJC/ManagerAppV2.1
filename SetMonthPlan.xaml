@@ -8,8 +8,8 @@
         Title="Установка месячного плана" Height="297" Width="400" SizeToContent="WidthAndHeight">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180*"/>
-            <ColumnDefinition Width="200*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,11 +29,16 @@
         <TextBox x:Name="txtName" Grid.Row="3" Margin="5,5,5,5" IsReadOnly="True" Grid.ColumnSpan="2"/>
 
         <Label Grid.Row="4" Content="Роль пользователя:" Margin="5,5,10,5"/>
-        <TextBox x:Name="txtRole" Grid.Row="5" IsReadOnly="True" Height="29" VerticalAlignment="Center" Margin="5,5,5,5"/>
+        <TextBox x:Name="txtRole" Grid.Row="5" IsReadOnly="True" Height="29" VerticalAlignment="Center" Margin="5,0,5,0"/>
 
         <Label Grid.Row="4" Content="Месячный план:" Margin="5,5,5,5" Grid.Column="1"/>
-        <TextBox x:Name="txtMonthPlan" Grid.Row="5" Margin="5,5,5,5" Height="29" VerticalAlignment="Center" Grid.Column="1"/>
-
-        <Button Grid.Row="6" Content="Сохранить план" Click="BtnSavePlan_Click" Margin="0,19,0,0" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="txtMonthPlan" Grid.Row="5" Margin="5,0,5,0" Height="29" VerticalAlignment="Center" Grid.Column="1"/>
+        <Button Content="Сохранить план" Background="#FF333333" Foreground="White" Height="35" Padding="1,1,1,1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="BtnSavePlan_Click" Grid.Row="6" Width="110" Margin="135,0,0,13" Grid.ColumnSpan="2">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
     </Grid>
 </Window>

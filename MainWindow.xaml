@@ -11,7 +11,7 @@
     </Window.Resources>
     <Grid x:Name="MainGrid">
         <Label x:Name="loginLabel" HorizontalAlignment="Left" Margin="170,-35,0,0" VerticalAlignment="Top"/>
-        <Grid x:Name="Top" RenderTransformOrigin="0.5,0.5" Background="#FFB3B3B3" Height="50" VerticalAlignment="Top">
+        <Grid x:Name="TopGrid" RenderTransformOrigin="0.5,0.5" Background="#FFB3B3B3" Height="50" VerticalAlignment="Top">
             <Grid x:Name="Profile" Margin="0,5,5,5" HorizontalAlignment="Right" Width="140">
                 <Rectangle x:Name="ProfileBackgrnd" RadiusX="10" RadiusY="10" Fill="#FF1F7334" HorizontalAlignment="Center" Width="140"/>
                 <Label x:Name="NameLabel" VerticalAlignment="Top" Height="15" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Padding="0,0,0,0" Margin="40,5,32,0" Foreground="White" FontFamily="Segoe UI Symbol" Content="test"/>

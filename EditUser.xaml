@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="EditPage" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+        Title="Редактировать пользователя" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid Height="245" Width="510" Margin="0,0,0,0" >
         <Border CornerRadius="45,45,45,45" Margin="24,49,0,0" Width="86" HorizontalAlignment="Left" Height="84" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="3">
             <Border.Background>
@@ -13,26 +13,26 @@
             </Border.Background>
         </Border>
 
-        <Label x:Name="LoginLabel" Content="Login" Margin="126,57,295,162" Padding="5,5,5,0"/>
-        <Label x:Name="PasswordLabel" Content="Password" HorizontalAlignment="Left" Margin="126,103,0,120" Padding="5,5,5,0"/>
-        <Button x:Name="Cancel" Content="Cancel" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Cancel_Click">
+        <Label x:Name="LoginLabel" Content="Логин" Margin="126,57,295,162" Padding="5,5,5,0"/>
+        <Label x:Name="PasswordLabel" Content="Пароль" HorizontalAlignment="Left" Margin="126,103,0,120" Padding="5,5,5,0"/>
+        <Button x:Name="Cancel" Content="Отмена" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Cancel_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button Content="Save" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,105,10" Click="EditButton_Click">
+        <Button Content="Сохранить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,105,10" Click="EditButton_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Label x:Name="PasswordLabel1" Content="Confirm password" HorizontalAlignment="Left" Margin="126,151,0,70" Padding="5,5,5,0"/>
-        <Label x:Name="NameLabel" Content="Name" Margin="295,57,127,162" Padding="5,5,5,0"/>
-        <Label x:Name="DataBaseNameLabel" Content="Name of table (optional)" HorizontalAlignment="Left" Margin="295,103,0,120" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True"/>
-        <Label x:Name="RoleLabel" Content="Role" HorizontalAlignment="Left" Margin="295,151,0,70" Padding="5,5,5,0"/>
+        <Label x:Name="ConfirmPasswordLabel" Content="Подтверждение пароля" HorizontalAlignment="Left" Margin="126,151,0,70" Padding="5,5,5,0"/>
+        <Label x:Name="NameLabel" Content="Имя" Margin="295,57,127,162" Padding="5,5,5,0"/>
+        <Label x:Name="DataBaseNameLabel" Content="Имя таблицы (необязательно)" HorizontalAlignment="Left" Margin="295,103,0,120" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True"/>
+        <Label x:Name="RoleLabel" Content="Роль" HorizontalAlignment="Left" Margin="295,151,0,70" Padding="5,5,5,0"/>
         <TextBox x:Name="LoginTextBox" Margin="126,83,220,142" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -70,7 +70,14 @@
         </TextBox>
         <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="295,175,0,0" VerticalAlignment="Top" Width="140" Height="20"/>
         <ComboBox x:Name="LoginCB"  HorizontalAlignment="Left" Margin="126,33,0,0" VerticalAlignment="Top" Width="140" Height="20" SelectionChanged="LoginCB_SelectionChanged"/>
-        <Button Content="Delete" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,190,10" Click="DeleteButton_Click">
+        <Button Content="Удалить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,190,10" Click="DeleteButton_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button x:Name="EditRoleBtn" Content="Ред." Background="#FF333333" Foreground="White" Width="50" Height="20" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,50" Click="EditRoleBtn_Click" >
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>

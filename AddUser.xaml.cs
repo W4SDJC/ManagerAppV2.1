@@ -1,44 +1,22 @@
-﻿using ManagerAppV2;
-using MySql.Data.MySqlClient;
-using System.Security.Cryptography;
-using Org.BouncyCastle.Utilities.Encoders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MySql.Data.MySqlClient;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Reflection.PortableExecutable;
-
 
 namespace ManagerAppV2._1
 {
-    /// <summary>
-    /// Логика взаимодействия для AddUser.xaml
-    /// </summary>
+
     public partial class AddUser : Window
     {
         public AddUser()
         {
             InitializeComponent();
-            LoadComboBoxData();
+            LoadRolesIntoComboBox();
         }
         ConnectHelper CH = new ConnectHelper();
-        private void LoadComboBoxData()
+        private void LoadRolesIntoComboBox()
         {
-
-            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;"; // DISTINCT для уникальных значений
-
+            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;";
             List<string> items = new List<string>();
 
             try
@@ -62,10 +40,10 @@ namespace ManagerAppV2._1
                     }
                 }
 
-                // Привязка данных к ComboBox
                 RoleComboBox.ItemsSource = items;
 
-                RoleComboBox.SelectedIndex = 0;
+                if (items.Count > 0)
+                    RoleComboBox.SelectedIndex = 0;
             }
             catch (MySqlException ex)
             {
@@ -81,8 +59,6 @@ namespace ManagerAppV2._1
             }
             return "";
         }
-
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string dbname;
@@ -146,8 +122,6 @@ namespace ManagerAppV2._1
             }
             
         }
-            
-
         private bool ConfirmingPassword(string password, string confirmPassword)
         {
             return password == confirmPassword;
@@ -173,7 +147,6 @@ namespace ManagerAppV2._1
             // Сохраняем в БД
             SaveUserToDatabase(LoginTextBox.Text, hashedPassword);
         }
-
         private void SaveUserToDatabase(string username, string hashedPassword)
         {
             using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
@@ -187,11 +160,11 @@ namespace ManagerAppV2._1
                 cmd.ExecuteNonQuery();
             }
         }
-
         private void AddRole_Click(object sender, RoutedEventArgs e)
         {
-            AddRole AR = new AddRole();
-            AR.ShowDialog();
+            EditRole roleWindow = new EditRole();
+            roleWindow.RoleChanged += LoadRolesIntoComboBox; // Подписка на событие для обновления ComboBox
+            roleWindow.ShowDialog();
         }
     }
 }

@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="ProfilePage" Height="185" Width="320" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+        Title="Редактировать профиль" Height="185" Width="320" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid Width="320">
-        <Border CornerRadius="45,45,45,45" Margin="20,28,0,0" Width="85" Height="85" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Border CornerRadius="45,45,45,45" Margin="20,28,0,0" Width="85" Height="85" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="3">
             <Border.Background>
-                <ImageBrush  ImageSource="/Icons/Avatar.jpg" Stretch="Fill" />
+                <ImageBrush  ImageSource="/Icons/AppLogo.png" Stretch="Fill" />
             </Border.Background>
         </Border>
 
-        <Label x:Name="NameLabel" Content="Name" Margin="128,15,150,128"/>
+        <Label x:Name="NameLabel" Content="Имя" Margin="128,15,150,128"/>
         <TextBox x:Name="NameTextBox" Margin="128,41,32,108" TextWrapping="Wrap" Text="TextBox" Padding="5,0,0,0">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -21,7 +21,7 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <Label x:Name="RoleLabel" Content="Role" HorizontalAlignment="Left" Margin="128,61,0,83"/>
+        <Label x:Name="RoleLabel" Content="Роль" HorizontalAlignment="Left" Margin="128,61,0,83"/>
         <TextBox x:Name="RoleTextBox" Margin="128,85,72,64" TextWrapping="Wrap" Text="TextBox" Padding="5,0,0,0" IsReadOnly="True" Foreground="#FF616161">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -29,7 +29,7 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <Button Content="Save" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Button_Click">
+        <Button Content="Сохранить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Button_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>

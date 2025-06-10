@@ -8,8 +8,6 @@ using System.Windows;
 
 namespace ManagerAppV2._1
 {
-
-
     public static class PasswordHasher
     {
         // Размер соли (рекомендуется минимум 16 байт)
@@ -21,22 +19,28 @@ namespace ManagerAppV2._1
 
         public static string HashPassword(string password)
         {
-            // Генерируем случайную соль
-            byte[] salt;
-            new RNGCryptoServiceProvider().GetBytes(salt = new byte[SaltSize]);
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Пароль не должен быть пустым.", nameof(password));
 
-            // Создаем хеш с помощью PBKDF2
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
-            byte[] hash = pbkdf2.GetBytes(HashSize);
+            byte[] salt = new byte[SaltSize];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
 
-            // Комбинируем соль и хеш
+            byte[] hash;
+            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
+            {
+                hash = pbkdf2.GetBytes(HashSize);
+            }
+
             byte[] hashBytes = new byte[SaltSize + HashSize];
-            Array.Copy(salt, 0, hashBytes, 0, SaltSize);
-            Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
+            Buffer.BlockCopy(salt, 0, hashBytes, 0, SaltSize);
+            Buffer.BlockCopy(hash, 0, hashBytes, SaltSize, HashSize);
 
-            // Конвертируем в base64 для хранения
             return Convert.ToBase64String(hashBytes);
         }
+
 
         public static bool VerifyPassword(string password, string hashedPassword)
         {

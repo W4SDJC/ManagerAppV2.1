@@ -1,26 +1,12 @@
-﻿using ManagerAppV2;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿using MySql.Data.MySqlClient;
 using System.Data;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ManagerAppV2._1
 {
-    /// <summary>
-    /// Логика взаимодействия для AddnEdit.xaml
-    /// </summary>
+
     public partial class AddnEdit : Window
     {
         public string db = DataSource.DBname;
@@ -442,9 +428,6 @@ namespace ManagerAppV2._1
         {
             AddShipment(db,ID,AdminMode);
         }
-
-
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

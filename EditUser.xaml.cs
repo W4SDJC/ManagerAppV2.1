@@ -1,26 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace ManagerAppV2._1
 {
-    /// <summary>
-    /// Логика взаимодействия для EditUser.xaml
-    /// </summary>
+
     public partial class EditUser : Window
     {
         ConnectHelper CH = new ConnectHelper();
@@ -255,9 +241,7 @@ namespace ManagerAppV2._1
 
         private void LoadRoleComboBoxData()
         {
-
-            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;"; // DISTINCT для уникальных значений
-
+            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;";
             List<string> items = new List<string>();
 
             try
@@ -265,26 +249,20 @@ namespace ManagerAppV2._1
                 using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                 {
                     connection.Open();
-
                     using (MySqlCommand command = new MySqlCommand(query, connection))
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        using (MySqlDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                if (!reader.IsDBNull(0))
-                                {
-                                    items.Add(reader.GetString(0));
-                                }
-                            }
+                            if (!reader.IsDBNull(0))
+                                items.Add(reader.GetString(0));
                         }
                     }
                 }
 
-                // Привязка данных к ComboBox
                 RoleComboBox.ItemsSource = items;
-
-                RoleComboBox.SelectedIndex = 1;
+                if (items.Count > 0)
+                    RoleComboBox.SelectedIndex = 0;
             }
             catch (MySqlException ex)
             {
@@ -388,7 +366,14 @@ namespace ManagerAppV2._1
                 LoginCB.Items.Clear();
                 LoadComboBoxDataAsync();
             }
-        } 
+        }
+
+        private void EditRoleBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EditRole roleWindow = new EditRole();
+            roleWindow.RoleChanged += LoadRoleComboBoxData; // Подписка на событие для обновления ComboBox
+            roleWindow.ShowDialog();
+        }
     }
 
 }

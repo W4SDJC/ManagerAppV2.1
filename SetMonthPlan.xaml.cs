@@ -1,11 +1,7 @@
-﻿using ManagerAppV2._1;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
+﻿using MySql.Data.MySqlClient;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace ManagerAppV2._1
 {
