@@ -339,15 +339,15 @@
                         <Image Source="/Icons/Edit.png" Width="15" Height="15" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="ExportBtn1" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Margin="0,5,0,0" >
+                <Button x:Name="TableRemoveBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Margin="0,5,0,0" Click="TableRemoveBtn_Click" >
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal" Width="155">
-                        <TextBlock FontSize="14" Text="Export" Foreground="White" Margin="5,0,5,0" Width="125" />
-                        <Image Source="/Icons/Share.png" Height="15" HorizontalAlignment="Right" Margin="0,0,5,0" />
+                        <TextBlock FontSize="14" Text="Удаление таблиц" Foreground="White" Margin="5,0,5,0" Width="125" />
+                        <Image Source="/Icons/Trash.png" Height="15" HorizontalAlignment="Right" Margin="0,0,5,0" />
                     </StackPanel>
                 </Button>
             </StackPanel>

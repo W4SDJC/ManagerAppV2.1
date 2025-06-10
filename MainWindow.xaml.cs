@@ -1323,5 +1323,11 @@ namespace ManagerAppV2._1
             }
             return null;
         }
+
+        private void TableRemoveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            TableRemove TBR = new TableRemove();
+            TBR.Show();
+        }
     }
 }
