@@ -97,6 +97,11 @@ namespace ManagerAppV2._1
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
+            // Проверка обязательных полей
+            ValidateTextBox(LoginTextBox, "Login");
+            ValidateTextBox(NameTextBox, "Name");
+
+            // Получаем ID пользователя
             string id;
             using (MySqlConnection con = new MySqlConnection(CH.GetConnectionString()))
             {
@@ -106,20 +111,30 @@ namespace ManagerAppV2._1
                 id = IDGetter.ExecuteScalar().ToString();
             }
 
-            string dbname;
-            ValidateTextBox(LoginTextBox, "Login");
-            ValidateTextBox(NameTextBox, "Name");
-            ValidateTextBox(PasswordTextBox, "Password");
-            ValidateTextBox(ConfirmPasswordTextBox, "Password confirmation");
-            if (string.IsNullOrEmpty(DataBaseNameTextBox.Text))
+            // Определяем имя базы данных
+            string dbname = string.IsNullOrEmpty(DataBaseNameTextBox.Text)
+                ? LoginTextBox.Text + RoleComboBox.SelectedItem.ToString()
+                : DataBaseNameTextBox.Text;
+
+            // Проверяем, были ли заполнены поля пароля
+            bool passwordFieldsEmpty = string.IsNullOrEmpty(PasswordTextBox.Text) &&
+                                      string.IsNullOrEmpty(ConfirmPasswordTextBox.Text);
+
+            // Если поля пароля не пустые, проверяем их совпадение
+            if (!passwordFieldsEmpty)
             {
-                dbname = LoginTextBox.Text + RoleComboBox.SelectedItem.ToString();
+                ValidateTextBox(PasswordTextBox, "Password");
+                ValidateTextBox(ConfirmPasswordTextBox, "Password confirmation");
+
+                if (!ConfirmingPassword(PasswordTextBox.Text, ConfirmPasswordTextBox.Text))
+                {
+                    MessageBox.Show("Passwords don't match", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
-            else
-            { dbname = DataBaseNameTextBox.Text; }
-            if (ConfirmingPassword(PasswordTextBox.Text, ConfirmPasswordTextBox.Text))
-            {
-                string query = $"CREATE TABLE if not exists `{dbname}` (" +
+
+            // Строим SQL запрос
+            string query = $"CREATE TABLE if not exists `{dbname}` (" +
                 $"`id` int NOT NULL AUTO_INCREMENT," +
                 $"`ShipmentDate` date DEFAULT NULL," +
                 $"`ShipmentWarehouse` varchar(60) DEFAULT NULL," +
@@ -139,31 +154,36 @@ namespace ManagerAppV2._1
                 $"UNIQUE KEY `id_UNIQUE` (`id`)," +
                 $"UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`)" +
                 $") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
-                $"UPDATE users SET name = '{NameTextBox.Text}', login = '{LoginTextBox.Text}', password = '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', role = '{RoleComboBox.SelectedItem}', databasename = '{dbname}' WHERE id = '{id}'";
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
-                    {
-                        connection.Open();
+                $"UPDATE users SET name = '{NameTextBox.Text}', login = '{LoginTextBox.Text}', " +
+                $"role = '{RoleComboBox.SelectedItem}', databasename = '{dbname}'";
 
-                        using (MySqlCommand command = new MySqlCommand(query, connection))
-                        {
-                            int result = command.ExecuteNonQuery();
-                            MessageBox.Show($"Пользователь {dbname} успешно изменен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
+            // Добавляем обновление пароля только если поля не пустые
+            if (!passwordFieldsEmpty)
+            {
+                query += $", password = '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}'";
+            }
+
+            query += $" WHERE id = '{id}'";
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        int result = command.ExecuteNonQuery();
+                        MessageBox.Show($"Пользователь {dbname} успешно изменен!", "Успех",
+                                      MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show($"Ошибка при создании таблицы:\n{ex.Message}", "Ошибка",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-
             }
-            else
+            catch (MySqlException ex)
             {
-                MessageBox.Show("Passwords don't match", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при создании таблицы:\n{ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             LoadComboBoxDataAsync();
         }
 

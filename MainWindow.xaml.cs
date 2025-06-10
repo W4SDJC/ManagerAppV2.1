@@ -93,11 +93,24 @@ namespace ManagerAppV2._1
                 TabItem selectedTab = AdminTabControl.SelectedItem as TabItem;
                 if (selectedTab?.Content is DataGrid dataGrid && dataGrid.SelectedItem is DataRowView row)
                 {
-                    var selectedData = row.Row; // DataRow с доступом по именам колонок
-                    var editWindow = new AddnEdit("Edit", GetTabName(), row.Row, null, true); // передаём DataRow
-                    editWindow.ShowDialog();
+                    if (selectedTab != null)
+                    {
+                        var dataGrid1 = selectedTab.Content as DataGrid;
+                        if (dataGrid1 != null && dataGrid1.SelectedItem != null)
+                        {
+                            // Приводим к DataRowView (если ItemsSource — DataView):
+                            var rowView = dataGrid.SelectedItem as DataRowView;
+                            if (rowView != null)
+                            {
+                                // Получаем значение столбца 'id':
+                                string idValue = rowView["id"].ToString();
+                                var selectedData = row.Row; // DataRow с доступом по именам колонок
+                                var editWindow = new AddnEdit("Edit", GetTabName(), row.Row, idValue, true); // передаём DataRow
+                                editWindow.ShowDialog();
+                            }
+                        }
+                    }
                 }
-
             }
             else
             {
@@ -106,11 +119,10 @@ namespace ManagerAppV2._1
                     MessageBox.Show("Выберите строку для изменения");
                     return;
                 }
-                MessageBox.Show(AdminMode.ToString());
                 DataRowView selectedRow = (DataRowView)MainDataGrid.SelectedItem;
-                string id = (selectedRow["id"]).ToString();
+                string id = selectedRow["id"].ToString();
 
-                var editWindow = new AddnEdit("Edit",DBname, null, id); // передаём DataRow
+                var editWindow = new AddnEdit("Edit",DBname, null, id); 
                 editWindow.ShowDialog();
                 ReLoadData(DBname);
             }
@@ -486,10 +498,10 @@ namespace ManagerAppV2._1
             }
         }
 
-        private void LoadDataToLabel(string role = null)
+        private void LoadDataToLabel(string DBname = null)
         {
             string connectionString = CH.GetConnectionString();
-            string query = $"SELECT monthPlan FROM users WHERE login = '{Login}'";
+            string query = $"SELECT monthPlan FROM users WHERE databasename = '{DBname}'";
             string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
 
             try
@@ -514,7 +526,7 @@ namespace ManagerAppV2._1
                         MonthPlanLabel.Content = convResult.ToString("N0", culture);
                     }
                 }
-                SoldControl(role);
+                SoldControl();
             }
             catch (MySqlException ex)
             {
@@ -799,6 +811,7 @@ namespace ManagerAppV2._1
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
+
                 connection.Open();
 
                 // Запрос для получения списка таблиц
@@ -1293,7 +1306,8 @@ namespace ManagerAppV2._1
                 if (tabControl.SelectedItem is TabItem selectedTab)
                 {
                     LoadDataAndCreateCheckBoxes(true);
-                    LoadDataToLabel(CH.GetRole(GetTabName()));
+                    DataSource.DBname = GetTabName();
+                    LoadDataToLabel(GetTabName());
                 }
             }
 

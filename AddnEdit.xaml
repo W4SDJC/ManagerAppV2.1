@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="AddnEdit" Height="615" Width="490" SizeToContent="WidthAndHeight">
+        Title="AddnEdit" Height="615" Width="490" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Window.Resources>
 
     </Window.Resources>
@@ -19,7 +19,9 @@
 
                 <!-- Склад отгрузки -->
                 <TextBlock Text="Склад отгрузки:"/>
-                <ComboBox x:Name="WarehouseCB" SelectionChanged="ProductCB_SelectionChanged"/>
+                <ComboBox x:Name="WarehouseCB" SelectionChanged="WarehouseCB_SelectionChanged" />
+                <TextBlock Text="Адрес склада:"/>
+                <TextBox x:Name="WarehouseAddress" IsReadOnly="True" Foreground="#FF616161"/>
 
                 <!-- Город клиента -->
                 <TextBlock Text="Город клиента:"/>
@@ -35,27 +37,27 @@
 
                 <!-- Количество -->
                 <TextBlock Text="Количество:"/>
-                <TextBox x:Name="amountTextBox" Margin="0,0,0,10"/>
+                <TextBox x:Name="amountTextBox" Margin="0,0,0,10" TextChanged="amountTextBox_TextChanged"/>
 
                 <!-- Единица измерения -->
                 <TextBlock Text="Единица измерения:"/>
                 <TextBox x:Name="unitTextBox" Margin="0,0,0,10" IsReadOnly="True" Foreground="#FF616161"/>
+                <TextBlock Text="Минимальная цена:"/>
+                <TextBox x:Name="minPriceTextBox" IsReadOnly="True" Foreground="#FF616161"/>
 
                 <!-- Цена -->
-                <TextBlock Text="Цена:"/>
-                <TextBox x:Name="priceTextBox" Margin="0,0,0,10"/>
+                <TextBlock Text="Цена продажи:" Margin="0,5,0,0"/>
+                <TextBox x:Name="priceTextBox" Margin="0,0,0,10" TextChanged="priceTextBox_TextChanged"/>
 
                 <!-- Минимальная цена -->
-                <TextBlock Text="Минимальная цена:"/>
-                <TextBox x:Name="minPriceTextBox" Margin="0,0,0,10"/>
 
                 <!-- Номер УПД -->
                 <TextBlock Text="Номер УПД:"/>
                 <TextBox x:Name="updNumberTextBox" Margin="0,0,0,10"/>
 
                 <!-- Цена отгрузки -->
-                <TextBlock Text="Цена отгрузки:"/>
-                <TextBox x:Name="shipmentPriceTextBox" Margin="0,0,0,20"/>
+                <TextBlock Text="Сумма отгрузки:"/>
+                <TextBox x:Name="shipmentPriceTextBox" Margin="0,0,0,20" IsReadOnly="True" Foreground="#FF25B92E"/>
             </StackPanel>
         </ScrollViewer>
         <Button x:Name="CancelButton" Background="#333333" Foreground="White" BorderThickness="0" Padding="10,5,10,5" Click="CancelButton_Click" ScrollViewer.CanContentScroll="True" Height="30" Margin="0,0,25,25" HorizontalAlignment="Right" Width="68" VerticalAlignment="Bottom">
@@ -78,5 +80,6 @@
                 <TextBlock x:Name="AddnSaveTextBlock" Margin="0,0,0,0" FontSize="14" VerticalAlignment="Center" Width="Auto" Text="Apply" Foreground="White" HorizontalAlignment="Center" />
             </StackPanel>
         </Button>
+        <TextBlock x:Name="ErrorTextBlock" TextWrapping="Wrap" Margin="31,545,219,10" TextAlignment="Center" Width="240" MaxWidth="250" Height="45"/>
     </Grid>
 </Window>

@@ -26,29 +26,29 @@
         </Button>
         <Label x:Name="UnitLabel" Content="Единица измерения" Margin="188,45,73,174" Padding="5,5,5,0"/>
         <Label x:Name="RoleLabel" Content="Роль" HorizontalAlignment="Left" Margin="188,129,0,92" Padding="5,5,5,0"/>
-        <TextBox x:Name="NameTextBox" Margin="19,71,220,154" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+        <TextBox x:Name="NameTextBox" Margin="19,71,220,154" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" TabIndex="2">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="UnitTextBox" Margin="188,71,73,154" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="UnitTextBox" Margin="188,71,73,154" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="3">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="MinPriceTextBox" Margin="19,152,220,73" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="MinPriceTextBox" Margin="19,152,220,73" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="5">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="188,151,0,0" VerticalAlignment="Top" Width="140" Height="20"/>
-        <ComboBox x:Name="ProductCB"  HorizontalAlignment="Left" Margin="19,20,0,0" VerticalAlignment="Top" Width="162" Height="20" SelectionChanged="ProductCB_SelectionChanged" />
+        <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="188,151,0,0" VerticalAlignment="Top" Width="140" Height="20" TabIndex="6"/>
+        <ComboBox x:Name="ProductCB"  HorizontalAlignment="Left" Margin="19,20,0,0" VerticalAlignment="Top" Width="162" Height="20" SelectionChanged="ProductCB_SelectionChanged" TabIndex="1" />
         <Button x:Name="DeleteButton" Content="Удалить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,10" >
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -56,8 +56,8 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Label x:Name="MinPriceLabel_Копировать" Content="Розничная цена" HorizontalAlignment="Left" Margin="19,90,0,132" Padding="5,5,5,0"/>
-        <TextBox x:Name="PriceTextBox" Margin="19,112,220,112" TextWrapping="Wrap" Padding="5,0,0,0">
+        <Label x:Name="PriceLabel" Content="Цена закупки" HorizontalAlignment="Left" Margin="19,90,0,132" Padding="5,5,5,0"/>
+        <TextBox x:Name="PriceTextBox" Margin="19,112,220,112" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="4">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>

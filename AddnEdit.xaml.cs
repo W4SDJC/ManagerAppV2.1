@@ -9,7 +9,7 @@ namespace ManagerAppV2._1
 
     public partial class AddnEdit : Window
     {
-        public string db = DataSource.DBname;
+        public string db;
         public string ID;
         public bool AdminMode = false;
 
@@ -20,16 +20,17 @@ namespace ManagerAppV2._1
             InitializeComponent();
             FormMode(Mode, database, data, id, adminmode);
             LoadComboBoxData();
+
         }
         public void FormMode(string Mode, string dbase, DataRow data = null, string id = null, bool adminmode = false)
         {
+
             AdminMode = adminmode;
             if (Mode == "Add")
             {
                 MainWindow.Title = "Добавить";
                 AddnSaveTextBlock.Text = "Добавить";
                 db = dbase;
-
             }
             else
             {
@@ -37,6 +38,7 @@ namespace ManagerAppV2._1
                 mainLabel.Text = "Изменение существующей отгрузки";
                 AddnSaveTextBlock.Text = "Сохранить";
                 ID = id;
+                db = dbase;
                 if (id == null) { fill(data); }
                 else { FillbyID(dbase, id); }
             }
@@ -94,7 +96,7 @@ namespace ManagerAppV2._1
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -127,8 +129,7 @@ namespace ManagerAppV2._1
                             Reward, 
                             UPDNumber, 
                             ShipmentPrice
-                        ) VALUES (
-                            @date, @warehouse, @city, @clientName, @productName, 
+                        ) VALUES (@date, @warehouse, @city, @clientName, @productName, 
                             @amount, @unit, @price, @minPrice, 
                             @value, @minValue, @reward, @updNumber, @shipmentPrice
                         )";
@@ -171,7 +172,7 @@ namespace ManagerAppV2._1
 
                                     if (result > 0)
                                     {
-                                        MessageBox.Show("Отгрузка успешно добавлена!");
+                                        MessageBox.Show("Отгрузка успешно добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                                         MW.ReLoadData(DataSource.DBname);
                                         ClearForm();
                                     }
@@ -180,7 +181,7 @@ namespace ManagerAppV2._1
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
@@ -247,7 +248,7 @@ namespace ManagerAppV2._1
 
                                     if (result > 0)
                                     {
-                                        MessageBox.Show("Отгрузка успешно добавлена!");
+                                        MessageBox.Show("Отгрузка успешно добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                                         MW.ReLoadData(DataSource.DBname);
                                         ClearForm();
                                     }
@@ -256,7 +257,7 @@ namespace ManagerAppV2._1
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
 
@@ -266,12 +267,9 @@ namespace ManagerAppV2._1
             {
                 if (AddnSaveTextBlock.Text == "Добавить")
                 {
-
                     // Проверка обязательных полей
                     if (!ValidateInput()) return;
-
                     // SQL запрос с параметрами
-                    
                     string query = @$"INSERT INTO `{db}` (
                         ShipmentDate, 
                         ShipmentWarehouse, 
@@ -331,7 +329,7 @@ namespace ManagerAppV2._1
 
                                 if (result > 0)
                                 {
-                                    MessageBox.Show("Отгрузка успешно добавлена!");
+                                    MessageBox.Show("Отгрузка успешно добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                                     MW.ReLoadData(DataSource.DBname);
                                     ClearForm();
                                 }
@@ -340,7 +338,7 @@ namespace ManagerAppV2._1
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
+                        MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     
                 }
@@ -366,58 +364,72 @@ namespace ManagerAppV2._1
                             Reward = @reward, 
                             UPDNumber = @updNumber, 
                             ShipmentPrice = @shipmentPrice
-                         WHERE id = {id}";
+                         WHERE `id` = '{id}'";
 
-                        try
+                    try
+                    {
+                        // Парсим и вычисляем значения
+                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                        decimal price = decimal.Parse(priceTextBox.Text);
+                        decimal minPrice = decimal.Parse(minPriceTextBox.Text);
+                        decimal amount = decimal.Parse(amountTextBox.Text);
+                        decimal shipmentValue = price * amount;
+                        decimal minShipmentValue = minPrice * amount;
+                        decimal reward = shipmentValue - minShipmentValue;
+                        decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+
+                        using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                         {
-                            // Парсим и вычисляем значения
-                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
-                            decimal price = decimal.Parse(priceTextBox.Text);
-                            decimal minPrice = decimal.Parse(minPriceTextBox.Text);
-                            decimal amount = decimal.Parse(amountTextBox.Text);
-                            decimal shipmentValue = price * amount;
-                            decimal minShipmentValue = minPrice * amount;
-                            decimal reward = shipmentValue - minShipmentValue;
-                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+                            connection.Open();
 
-                            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                            using (MySqlCommand command = new MySqlCommand(query, connection))
                             {
-                                connection.Open();
+                                // Добавляем параметры
+                                command.Parameters.AddWithValue("@date", shipmentDate);
+                                command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
+                                command.Parameters.AddWithValue("@city", cityTextBox.Text);
+                                command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
+                                command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
+                                command.Parameters.AddWithValue("@amount", amount);
+                                command.Parameters.AddWithValue("@unit", unitTextBox.Text);
+                                command.Parameters.AddWithValue("@price", price);
+                                command.Parameters.AddWithValue("@minPrice", minPrice);
+                                command.Parameters.AddWithValue("@value", shipmentValue);
+                                command.Parameters.AddWithValue("@minValue", minShipmentValue);
+                                command.Parameters.AddWithValue("@reward", reward);
+                                command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
+                                command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
 
-                                using (MySqlCommand command = new MySqlCommand(query, connection))
+                                int result = command.ExecuteNonQuery();
+                                //MessageBox.Show($"Результат выполнения: {result}"); // проверка
+
+                                if (result > 0)
                                 {
-                                    // Добавляем параметры
-                                    command.Parameters.AddWithValue("@date", shipmentDate);
-                                    command.Parameters.AddWithValue("@warehouse", WarehouseCB.SelectedItem);
-                                    command.Parameters.AddWithValue("@city", cityTextBox.Text);
-                                    command.Parameters.AddWithValue("@clientName", clientNameTextBox.Text);
-                                    command.Parameters.AddWithValue("@productName", ProductCB.SelectedItem);
-                                    command.Parameters.AddWithValue("@amount", amount);
-                                    command.Parameters.AddWithValue("@unit", unitTextBox.Text);
-                                    command.Parameters.AddWithValue("@price", price);
-                                    command.Parameters.AddWithValue("@minPrice", minPrice);
-                                    command.Parameters.AddWithValue("@value", shipmentValue);
-                                    command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                                    command.Parameters.AddWithValue("@reward", reward);
-                                    command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
-                                    command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
+                                    //MessageBox.Show("Работает");
 
-                                    int result = command.ExecuteNonQuery();
-
-                                    if (result > 0)
+                                    try
                                     {
-                                        MessageBox.Show("Отгрузка успешно добавлена!");
                                         MW.ReLoadData(DataSource.DBname);
-                                        ClearForm();
-                                        this.Close();
                                     }
+                                    catch (Exception ex)
+                                    {
+                                        MessageBox.Show("Ошибка обновления данных: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    }
+
+                                    ClearForm();
+                                    this.Close();
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Ни одна строка не была обновлена. Возможно, неверный ID.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}");
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                     }
 
                 }
@@ -426,6 +438,7 @@ namespace ManagerAppV2._1
 
         private void AddShipment_Click(object sender, RoutedEventArgs e)
         {
+
             AddShipment(db,ID,AdminMode);
         }
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -445,16 +458,16 @@ namespace ManagerAppV2._1
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
                     object Price= command.ExecuteScalar();
-                    priceTextBox.Text = Price?.ToString() ?? string.Empty;
+                    minPriceTextBox.Text = Price?.ToString() ?? string.Empty;
                     MySqlCommand command2 = new MySqlCommand(query2, connection);
                     object UofM= command2.ExecuteScalar();
-                    unitTextBox.Text = UofM.ToString() ?? string.Empty;
-
+                    unitTextBox.Text = UofM?.ToString() ?? string.Empty;
+                    CalculateSum();
                 }
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -523,42 +536,42 @@ namespace ManagerAppV2._1
                 string.IsNullOrWhiteSpace(minPriceTextBox.Text) ||
                 string.IsNullOrWhiteSpace(shipmentPriceTextBox.Text))
             {
-                MessageBox.Show("Заполните все обязательные поля!");
+                MessageBox.Show("Заполните все обязательные поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
             // Проверка числовых значений
             if (!DateTime.TryParse(shipmentDateTextBox.Text, out _))
             {
-                MessageBox.Show("Введите корректную дату в формате DD-MM-YYYY!");
+                MessageBox.Show("Введите корректную дату в формате DD-MM-YYYY!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 shipmentDateTextBox.Focus();
                 return false;
             }
 
             if (!decimal.TryParse(amountTextBox.Text, out decimal amount) || amount <= 0)
             {
-                MessageBox.Show("Количество должно быть положительным числом!");
+                MessageBox.Show("Количество должно быть положительным числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 amountTextBox.Focus();
                 return false;
             }
 
             if (!decimal.TryParse(priceTextBox.Text, out decimal price) || price <= 0)
             {
-                MessageBox.Show("Цена должна быть положительным числом!");
+                MessageBox.Show("Цена должна быть положительным числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 priceTextBox.Focus();
                 return false;
             }
 
             if (!decimal.TryParse(minPriceTextBox.Text, out decimal minPrice) || minPrice <= 0)
             {
-                MessageBox.Show("Минимальная цена должна быть положительным числом!");
+                MessageBox.Show("Минимальная цена должна быть положительным числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 minPriceTextBox.Focus();
                 return false;
             }
 
             if (!decimal.TryParse(shipmentPriceTextBox.Text, out decimal shipmentPrice) || shipmentPrice <= 0)
             {
-                MessageBox.Show("Цена отгрузки должна быть положительным числом!");
+                MessageBox.Show("Цена отгрузки должна быть положительным числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 shipmentPriceTextBox.Focus();
                 return false;
             }
@@ -578,5 +591,105 @@ namespace ManagerAppV2._1
             updNumberTextBox.Text = "";
             shipmentPriceTextBox.Text = "";
         }
+
+        private void amountTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalculateSum();
+        }
+        private void priceTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CalculateSum();
+        }
+        private void CalculateSum()
+        {
+            ErrorTextBlock.Text = String.Empty;
+
+            // Проверяем, что текстовые поля существуют и не пустые
+            if (string.IsNullOrWhiteSpace(amountTextBox.Text) || string.IsNullOrWhiteSpace(priceTextBox.Text))
+            {
+                ShowCalculationError("Поля количества и цены должны быть заполнены");
+                return;
+            }
+
+            // Пытаемся преобразовать введенные значения в числа
+            if (!int.TryParse(amountTextBox.Text, out int amount) ||
+                !int.TryParse(priceTextBox.Text, out int price))
+            {
+                ShowCalculationError("Введите корректные числовые значения");
+                return;
+            }
+
+            // Проверяем, что значения положительные
+            if (amount <= 0 || price <= 0)
+            {
+                ShowCalculationError("Значения должны быть положительными");
+                return;
+            }
+
+            try
+            {
+                ErrorTextBlock.Text = String.Empty;
+                // Вычисляем сумму
+                int sum = amount * price;
+
+                // Форматируем результат (например, с разделителями тысяч)
+                shipmentPriceTextBox.Text = sum.ToString("N0");
+            }
+            catch (OverflowException)
+            {
+                ShowCalculationError("Слишком большое значение для вычисления");
+            }
+            catch (Exception ex)
+            {
+                // Логируем неожиданные ошибки
+                ShowCalculationError("Произошла непредвиденная ошибка");
+            }
+        }
+
+        // Вспомогательные методы
+        private void ShowCalculationError(string message)
+        {
+            ErrorTextBlock.TextWrapping = TextWrapping.Wrap;
+
+            ErrorTextBlock.Text = "Ошибка расчета: \n" + message;
+            shipmentPriceTextBox.Text = string.Empty;
+        }
+
+        private void WarehouseCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (WarehouseCB.SelectedItem == null)
+                return;
+
+            string selectedWarehouse = WarehouseCB.SelectedItem.ToString();
+
+            string query = "SELECT address FROM warehouses WHERE name = @name";
+
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                {
+                    connection.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@name", selectedWarehouse);
+                        object result = cmd.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            WarehouseAddress.Text = result.ToString();
+                        }
+                        else
+                        {
+                            WarehouseAddress.Text = "Адрес не найден";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка загрузки адреса: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
     }
 }

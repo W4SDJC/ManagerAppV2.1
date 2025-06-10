@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,7 +54,7 @@ namespace ManagerAppV2._1
         }
         private void Load()
         {
-            MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
+            try { MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
 
             if (!checker.AreRequiredTablesPresent())
             {
@@ -80,7 +79,10 @@ namespace ManagerAppV2._1
                 SettingButtonImage.Source = bi;
                 StopErrorAnimation(SettingButton);
                 LoginButton.IsEnabled = true;
+                }
             }
+            catch (Exception e) { }
+            ;
         }
 
         // Обработчик кнопки "Войти"
@@ -95,7 +97,7 @@ namespace ManagerAppV2._1
                 return;
             }
 
-            bool isConnected = CheckMySQLConnection(filePath);
+            bool isConnected = CH.CheckMySQLConnection(filePath);
 
             if (isConnected)
             {
@@ -185,48 +187,5 @@ namespace ManagerAppV2._1
             ConnectionSettings CS = new ConnectionSettings(this); // передаем ссылку на главное окно
             CS.ShowDialog();
         }
-
-        // Проверка подключения к MySQL через конфигурационный файл
-        public bool CheckMySQLConnection(string configFilePath)
-        {
-            try
-            {
-                if (!File.Exists(configFilePath))
-                {
-                    MessageBox.Show("Файл конфигурации не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                string json = File.ReadAllText(configFilePath);
-                ConnectHelper config = JsonConvert.DeserializeObject<ConnectHelper>(json);
-
-                if (config == null)
-                {
-                    MessageBox.Show("Ошибка чтения конфигурации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                string connectionString = $"Server={config.Server};Port={config.Port};Database={config.Database};Uid={config.User};Pwd={config.Password};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    connection.Close();
-                    return true;
-                }
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show($"Ошибка подключения к MySQL: {ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Общая ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
-
-
     }
 }

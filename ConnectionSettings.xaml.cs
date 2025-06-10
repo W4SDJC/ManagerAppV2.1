@@ -15,7 +15,7 @@ namespace ManagerAppV2._1
         {
             InitializeComponent();
             Load();
-            loginWindow = callerWindow; // сохранить ссылку на главное окно
+            loginWindow = callerWindow;
             if (!string.IsNullOrEmpty(loginWindow.ConnectionErrorText))
             {
                 ErrorTextBlock.Text = loginWindow.ConnectionErrorText;
@@ -29,26 +29,45 @@ namespace ManagerAppV2._1
                 ConnectHelper CH = JsonConvert.DeserializeObject<ConnectHelper>(json);
                 if (CH != null)
                 {
-                    ServerTextBox.Text = CH.Server;
-                    PortTextBox.Text = CH.Port.ToString();
-                    DatabaseTextBox.Text = CH.Database;
-                    UserTextBox.Text = CH.User;
-                    PasswordBox.Password = CH.Password;
-                    CH.Load();
+                    try
+                    {
+                        ServerTextBox.Text = CH.Server;
+                        PortTextBox.Text = CH.Port.ToString();
+                        DatabaseTextBox.Text = CH.Database;
+                        UserTextBox.Text = CH.User;
+                        PasswordBox.Password = CryptoHelper.Decrypt(CH.Password);
+                        CH.Load();
+                    }
+                    catch
+                    {
+                        // Первый запуск: пароль еще не зашифрован
+                        try
+                        {
+                            // Попробуем расшифровать, если не получилось — значит пароль в открытом виде
+                            string plainPassword = CH.Password;
+                            CH.Password = CryptoHelper.Encrypt(plainPassword);
+
+                            string updatedJson = JsonConvert.SerializeObject(CH, Formatting.Indented);
+                            File.WriteAllText(filePath, updatedJson);
+
+                            PasswordBox.Password = plainPassword;
+                        }
+                        catch
+                        {
+                            PasswordBox.Password = "";
+                        }
+                    }
                 }
             }
             else
             {
-                MessageBox.Show("Файл конфигурации не найден. Будет создан новый файл с настройками по умолчанию.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // Создание файла с настройками по умолчанию
                 ConnectHelper defaultCH = new ConnectHelper
                 {
                     Server = "localhost",
                     Port = 3306,
                     Database = "database",
                     User = "root",
-                    Password = ""
+                    Password = CryptoHelper.Encrypt("")
                 };
                 if (Application.Current.MainWindow is LoginWindow LoginWindow)
                 {
@@ -56,16 +75,13 @@ namespace ManagerAppV2._1
                 }
                 string json = JsonConvert.SerializeObject(defaultCH, Formatting.Indented);
                 File.WriteAllText(filePath, json);
-
-                // Заполнение полей формы значениями по умолчанию
                 ServerTextBox.Text = defaultCH.Server;
                 PortTextBox.Text = defaultCH.Port.ToString();
                 DatabaseTextBox.Text = defaultCH.Database;
                 UserTextBox.Text = defaultCH.User;
-                PasswordBox.Password = defaultCH.Password;
+                PasswordBox.Password = "";
             }
         }
-
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -77,13 +93,12 @@ namespace ManagerAppV2._1
                     Port = port,
                     Database = DatabaseTextBox.Text,
                     User = UserTextBox.Text,
-                    Password = PasswordBox.Password
+                    Password = CryptoHelper.Encrypt(PasswordBox.Password)
                 };
-
                 string json = JsonConvert.SerializeObject(CH, Formatting.Indented);
                 File.WriteAllText(filePath, json);
                 MessageBox.Show("Данные сохранены!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                bool isConnected = CheckMySQLConnection("Config.json");
+                bool isConnected = CH.CheckMySQLConnection("Config.json");
                 if (isConnected)
                 {
                     ErrorTextBlock.Foreground = new SolidColorBrush(Colors.Green);
@@ -104,12 +119,11 @@ namespace ManagerAppV2._1
                 MessageBox.Show("Порт должен быть числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private void TableCheck()
         {
             ConnectHelper CH = new ConnectHelper();
-
             MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
-
             if (checker.AreRequiredTablesPresent())
             {
                 MessageBox.Show("Все нужные таблицы найдены.");
@@ -204,13 +218,12 @@ namespace ManagerAppV2._1
                             ";
                     try
                     {
-                        using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString()))
+                        using (MySqlConnection conn = new MySqlConnection(CH.GetConnectionString(2)))
                         {
                             conn.Open();
                             using (MySqlCommand command = new MySqlCommand(query1, conn))
                             {
                                 int result = command.ExecuteNonQuery();
-
                                 if (result > 0)
                                 {
                                     MessageBox.Show("Таблицы успешно созданы!");
@@ -219,7 +232,6 @@ namespace ManagerAppV2._1
                             using (MySqlCommand command = new MySqlCommand(query2, conn))
                             {
                                 int result = command.ExecuteNonQuery();
-
                                 if (result > 0)
                                 {
                                     MessageBox.Show("Admin пользователь создан!\nЛогин: admin Пароль: admin");
@@ -231,44 +243,6 @@ namespace ManagerAppV2._1
                 }
             }
         }
-        public bool CheckMySQLConnection(string configFilePath)
-        {
-            try
-            {
-                if (!File.Exists(configFilePath))
-                {
-                    MessageBox.Show("Файл конфигурации не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
 
-                string json = File.ReadAllText(configFilePath);
-                ConnectHelper config = JsonConvert.DeserializeObject<ConnectHelper>(json);
-
-                if (config == null)
-                {
-                    MessageBox.Show("Ошибка чтения конфигурации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                string connectionString = $"Server={config.Server};Port={config.Port};Database={config.Database};Uid={config.User};Pwd={config.Password};";
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open(); // Попытка открыть соединение
-                    connection.Close();
-                    return true; // Успех
-                }
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show($"Ошибка подключения к MySQL: {ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Общая ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
     }
 }

@@ -1,11 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.IO;
 
 namespace ManagerAppV2
@@ -78,10 +74,63 @@ namespace ManagerAppV2
 
         }
         // Метод для получения строки подключения
-        public string GetConnectionString()
+        public string GetConnectionString(int mode = 1)
         {
             Load();
-            return $"server={Server};port={Port.ToString()};user={User};password={Password};database={Database};";
+
+            string decryptedPassword = CryptoHelper.Decrypt(Password);
+
+            switch (mode)
+            {
+                case 1: // С базой данных
+                    return $"server={Server};port={Port};user={User};password={decryptedPassword};database={Database};";
+
+                case 2: // Без базы данных
+                    return $"server={Server};port={Port};user={User};password={decryptedPassword};";
+
+                default:
+                    throw new ArgumentException("Недопустимое значение mode. Допустимо: 1 или 2.");
+            }
+        }
+
+        public bool CheckMySQLConnection(string configFilePath)
+        {
+            try
+            {
+                if (!File.Exists(configFilePath))
+                {
+                    MessageBox.Show("Файл конфигурации не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                string json = File.ReadAllText(configFilePath);
+                ConnectHelper config = JsonConvert.DeserializeObject<ConnectHelper>(json);
+
+                if (config == null)
+                {
+                    MessageBox.Show("Ошибка чтения конфигурации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                string connectionString = $"Server={config.Server};Port={config.Port};Uid={config.User};Pwd={CryptoHelper.Decrypt(config.Password)};";
+
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    connection.Close();
+                    return true;
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show($"Ошибка подключения к MySQL: {ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Общая ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
         }
 
         public string ManagerData(string DBName)
