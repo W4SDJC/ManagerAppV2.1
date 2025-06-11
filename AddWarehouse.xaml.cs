@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class AddWarehouse : Window
     {

@@ -1,15 +1,15 @@
-﻿<Window x:Class="ManagerAppV2._1.AddnEditProduct"
+﻿<Window x:Class="ManagerAppV3._5.AddnEditProduct"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ManagerAppV2._1"
+        xmlns:local="clr-namespace:ManagerAppV3._5"
         mc:Ignorable="d"
-        Title="AddnEditProduct" Height="260" Width="401" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="AddnEditProduct" Height="200" Width="401" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid>
 
-        <Label x:Name="NameLabel" Content="Название" Margin="19,45,220,174" Padding="5,5,5,0"/>
-        <Label x:Name="MinPriceLabel" Content="Минимальная цена" HorizontalAlignment="Left" Margin="19,130,0,93" Padding="5,5,5,0"/>
+        <Label x:Name="NameLabel" Content="Название" Margin="19,45,220,0" Padding="5,5,5,0" Height="25" VerticalAlignment="Top"/>
+        <Label x:Name="MinPriceLabel" Content="Минимальная цена" HorizontalAlignment="Left" Margin="189,90,0,0" Padding="5,5,5,0" Height="21" VerticalAlignment="Top"/>
         <Button x:Name="Cancel" Content="Отмена" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Click="Cancel_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
@@ -24,22 +24,22 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Label x:Name="UnitLabel" Content="Единица измерения" Margin="188,45,73,174" Padding="5,5,5,0"/>
-        <TextBox x:Name="NameTextBox" Margin="19,71,220,154" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" TabIndex="2">
+        <Label x:Name="UnitLabel" Content="Единица измерения" Margin="188,45,73,0" Padding="5,5,5,0" Height="25" VerticalAlignment="Top"/>
+        <TextBox x:Name="NameTextBox" Margin="19,71,220,0" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" TabIndex="2" Height="19" VerticalAlignment="Top">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="UnitTextBox" Margin="188,71,73,154" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="3">
+        <TextBox x:Name="UnitTextBox" Margin="188,71,73,0" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="3" Height="19" VerticalAlignment="Top">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="MinPriceTextBox" Margin="19,152,220,73" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="5">
+        <TextBox x:Name="MinPriceTextBox" Margin="189,112,50,0" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="5" Height="19" VerticalAlignment="Top">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
@@ -54,8 +54,8 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Label x:Name="PriceLabel" Content="Цена закупки" HorizontalAlignment="Left" Margin="19,90,0,132" Padding="5,5,5,0"/>
-        <TextBox x:Name="PriceTextBox" Margin="19,112,220,112" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="4">
+        <Label x:Name="PriceLabel" Content="Цена закупки" HorizontalAlignment="Left" Margin="19,90,0,0" Padding="5,5,5,0" Height="22" VerticalAlignment="Top"/>
+        <TextBox x:Name="PriceTextBox" Margin="19,112,220,0" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="4" Height="20" VerticalAlignment="Top">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>

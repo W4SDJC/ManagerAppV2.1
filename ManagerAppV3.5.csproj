@@ -15,7 +15,6 @@
     <None Remove="AppIcon.png" />
     <None Remove="ArrowDown.png" />
     <None Remove="Avatar.jpg" />
-    <None Remove="Config.json" />
     <None Remove="Database.png" />
     <None Remove="Icons\AppLogo.png" />
     <None Remove="Icons\ArrowLeft.png" />
@@ -51,9 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="Icons\AccountMore.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

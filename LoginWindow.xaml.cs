@@ -6,7 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class LoginWindow : Window
     {
@@ -54,35 +54,38 @@ namespace ManagerAppV2._1
         }
         private void Load()
         {
-            try { MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
+            try
+            {
+                MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
 
-            if (!checker.AreRequiredTablesPresent())
-            {
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                SettingButtonImage.Source = bi;
-                StartErrorAnimation(SettingButton);
-                LoginButton.IsEnabled = false;
-            }
-            else
-            {
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                SettingButtonImage.Source = bi;
-                StopErrorAnimation(SettingButton);
-                LoginButton.IsEnabled = true;
+                if (!checker.AreRequiredTablesPresent())
+                {
+                    SetSettingButtonImage();
+                    StartErrorAnimation(SettingButton);
+                    LoginButton.IsEnabled = false;
+                }
+                else
+                {
+                    SetSettingButtonImage();
+                    StopErrorAnimation(SettingButton);
+                    LoginButton.IsEnabled = true;
                 }
             }
-            catch (Exception e) { }
-            ;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void SetSettingButtonImage()
+        {
+            BitmapImage bi = new BitmapImage();
+            // BitmapImage.UriSource must be in a BeginInit/EndInit block.
+            bi.BeginInit();
+            bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
+            bi.EndInit();
+            // Set the image source.
+            SettingButtonImage.Source = bi;
         }
 
         // Обработчик кнопки "Войти"
@@ -112,18 +115,21 @@ namespace ManagerAppV2._1
                         connection.Open();
 
                         // Получение роли пользователя
-                        string getRole = $"SELECT role FROM users WHERE login = '{login}'";
+                        string getRole = "SELECT role FROM users WHERE login = @login";
                         MySqlCommand roleCmd = new MySqlCommand(getRole, connection);
+                        roleCmd.Parameters.AddWithValue("@login", login);
                         object role = roleCmd.ExecuteScalar();
 
                         // Получение имени пользователя
-                        string getName = $"SELECT name FROM users WHERE login = '{login}'";
+                        string getName = "SELECT name FROM users WHERE login = @login";
                         MySqlCommand nameCmd = new MySqlCommand(getName, connection);
+                        nameCmd.Parameters.AddWithValue("@login", login);
                         string name = nameCmd.ExecuteScalar()?.ToString();
 
                         // Получение имени базы данных
-                        string getDbName = $"SELECT databasename FROM users WHERE login = '{login}'";
+                        string getDbName = "SELECT databasename FROM users WHERE login = @login";
                         MySqlCommand dbCmd = new MySqlCommand(getDbName, connection);
+                        dbCmd.Parameters.AddWithValue("@login", login);
                         string dbName = dbCmd.ExecuteScalar()?.ToString();
 
                         // Установка глобальных данных

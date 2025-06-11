@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class TableRemove : Window
     {
@@ -12,7 +12,6 @@ namespace ManagerAppV2._1
             InitializeComponent();
             LoadTableNames();
         }
-
         private void LoadTableNames()
         {
             string query = "SHOW TABLES;";
@@ -42,7 +41,6 @@ namespace ManagerAppV2._1
                 MessageBox.Show("Ошибка загрузки таблиц: " + ex.Message);
             }
         }
-
         private void DeleteTableButton_Click(object sender, RoutedEventArgs e)
         {
             if (TablesComboBox.SelectedItem == null)
@@ -52,8 +50,7 @@ namespace ManagerAppV2._1
             }
 
             string selectedTable = TablesComboBox.SelectedItem.ToString();
-            var result = MessageBox.Show($"Вы действительно хотите удалить таблицу '{selectedTable}'?",
-                                         "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show($"Вы действительно хотите удалить таблицу '{selectedTable}'?","Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {

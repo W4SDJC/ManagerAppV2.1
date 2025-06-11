@@ -1,6 +1,4 @@
-﻿
-
-namespace ManagerAppV2._1
+﻿namespace ManagerAppV3._5
 {
     public static class DataSource
     {

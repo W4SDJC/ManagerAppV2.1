@@ -1,9 +1,9 @@
-﻿<Window x:Class="ManagerAppV2._1.AddWarehouse"
+﻿<Window x:Class="ManagerAppV3._5.AddWarehouse"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ManagerAppV2._1"
+        xmlns:local="clr-namespace:ManagerAppV3._5"
         mc:Ignorable="d"
         Title="Добавление склада" Height="70" Width="365" MinHeight="195" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid Margin="10">

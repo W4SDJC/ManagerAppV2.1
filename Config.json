@@ -1,8 +1,0 @@
-{
-    "Server": "localhost",
-    "Port": 3306,
-    "Database": "myappdb",
-    "User": "appuser",
-    "Password": "securepassword123",
-    "Charset": "utf8mb4"
-}

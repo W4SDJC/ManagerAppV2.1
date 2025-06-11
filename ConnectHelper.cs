@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.IO;
 
-namespace ManagerAppV2
+namespace ManagerAppV3._5
 {
     public class ConnectHelper
     {

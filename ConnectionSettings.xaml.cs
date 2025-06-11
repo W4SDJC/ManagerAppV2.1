@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class ConnectionSettings : Window
     {

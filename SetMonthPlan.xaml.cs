@@ -3,19 +3,24 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class SetMonthPlan : Window
     {
         ConnectHelper CH = new ConnectHelper();
         private List<User> users = new List<User>();
-
+        public class User
+        {
+            public string Name { get; set; }
+            public string Login { get; set; }
+            public string Role { get; set; }
+            public decimal MonthPlan { get; set; }
+        }
         public SetMonthPlan()
         {
             InitializeComponent();
             LoadUsers();
         }
-
         private void LoadUsers()
         {
             try
@@ -44,7 +49,6 @@ namespace ManagerAppV2._1
                         }
                     }
                 }
-
                 cmbUsers.ItemsSource = users;
                 cmbUsers.SelectedIndex = -1;
             }
@@ -73,7 +77,6 @@ namespace ManagerAppV2._1
                 txtMonthPlan.Clear();
             }
         }
-
         private void BtnSavePlan_Click(object sender, RoutedEventArgs e)
         {
             if (cmbUsers.SelectedItem == null)
@@ -128,13 +131,5 @@ namespace ManagerAppV2._1
                 MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-    }
-
-    public class User
-    {
-        public string Name { get; set; }
-        public string Login { get; set; }
-        public string Role { get; set; }
-        public decimal MonthPlan { get; set; }
     }
 }

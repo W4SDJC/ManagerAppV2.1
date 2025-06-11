@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.IO;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     class ConfigManager
     {

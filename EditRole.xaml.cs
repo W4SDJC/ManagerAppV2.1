@@ -1,8 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
-using System.Windows.Controls;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class EditRole : Window
     {

@@ -1,11 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
-    /// <summary>
-    /// Логика взаимодействия для ProfilePage.xaml
-    /// </summary>
     public partial class ProfilePage : Window
     {
         ConnectHelper CH = new ConnectHelper();
@@ -65,7 +62,6 @@ namespace ManagerAppV2._1
                     var newMainWindow = new MainWindow();
                     newMainWindow.Show();
 
-                    // Закрываем текущее окно (если нужно)
                     this.Close();
                 }
             }

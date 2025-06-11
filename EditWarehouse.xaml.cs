@@ -2,13 +2,18 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public partial class EditWarehouse : Window
     {
         private readonly ConnectHelper _connectHelper = new ConnectHelper();
         private List<Warehouse> _warehouses = new List<Warehouse>();
-
+        public class Warehouse
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Address { get; set; }
+        }
         public EditWarehouse()
         {
             InitializeComponent();
@@ -108,7 +113,7 @@ namespace ManagerAppV2._1
         }
         #endregion
 
-        #region Business Logic
+        #region Validation Logic
         private bool ValidateInput()
         {
             if (cmbWarehouses.SelectedItem == null)
@@ -245,10 +250,4 @@ namespace ManagerAppV2._1
         }
     }
 
-    public class Warehouse
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Address { get; set; }
-    }
 }

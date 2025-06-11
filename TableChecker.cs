@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
     public class MySQLTableChecker
     {
@@ -11,7 +11,6 @@ namespace ManagerAppV2._1
         {
             this.connectionString = connectionString;
         }
-
         public bool AreRequiredTablesPresent()
         {
             // Список обязательных таблиц
@@ -35,7 +34,6 @@ namespace ManagerAppV2._1
                         }
                     }
                 }
-
                 // Проверяем наличие каждой обязательной таблицы
                 foreach (var table in requiredTables)
                 {
@@ -44,8 +42,6 @@ namespace ManagerAppV2._1
                         return false;
                     }
                 }
-
-                // Все таблицы на месте
                 return true;
             }
             catch (Exception ex)

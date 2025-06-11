@@ -13,7 +13,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 
-namespace ManagerAppV2._1
+namespace ManagerAppV3._5
 {
 
     public partial class MainWindow : Window
