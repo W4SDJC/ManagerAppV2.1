@@ -12,7 +12,6 @@ public static class CryptoHelper
         byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
         return Convert.ToBase64String(encrypted);
     }
-
     public static string Decrypt(string encryptedText)
     {
         try {
