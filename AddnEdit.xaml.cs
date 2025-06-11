@@ -24,7 +24,7 @@ namespace ManagerAppV2._1
         }
         public void FormMode(string Mode, string dbase, DataRow data = null, string id = null, bool adminmode = false)
         {
-
+            
             AdminMode = adminmode;
             if (Mode == "Add")
             {
@@ -430,16 +430,14 @@ namespace ManagerAppV2._1
                     {
                         MessageBox.Show($"Ошибка при добавлении отгрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    }
-
                 }
             }
-        
+        }
 
         private void AddShipment_Click(object sender, RoutedEventArgs e)
         {
-
             AddShipment(db,ID,AdminMode);
+
         }
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {

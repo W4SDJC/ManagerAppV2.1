@@ -133,12 +133,12 @@ namespace ManagerAppV2._1
                 var DialogResult = MessageBox.Show("Отсутствуют необходимые таблицы. \nСоздать таблицы?", "Отсутсвие таблиц", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (DialogResult == MessageBoxResult.Yes)
                 {
-                    string query1 = @"
-                            CREATE DATABASE IF NOT EXISTS `database`
+                    string query1 = $@"
+                            CREATE DATABASE IF NOT EXISTS `{DatabaseTextBox.Text.ToLower()}`
                             /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ 
                             /*!80016 DEFAULT ENCRYPTION='N' */;
 
-                            USE `database`;
+                            USE `{DatabaseTextBox.Text.ToLower()}`;
 
                             CREATE TABLE IF NOT EXISTS `admin` (
                                 `id` INT NOT NULL AUTO_INCREMENT,
@@ -215,6 +215,7 @@ namespace ManagerAppV2._1
                     string query2 = $@"
                             INSERT INTO users(`name`, `login`, `password`, `role`, `databasename`) 
                             VALUES ('Admin', 'admin', '{PasswordHasher.HashPassword("admin")}', 'Admin', 'admin');
+                            INSERT INTO `roles` (`role`) VALUES ('Admin');
                             ";
                     try
                     {

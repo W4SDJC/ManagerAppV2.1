@@ -136,21 +136,23 @@ namespace ManagerAppV2
         public string ManagerData(string DBName)
         {
             string Query = "SELECT " +
-                            "id," +
-                            "DATE_FORMAT(ShipmentDate, '%d.%m.%Y') as \"Дата отправки\"," +
-                            "ShipmentWarehouse as \"Склад отправки\"," +
-                            "ClientCity as \"Город покупателя\"," +
-                            "ClientName as \"Покупатель\"," +
-                            "ProductName as \"Товар\"," +
-                            "ProductAmount as \"Количество\"," +
-                            "`UnitOfMeasurement` as `Ед Изм`," +
-                            "Price as \"Цена менеджера\"," +
-                            "MinimumPrice as \"Мин цена\"," +
-                            "ShipmentValue as \"Итого менеджера\"," +
-                            "`ShipmentValue(Minimum_price)` as \"Итого (Мин)\"," +
-                            "UPDNumber as \"Номер УПД\"," +
-                            "ShipmentPrice as \"Стоимость доставки\"," +
-                            $"Reward as Премия FROM `{DBName}`;";
+                "id, " +
+                "DATE_FORMAT(ShipmentDate, '%d.%m.%Y') as 'Дата отправки', " +
+                "ShipmentWarehouse as 'Склад отправки', " +
+                "ClientCity as 'Город покупателя', " +
+                "ClientName as 'Покупатель', " +
+                "ProductName as 'Товар', " +
+                "ProductAmount as 'Количество', " +
+                "UnitOfMeasurement as 'Ед Изм', " +
+                "Price as 'Цена менеджера', " +
+                "MinimumPrice as 'Мин цена', " +
+                "ShipmentValue as 'Итого менеджера', " +
+                "`ShipmentValue(Minimum_price)` as 'Итого (Мин)', " +
+                "UPDNumber as 'Номер УПД', " +
+                "ShipmentPrice as 'Стоимость доставки', " +
+                "Reward as 'Премия' " +
+                $"FROM `{DBName}`;";
+
             return Query;
         }
         public string GetRole(string tableName)

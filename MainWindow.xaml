@@ -68,7 +68,7 @@
                         </Button.Resources>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontSize="14" Text="Редактировать" Foreground="White" VerticalAlignment="Center" />
-                            <Image Source="/Icons/ArrowDown.png" Height="15" Margin="5,0,0,0" />
+                            <Image x:Name="EditBtnIMG" Source="/Icons/ArrowDown.png" Height="15" Margin="5,0,0,0" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -176,9 +176,7 @@
                         <ImageBrush/>
                     </Rectangle.OpacityMask>
                 </Rectangle>
-                <TabControl x:Name="AdminTabControl" SelectionChanged="AdminTabControl_SelectionChanged" Margin="0,0,3,0" >
-
-                </TabControl>
+                <TabControl x:Name="AdminTabControl" SelectionChanged="AdminTabControl_SelectionChanged" Margin="0,0,3,0" />
             </Grid>
             <DockPanel Grid.Row="1" LastChildFill="True" Background="#FF2D2D30" Grid.ColumnSpan="3">
                 <TextBlock x:Name="ErrorMarquee" 
@@ -204,7 +202,7 @@
                 </TextBlock>
             </DockPanel>
         </Grid>
-        <Grid x:Name="DatabaseMenu" HorizontalAlignment="Left" Margin="6,45,0,0" VerticalAlignment="Top" Width="174" d:IsHidden="True">
+        <Grid x:Name="DatabaseMenu" HorizontalAlignment="Left" Margin="6,45,0,0" VerticalAlignment="Top" Width="175">
             <Rectangle x:Name="DatabaseMenuBackgrnd" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
             <StackPanel Margin="5">
                 <Button x:Name="NewBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Click="AddData_Click">
@@ -240,18 +238,7 @@
                         <Image Source="/Icons/Trash.png" Width="15" Height="15" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="CopyBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Margin="0,5,0,0">
-                    <Button.Resources>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                    <StackPanel Orientation="Horizontal" Width="155">
-                        <TextBlock FontSize="14" Text="Copy" Foreground="White" Margin="0,0,5,0" Width="125" />
-                        <Image Source="/Icons/Copy.png" Width="15" Height="15" />
-                    </StackPanel>
-                </Button>
-                <Button x:Name="ExportBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Margin="0,5,0,0">
+                <Button x:Name="ExportBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Margin="0,5,0,0" Click="ExportBtn_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -292,7 +279,7 @@
             </StackPanel>
             <!--Buttons-->
         </Grid>
-        <Grid x:Name="EditMenu" HorizontalAlignment="Left" Margin="114,45,0,0" VerticalAlignment="Top" Width="173">
+        <Grid x:Name="EditMenu" HorizontalAlignment="Left" Margin="114,45,0,0" VerticalAlignment="Top" Width="175">
             <Rectangle x:Name="MenuBackgrnd1" Fill="#FF101010" RadiusX="10" RadiusY="10"/>
             <StackPanel Margin="5">
                 <Button x:Name="UserMenuBtn" Background="#333333" Foreground="White" BorderThickness="0" Height="25" Click="UsersMenu_Click">
@@ -346,7 +333,7 @@
                         </Style>
                     </Button.Resources>
                     <StackPanel Orientation="Horizontal" Width="155">
-                        <TextBlock FontSize="14" Text="Удаление таблиц" Foreground="White" Margin="5,0,5,0" Width="125" />
+                        <TextBlock FontSize="14" Text="Удалить таблицу" Foreground="White" Margin="5,0,5,0" Width="125" />
                         <Image Source="/Icons/Trash.png" Height="15" HorizontalAlignment="Right" Margin="0,0,5,0" />
                     </StackPanel>
                 </Button>

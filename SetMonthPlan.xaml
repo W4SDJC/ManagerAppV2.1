@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="Установка месячного плана" Height="297" Width="400" SizeToContent="WidthAndHeight">
+        Title="Установка месячного плана" Height="297" Width="400" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*"/>

@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ManagerAppV2._1
 {
@@ -76,6 +77,7 @@ namespace ManagerAppV2._1
                         }
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -87,7 +89,7 @@ namespace ManagerAppV2._1
         {
             if (RoleComboBox.SelectedItem == null || string.IsNullOrWhiteSpace(NewRoleNameTextBox.Text))
             {
-                MessageBox.Show("Выберите роль и введите новое имя.");
+                MessageBox.Show("Выберите роль и введите новое имя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -123,34 +125,55 @@ namespace ManagerAppV2._1
             {
                 MessageBox.Show("Ошибка при изменении роли: " + ex.Message);
             }
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+
+            if (mainWindow != null)
+            {
+                mainWindow.UpdateAll();
+            }
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (!string.IsNullOrWhiteSpace(NewRoleNameTextBox.Text))
             {
-                string query = $"INSERT INTO roles(role) VALUE(@role);";
-
-                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                try
                 {
-                    var cmd = new MySqlCommand(query, connection);
-                    cmd.Parameters.AddWithValue("@role", NewRoleNameTextBox.Text);
+                    string query = $"INSERT INTO roles(role) VALUE(@role);";
 
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
+                    using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                    {
+                        var cmd = new MySqlCommand(query, connection);
+                        cmd.Parameters.AddWithValue("@role", NewRoleNameTextBox.Text);
+
+                        connection.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show($"Роль {NewRoleNameTextBox.Text} успешно добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Вызов события для AddUser
+                    RoleChanged?.Invoke();
                 }
+                catch (MySqlException ex)
+                {
+                    MessageBox.Show("Ошибка при добавлении роли: " + ex.Message);
+                }
+                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
 
-                MessageBox.Show($"Роль {NewRoleNameTextBox.Text} успешно добавлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // Вызов события для AddUser
-                RoleChanged?.Invoke();
+                if (mainWindow != null)
+                {
+                    mainWindow.UpdateAll();
+                }
+                this.Close();
             }
-            catch (MySqlException ex)
+            else
             {
-                MessageBox.Show("Ошибка при добавлении роли: " + ex.Message);
+                MessageBox.Show("Введите название роли", "Ошибка",MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            this.Close();
         }
+
     }
 }

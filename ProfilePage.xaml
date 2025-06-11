@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV2._1"
         mc:Ignorable="d"
-        Title="Редактировать профиль" Height="185" Width="320" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+        Title="Редактировать профиль" Height="185" Width="320" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid Width="320">
         <Border CornerRadius="45,45,45,45" Margin="20,28,0,0" Width="85" Height="85" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="3">
             <Border.Background>

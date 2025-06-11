@@ -22,7 +22,7 @@ namespace ManagerAppV2._1
                 SaveButton.Content = "Добавить";
                 ProductCB.Visibility = Visibility.Collapsed;
                 DeleteButton.Visibility = Visibility.Collapsed;
-                LoadRoleComboBoxData();
+
             }
             else
             {
@@ -31,7 +31,7 @@ namespace ManagerAppV2._1
                 ProductCB.Visibility = Visibility.Visible;
                 DeleteButton.Visibility = Visibility.Visible;
                 LoadComboBoxDataAsync();
-                LoadRoleComboBoxData();
+
             }
 
         }
@@ -141,44 +141,7 @@ namespace ManagerAppV2._1
                 ProductCB.IsEnabled = true;
             }
         }
-        private void LoadRoleComboBoxData()
-        {
-
-            string query = "SELECT DISTINCT role FROM `roles` WHERE id != 0;"; // DISTINCT для уникальных значений
-
-            List<string> items = new List<string>();
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
-                {
-                    connection.Open();
-
-                    using (MySqlCommand command = new MySqlCommand(query, connection))
-                    {
-                        using (MySqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                if (!reader.IsDBNull(0))
-                                {
-                                    items.Add(reader.GetString(0));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Привязка данных к ComboBox
-                RoleComboBox.ItemsSource = items;
-
-                RoleComboBox.SelectedIndex = 1;
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
-            }
-        }
+       
         private async Task LoadUserDataAsync(string login)
         {
             const string query = @"
@@ -204,18 +167,6 @@ namespace ManagerAppV2._1
                     PriceTextBox.Text = reader["Product_price"]?.ToString() ?? "";
                     MinPriceTextBox.Text = reader["Minimum_price"]?.ToString() ?? "";
                     UnitTextBox.Text = reader["Unit_of_measurement"]?.ToString() ?? "";
-
-
-                    // Установка значения в ComboBox ролей
-                    //var role = reader["role"]?.ToString();
-                    //if (!string.IsNullOrEmpty(role))
-                    //{
-                    //    RoleComboBox.SelectedItem = role;
-                    //}
-                    //else
-                    //{
-                    //    RoleComboBox.SelectedIndex = -1;
-                    //}
                 }
                 else
                 {
@@ -241,6 +192,22 @@ namespace ManagerAppV2._1
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            // Проверка на пустоту
+            if (string.IsNullOrWhiteSpace(NameTextBox.Text) ||
+                string.IsNullOrWhiteSpace(PriceTextBox.Text) ||
+                string.IsNullOrWhiteSpace(MinPriceTextBox.Text) ||
+                string.IsNullOrWhiteSpace(UnitTextBox.Text))
+            {
+                MessageBox.Show("Пожалуйста, заполните все поля и выберите роль.", "Ошибка ввода", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Проверка что в полях цен — только числа
+            if (!decimal.TryParse(PriceTextBox.Text, out _) || !decimal.TryParse(MinPriceTextBox.Text, out _))
+            {
+                MessageBox.Show("Цена и Минимальная цена должны быть числовыми значениями.", "Ошибка ввода", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             if (SaveButton.Content.ToString() == "Добавить")
             {
@@ -250,10 +217,9 @@ namespace ManagerAppV2._1
                 $"Product_name," +
                 $"Product_price," +
                 $"Minimum_price," +
-                $"Unit_of_measurement," +
-                $"Role" +
+                $"Unit_of_measurement" +
                 $") VALUES ( " +
-                $"@Pname, @Pprice, @MinPrice, @UOM, @Role)";
+                $"@Pname, @Pprice, @MinPrice, @UOM)";
                 try
                 {
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
@@ -262,19 +228,16 @@ namespace ManagerAppV2._1
 
                         using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
-                            // Добавляем параметры
                             command.Parameters.AddWithValue("@Pname", NameTextBox.Text);
                             command.Parameters.AddWithValue("@Pprice", PriceTextBox.Text);
                             command.Parameters.AddWithValue("@MinPrice", MinPriceTextBox.Text);
                             command.Parameters.AddWithValue("@UOM", UnitTextBox.Text);
-                            command.Parameters.AddWithValue("@Role", RoleComboBox.SelectedItem);
 
                             int result = command.ExecuteNonQuery();
 
                             if (result > 0)
                             {
                                 MessageBox.Show("Товар успешно добавлен!");
-                                //ClearUserForm();
                             }
                         }
                     }
@@ -292,11 +255,13 @@ namespace ManagerAppV2._1
                 using (MySqlConnection con = new MySqlConnection(CH.GetConnectionString()))
                 {
                     con.Open();
-                    string getID = $"SELECT id FROM `product price` where Product_name = '{ProductCB.SelectedItem.ToString()}';";
+                    string getID = $"SELECT id FROM `product price` WHERE Product_name = '{ProductCB.SelectedItem.ToString()}';";
                     MySqlCommand IDGetter = new MySqlCommand(getID, con);
                     id = IDGetter.ExecuteScalar().ToString();
                 }
-                string query = $"UPDATE `product price` SET Product_name = @Pname, Product_price = @Pprice, Minimum_price = @MinPrice, Unit_of_measurement = @UOM, Role = @Role WHERE id = { id }";
+
+                string query = $"UPDATE `product price` SET Product_name = @Pname, Product_price = @Pprice, Minimum_price = @MinPrice, Unit_of_measurement = @UOM WHERE id = {id}";
+
                 try
                 {
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
@@ -305,32 +270,28 @@ namespace ManagerAppV2._1
 
                         using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
-                            // Добавляем параметры
                             command.Parameters.AddWithValue("@Pname", NameTextBox.Text);
                             command.Parameters.AddWithValue("@Pprice", PriceTextBox.Text);
                             command.Parameters.AddWithValue("@MinPrice", MinPriceTextBox.Text);
                             command.Parameters.AddWithValue("@UOM", UnitTextBox.Text);
-                            command.Parameters.AddWithValue("@Role", RoleComboBox.SelectedItem);
 
                             int result = command.ExecuteNonQuery();
 
                             if (result > 0)
                             {
                                 MessageBox.Show("Товар успешно изменен!");
-                                //ClearUserForm();
                             }
                         }
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    MessageBox.Show($"Ошибка при создании элементов:\n{ex.Message}", "Ошибка",
+                    MessageBox.Show($"Ошибка при обновлении элементов:\n{ex.Message}", "Ошибка",
                                     MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
             }
-
         }
+
 
 
     }

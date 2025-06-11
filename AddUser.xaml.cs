@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -61,6 +62,7 @@ namespace ManagerAppV2._1
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+
             string dbname;
             ValidateTextBox(LoginTextBox, "Login");
             ValidateTextBox(NameTextBox, "Name");
@@ -68,7 +70,14 @@ namespace ManagerAppV2._1
             ValidateTextBox(ConfirmPasswordTextBox, "Password confirmation");
             if (string.IsNullOrEmpty(DataBaseNameTextBox.Text))
             {
-                dbname = LoginTextBox.Text + RoleComboBox.SelectedItem.ToString();
+                if (!ValidateInputFields())
+                {
+                    return; // выход, если не все поля заполнены
+                }
+                else
+                {
+                    dbname = LoginTextBox.Text + RoleComboBox.SelectedItem.ToString();
+                }
             }
             else
             { dbname = DataBaseNameTextBox.Text; }
@@ -114,7 +123,12 @@ namespace ManagerAppV2._1
                     MessageBox.Show($"Ошибка при создании таблицы:\n{ex.Message}", "Ошибка",
                                     MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
 
+                if (mainWindow != null)
+                {
+                    mainWindow.UpdateAll();
+                }
             }
             else
             {
@@ -166,5 +180,36 @@ namespace ManagerAppV2._1
             roleWindow.RoleChanged += LoadRolesIntoComboBox; // Подписка на событие для обновления ComboBox
             roleWindow.ShowDialog();
         }
+        private bool ValidateInputFields()
+        {
+            StringBuilder errorMessages = new StringBuilder();
+
+            // Проверка TextBox
+            if (string.IsNullOrWhiteSpace(LoginTextBox.Text))
+                errorMessages.AppendLine("Поле 'Логин' не заполнено.");
+
+            if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+                errorMessages.AppendLine("Поле 'Имя' не заполнено.");
+
+            if (string.IsNullOrWhiteSpace(PasswordTextBox.Text))
+                errorMessages.AppendLine("Поле 'Пароль' не заполнено.");
+
+            if (string.IsNullOrWhiteSpace(ConfirmPasswordTextBox.Text))
+                errorMessages.AppendLine("Поле 'Подтверждение пароля' не заполнено.");
+
+            // Проверка ComboBox
+            if (RoleComboBox.SelectedItem == null)
+                errorMessages.AppendLine("Не выбрана роль.");
+
+            // Если есть ошибки - вывести и вернуть false
+            if (errorMessages.Length > 0)
+            {
+                MessageBox.Show(errorMessages.ToString(), "Ошибка ввода", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            return true; // все проверки пройдены
+        }
+
     }
 }

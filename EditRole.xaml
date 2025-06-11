@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ManagerAppV2._1.EditRole"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Управление ролями" Height="180" Width="385" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+        Title="Управление ролями" Height="180" Width="385" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

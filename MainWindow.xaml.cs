@@ -1,4 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿using ClosedXML.Excel;
+using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 using System.Collections;
 using System.Data;
 using System.Globalization;
@@ -33,37 +35,18 @@ namespace ManagerAppV2._1
 
 
         // =========================== DATABASE MENU ===========================
+        #region DATABASE MENU
         private void DatabaseMenuOpen(object sender, RoutedEventArgs e)
         {
-            if (((int)DatabaseMenu.ActualHeight) > 0)
+            if (DatabaseMenu.ActualHeight > 0)
             {
-                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-                DatabaseBtnAnimation.To = 0;
-                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                DataBaseBtnimg.Source = bi;
+                AnimateMenu(DatabaseMenu, 0);
+                SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowDown.png");
             }
             else
             {
-                DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-                DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-                DatabaseBtnAnimation.To = 155;
-                DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-                BitmapImage bi = new BitmapImage();
-                // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-                bi.BeginInit();
-                bi.UriSource = new Uri(@"/Icons/ArrowUp.png", UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                // Set the image source.
-                DataBaseBtnimg.Source = bi;
+                AnimateMenu(DatabaseMenu, 125);
+                SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowUp.png");
             }
         }
 
@@ -152,73 +135,139 @@ namespace ManagerAppV2._1
                 DeleteData();
             }
         }
+        // ============================ EXPORT DATA ============================
+        #region Export Button
+        private void ExportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DataTable dataTable = null;
+                string fileName = "Export.xlsx";
+
+                if (AdminMode)
+                {
+                    // --- Экспорт из выбранной вкладки TabControl ---
+                    var selectedTab = AdminTabControl.SelectedItem as TabItem;
+                    if (selectedTab == null)
+                    {
+                        MessageBox.Show("Не выбрана вкладка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var dataGrid = selectedTab.Content as DataGrid;
+                    if (dataGrid == null || dataGrid.ItemsSource == null)
+                    {
+                        MessageBox.Show("В таблице нет данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var dataView = dataGrid.ItemsSource as DataView;
+                    if (dataView == null)
+                    {
+                        MessageBox.Show("Источник данных некорректен.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    dataTable = dataView.ToTable();
+                    fileName = selectedTab.Header.ToString() + ".xlsx";
+                }
+                else
+                {
+                    // --- Экспорт из MainDataGrid ---
+                    if (MainDataGrid.ItemsSource == null)
+                    {
+                        MessageBox.Show("В таблице нет данных для экспорта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var dataView = MainDataGrid.ItemsSource as DataView;
+                    if (dataView == null)
+                    {
+                        MessageBox.Show("Источник данных некорректен.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    dataTable = dataView.ToTable();
+                    fileName = $"{NameLabel.Content.ToString()}.xlsx";
+                }
+
+                // Диалог выбора пути сохранения
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Excel файл (*.xlsx)|*.xlsx",
+                    Title = "Сохранить таблицу как Excel",
+                    FileName = fileName
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    using (XLWorkbook workbook = new XLWorkbook())
+                    {
+                        workbook.Worksheets.Add(dataTable, "Данные");
+                        workbook.SaveAs(saveFileDialog.FileName);
+                    }
+
+                    MessageBox.Show("Экспорт завершен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при экспорте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        #endregion
+
         private void DatabaseMenuClose()
         {
-            DoubleAnimation DatabaseBtnAnimation = new DoubleAnimation();
-            DatabaseBtnAnimation.From = DatabaseMenu.ActualHeight;
-            DatabaseBtnAnimation.To = 0;
-            DatabaseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            DatabaseMenu.BeginAnimation(Grid.HeightProperty, DatabaseBtnAnimation);
-            BitmapImage bi = new BitmapImage();
-            // BitmapImage.UriSource must be in a BeginInit/EndInit block.
-            bi.BeginInit();
-            bi.UriSource = new Uri(@"/Icons/ArrowDown.png", UriKind.RelativeOrAbsolute);
-            bi.EndInit();
-            // Set the image source.
-            DataBaseBtnimg.Source = bi;
+            AnimateMenu(DatabaseMenu, 0);
+            SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowDown.png");
         }
-        // ========================= DATABASE MENU END =========================
-
+        #endregion
         // =========================== UPDATE BUTTON ===========================
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             ReLoadData(DBname, AdminMode);
             ApplyColumnVisibility();
-            LoadDataToLabel();
+            LoadDataToLabel(DBname);
+            GetMonth();
         }
-
+        public void UpdateAll()
+        {
+            ReLoadData(DBname, AdminMode);
+            ApplyColumnVisibility();
+            LoadDataToLabel(DBname);
+            GetMonth();
+        }
         // ============================= EDIT MENU =============================
-
+        #region EDIT MENU
         private void ManagersButton_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)EditMenu.ActualHeight) > 0)
+            if (EditMenu.ActualHeight > 0)
             {
-                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = EditMenu.ActualHeight;
-                ManagersBtnAnimation.To = 0;
-                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+                AnimateMenu(EditMenu, 0);
+                SetMenuIcon(EditBtnIMG, "/Icons/ArrowDown.png");
             }
             else
             {
-                DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-                ManagersBtnAnimation.From = EditMenu.ActualHeight;
-                ManagersBtnAnimation.To = 155;
-                ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+                AnimateMenu(EditMenu, 155);
+                SetMenuIcon(EditBtnIMG, "/Icons/ArrowUp.png");
             }
+ 
         }
 
         // ============================= USER MENU =============================
+        #region USER MENU
         private void UsersMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)UserMenu.ActualHeight) > 0)
+            if (UserMenu.ActualHeight > 0)
             {
-                DoubleAnimation UserBtnAnimation = new DoubleAnimation();
-                UserBtnAnimation.From = UserMenu.ActualHeight;
-                UserBtnAnimation.To = 0;
-                UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
+                AnimateMenu(UserMenu, 0);
             }
             else
             {
                 ProductMenuClose();
                 WarehouseMenuClose();
-                DoubleAnimation UserBtnAnimation = new DoubleAnimation();
-                UserBtnAnimation.From = UserMenu.ActualHeight;
-                UserBtnAnimation.To = 65;
-                UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
+                AnimateMenu(UserMenu, 65);
             }
         }
         // ============================ CREATE USER ============================
@@ -234,36 +283,25 @@ namespace ManagerAppV2._1
             EditUser EU = new EditUser();
             EU.Show();
         }
-        // =========================== USER MENU END ===========================
-
         private void UserMenuClose()
         {
-            DoubleAnimation UserBtnAnimation = new DoubleAnimation();
-            UserBtnAnimation.From = UserMenu.ActualHeight;
-            UserBtnAnimation.To = 0;
-            UserBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            UserMenu.BeginAnimation(Grid.HeightProperty, UserBtnAnimation);
+            AnimateMenu(UserMenu, 0);
         }
+        #endregion
+
         // ============================ PRODUCT MENU ============================
+        #region PRODUCT MENU
         private void ProductMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)ProductMenu.ActualHeight) > 0)
+            if (ProductMenu.ActualHeight > 0)
             {
-                DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
-                ProductBtnAnimation.From = ProductMenu.ActualHeight;
-                ProductBtnAnimation.To = 0;
-                ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+                AnimateMenu(ProductMenu, 0);
             }
             else
             {
                 UserMenuClose();
                 WarehouseMenuClose();
-                DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
-                ProductBtnAnimation.From = ProductMenu.ActualHeight;
-                ProductBtnAnimation.To = 65;
-                ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+                AnimateMenu(ProductMenu, 65);
             }
         }
         // ============================ ADD PRODUCT ============================
@@ -281,35 +319,24 @@ namespace ManagerAppV2._1
 
         private void ProductMenuClose()
         {
-            DoubleAnimation ProductBtnAnimation = new DoubleAnimation();
-            ProductBtnAnimation.From = ProductMenu.ActualHeight;
-            ProductBtnAnimation.To = 0;
-            ProductBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            ProductMenu.BeginAnimation(Grid.HeightProperty, ProductBtnAnimation);
+            AnimateMenu(ProductMenu, 0);
         }
         // ========================== PRODUCT MENU END ==========================
-
-
+        #endregion
         // =========================== WAREHOUSE MENU ===========================
+
+        #region WAREHOUSE MENU
         private void WarehouseMenuBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)WarehouseMenu.ActualHeight) > 0)
+            if (WarehouseMenu.ActualHeight> 0)
             {
-                DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
-                WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
-                WarehouseBtnAnimation.To = 0;
-                WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+                AnimateMenu(WarehouseMenu, 0);
             }
             else
             {
                 UserMenuClose();
                 ProductMenuClose();
-                DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
-                WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
-                WarehouseBtnAnimation.To = 65;
-                WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+                AnimateMenu(WarehouseMenu, 65);
             }
         }
         // =========================== ADD WAREHOUSE ===========================
@@ -326,32 +353,31 @@ namespace ManagerAppV2._1
         }
         private void WarehouseMenuClose()
         {
-            DoubleAnimation WarehouseBtnAnimation = new DoubleAnimation();
-            WarehouseBtnAnimation.From = WarehouseMenu.ActualHeight;
-            WarehouseBtnAnimation.To = 0;
-            WarehouseBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            WarehouseMenu.BeginAnimation(Grid.HeightProperty, WarehouseBtnAnimation);
+            AnimateMenu(WarehouseMenu, 0);
         }
         // ========================= WAREHOUSE MENU END =========================
-
+        #endregion
         // =========================== SET MONTH PLAN ===========================
         private void SetMonthPlan_Click(object sender, RoutedEventArgs e)
         {
             SetMonthPlan SMP = new SetMonthPlan();
             SMP.Show();
         }
-
+        // ============================ REMOVE TABLE ============================
+        private void TableRemoveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            TableRemove TBR = new TableRemove();
+            TBR.Show();
+        }
         private void EditMenuClose()
         {
-            DoubleAnimation ManagersBtnAnimation = new DoubleAnimation();
-            ManagersBtnAnimation.From = EditMenu.ActualHeight;
-            ManagersBtnAnimation.To = 0;
-            ManagersBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            EditMenu.BeginAnimation(Grid.HeightProperty, ManagersBtnAnimation);
+            AnimateMenu(EditMenu, 0);
+            SetMenuIcon(EditBtnIMG, "/Icons/ArrowDown.png");
         }
         // =========================== EDIT MENU END ===========================
-
+        #endregion
         // ============================ SEARCH FIELD ============================
+        #region SEARCH FIELD
         private void SearchField_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (AdminMode)
@@ -399,26 +425,18 @@ namespace ManagerAppV2._1
                 }
             }
         }
-        // ========================== SEARCH FIELD END ==========================
-
+        #endregion
         // ============================ PROFILE MENU ============================
+        #region PROFILE MENU
         private void ProfileMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (((int)ProfileMenu.ActualHeight) > 0)
+            if (ProfileMenu.ActualHeight > 0)
             {
-                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-                ProfileBtnAnimation.To = 0;
-                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+                AnimateMenu(ProfileMenu, 0);
             }
             else
             {
-                DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-                ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-                ProfileBtnAnimation.To = 65;
-                ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-                ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+                AnimateMenu(ProfileMenu, 65);
             }
         }
         // ============================ EDIT PROFILE ============================
@@ -438,32 +456,10 @@ namespace ManagerAppV2._1
         }
         private void ProfileMenuClose()
         {
-            DoubleAnimation ProfileBtnAnimation = new DoubleAnimation();
-            ProfileBtnAnimation.From = ProfileMenu.ActualHeight;
-            ProfileBtnAnimation.To = 0;
-            ProfileBtnAnimation.Duration = TimeSpan.FromSeconds(0.2);
-            ProfileMenu.BeginAnimation(Grid.HeightProperty, ProfileBtnAnimation);
+            AnimateMenu(ProfileMenu, 0);
         }
-        // ========================== PROFILE MENU END ==========================
+        #endregion
 
-        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            // Получаем элемент, по которому был сделан клик
-            var clickedElement = e.OriginalSource as DependencyObject;
-
-            // Проверяем, был ли клик вне всех меню
-            if (!IsDescendantOf(clickedElement, DatabaseMenu) &&
-                !IsDescendantOf(clickedElement, EditMenu) &&
-                !IsDescendantOf(clickedElement, ProfileMenu))
-            {
-                DatabaseMenuClose();
-                EditMenuClose();
-                UserMenuClose(); 
-                ProductMenuClose();
-                WarehouseMenuClose();
-                ProfileMenuClose();
-            }
-        }
         // =========================== FILTER BUTTON ===========================
         private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -476,8 +472,10 @@ namespace ManagerAppV2._1
             MinimizeElements();
             LoadDataToLabel();
             ReLoadData(DBname);
+            GetMonth();
         }
         // ============================ DATA CONTROL ============================
+        #region DATA CONTROL
         private void RoleControl()
         {
             NameLabel.Content = Name;
@@ -502,7 +500,6 @@ namespace ManagerAppV2._1
         {
             string connectionString = CH.GetConnectionString();
             string query = $"SELECT monthPlan FROM users WHERE databasename = '{DBname}'";
-            string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
 
             try
             {
@@ -521,8 +518,6 @@ namespace ManagerAppV2._1
                     else
                     {
                         int convResult = Convert.ToInt32(result);
-                        MonthPLabel.Content = $"План ({monthName})";
-                        SoldedMLabel.Content = $"Продано ({monthName})";
                         MonthPlanLabel.Content = convResult.ToString("N0", culture);
                     }
                 }
@@ -631,7 +626,7 @@ namespace ManagerAppV2._1
                 }
             }
         }
-
+        #endregion
         // ============================ ADMIN LOGIN ============================
 
         private void AdminControls()
@@ -643,7 +638,9 @@ namespace ManagerAppV2._1
             LoadTablesIntoTabControl();
             AdminTabControl.SelectedIndex = 0;
             LoadDataAndCreateCheckBoxes(true);
+            GetMonth();
         }
+
         private void AdminDelete()
         {
             // Получаем текущую активную вкладку
@@ -686,7 +683,7 @@ namespace ManagerAppV2._1
             AdminTabControl.Visibility = Visibility.Collapsed;
             AdminDatabaseGrid.Visibility = Visibility.Collapsed;
             MainDataGrid.Visibility = Visibility.Visible;
-            LoadTablesIntoTabControl();
+            //LoadTablesIntoTabControl();
             LoadDataAndCreateCheckBoxes();
             LoadDataToLabel(Role);
         }
@@ -745,11 +742,22 @@ namespace ManagerAppV2._1
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                var adapter = new MySqlDataAdapter($"SELECT * FROM `{tableName}`", connection);
-                adapter.Fill(tableData);
+                var specialTables = new List<string> { "product price", "roles", "users", "warehouses" };
+
+                if (!specialTables.Contains(tableName))
+                {
+                    string query = CH.ManagerData(DBname);
+                    var adapter = new MySqlDataAdapter(query, connection);
+                    adapter.Fill(tableData);
+                }
+                else
+                {
+                    var adapter = new MySqlDataAdapter($"SELECT * FROM `{tableName}`", connection);
+                    adapter.Fill(tableData);
+                }
+
             }
 
-            // Очистка столбцов (хотя при AutoGenerateColumns=false это не обязательно)
             dataGrid.Columns.Clear();
 
             foreach (DataColumn column in tableData.Columns)
@@ -1111,7 +1119,17 @@ namespace ManagerAppV2._1
                             return;
                         }
 
-                        query = $"SELECT * FROM `{tableName}`";
+                         var specialTables = new List<string> { "product price", "roles", "users", "warehouses" };
+
+                        if (!specialTables.Contains(tableName))
+                        {
+                            query = CH.ManagerData(tableName);
+                        }
+                        else
+                        {
+                            query = $"SELECT * FROM `{tableName}`";
+                        }
+
                     }
                     else
                     {
@@ -1189,8 +1207,86 @@ namespace ManagerAppV2._1
             }
             return null;
         }
+       
 
+        private string GetTabName()
+        {
+            if (AdminTabControl.SelectedItem is TabItem selectedTab)
+            {
+                var _currentTableName = selectedTab.Header.ToString();
+                return _currentTableName;
+            }
+            else return "error";
+        }
+        private void AdminTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Проверяем, что изменение действительно связано с выбором вкладки
+            if (e.Source is TabControl tabControl)
+            {
+                // Получаем выбранную вкладку
+                if (tabControl.SelectedItem is TabItem selectedTab)
+                {
+                    LoadDataAndCreateCheckBoxes(true);
+                    DataSource.DBname = GetTabName();
+                    LoadDataToLabel(GetTabName());
+                }
+            }
 
+        }
+        public DataGrid GetSelectedDataGrid(TabControl tabControl)
+        {
+            if (tabControl.SelectedItem is TabItem selectedTab &&
+                selectedTab.Content is DataGrid dataGrid)
+            {
+                return dataGrid;
+            }
+            return null;
+        }
+        
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+
+                if (child is T correctlyTyped)
+                    return correctlyTyped;
+
+                T descendent = FindVisualChild<T>(child);
+                if (descendent != null)
+                    return descendent;
+            }
+            return null;
+        }
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Получаем элемент, по которому был сделан клик
+            var clickedElement = e.OriginalSource as DependencyObject;
+
+            // Проверяем, был ли клик вне всех меню
+            if (!IsDescendantOf(clickedElement, DatabaseMenu) &&
+                !IsDescendantOf(clickedElement, EditMenu) &&
+                !IsDescendantOf(clickedElement, ProfileMenu))
+            {
+                DatabaseMenuClose();
+                EditMenuClose();
+                UserMenuClose();
+                ProductMenuClose();
+                WarehouseMenuClose();
+                ProfileMenuClose();
+            }
+        }
+
+        private void GetMonth()
+        {
+            string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
+
+            MonthPLabel.Content = $"План ({monthName})";
+            SoldedMLabel.Content = $"Продано ({monthName})";
+        }
+        // ======================= MANAGER DATAGRID STYLE =======================
+        #region MANAGER DATAGRID STYLE
         private void DataGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (_isCtrlPressed && _isMouseOverDataGrid)
@@ -1277,71 +1373,29 @@ namespace ManagerAppV2._1
             cellStyle.Triggers.Add(trigger);
             dataGrid.CellStyle = cellStyle;
         }
-
-        private void AdminTabControl_Selected(object sender, SelectionChangedEventArgs e)
+        #endregion
+        #region Menu animations
+        private void AnimateMenu(FrameworkElement menu, double toHeight)
         {
-            if (AdminTabControl.SelectedItem is TabItem selectedTab)
+            DoubleAnimation animation = new DoubleAnimation
             {
-                DBname = selectedTab.Header.ToString();
-
-                ReLoadData(DBname, true);
-
-            }
+                From = menu.ActualHeight,
+                To = toHeight,
+                Duration = TimeSpan.FromSeconds(0.2)
+            };
+            menu.BeginAnimation(FrameworkElement.HeightProperty, animation);
         }
-        private string GetTabName()
+        // Add the missing SetMenuIcon method to resolve the CS0103 error.
+        private void SetMenuIcon(Image imageControl, string iconPath)
         {
-            if (AdminTabControl.SelectedItem is TabItem selectedTab)
-            {
-                var _currentTableName = selectedTab.Header.ToString();
-                return _currentTableName;
-            }
-            else return "error";
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.UriSource = new Uri(iconPath, UriKind.RelativeOrAbsolute);
+            bitmapImage.EndInit();
+            imageControl.Source = bitmapImage;
         }
-        private void AdminTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Проверяем, что изменение действительно связано с выбором вкладки
-            if (e.Source is TabControl tabControl)
-            {
-                // Получаем выбранную вкладку
-                if (tabControl.SelectedItem is TabItem selectedTab)
-                {
-                    LoadDataAndCreateCheckBoxes(true);
-                    DataSource.DBname = GetTabName();
-                    LoadDataToLabel(GetTabName());
-                }
-            }
+        #endregion
 
-        }
-        public DataGrid GetSelectedDataGrid(TabControl tabControl)
-        {
-            if (tabControl.SelectedItem is TabItem selectedTab &&
-                selectedTab.Content is DataGrid dataGrid)
-            {
-                return dataGrid;
-            }
-            return null;
-        }
         
-        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
-
-                if (child is T correctlyTyped)
-                    return correctlyTyped;
-
-                T descendent = FindVisualChild<T>(child);
-                if (descendent != null)
-                    return descendent;
-            }
-            return null;
-        }
-
-        private void TableRemoveBtn_Click(object sender, RoutedEventArgs e)
-        {
-            TableRemove TBR = new TableRemove();
-            TBR.Show();
-        }
     }
 }

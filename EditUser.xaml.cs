@@ -128,7 +128,7 @@ namespace ManagerAppV2._1
 
                 if (!ConfirmingPassword(PasswordTextBox.Text, ConfirmPasswordTextBox.Text))
                 {
-                    MessageBox.Show("Passwords don't match", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Пароли не совпадают", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
@@ -185,6 +185,12 @@ namespace ManagerAppV2._1
             }
 
             LoadComboBoxDataAsync();
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+
+            if (mainWindow != null)
+            {
+                mainWindow.UpdateAll();
+            }
         }
 
         private bool ConfirmingPassword(string password, string confirmPassword)
@@ -304,8 +310,6 @@ namespace ManagerAppV2._1
             this.Close();
         }
 
-
-
         private async void LoginCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -329,7 +333,6 @@ namespace ManagerAppV2._1
                 ClearUserForm();
             }
         }
-
         private void ClearUserForm()
         {
             LoginTextBox.Text = "";
@@ -385,6 +388,12 @@ namespace ManagerAppV2._1
                 LoginCB.ItemsSource = null;
                 LoginCB.Items.Clear();
                 LoadComboBoxDataAsync();
+                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+
+                if (mainWindow != null)
+                {
+                    mainWindow.UpdateAll();
+                }
             }
         }
 

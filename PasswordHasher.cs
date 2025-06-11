@@ -15,7 +15,7 @@ namespace ManagerAppV2._1
         public static string HashPassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Пароль не должен быть пустым.", nameof(password));
+                MessageBox.Show("Пароль не должен быть пустым.", "Ошибка");
 
             byte[] salt = new byte[SaltSize];
             using (var rng = RandomNumberGenerator.Create())
