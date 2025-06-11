@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV3._5"
         mc:Ignorable="d"
-        Title="AddnEditProduct" Height="200" Width="401" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
-    <Grid>
+        Title="Управление продукцией" Height="200" Width="400" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+    <Grid Height="184" Width="400">
 
         <Label x:Name="NameLabel" Content="Название" Margin="19,45,220,0" Padding="5,5,5,0" Height="25" VerticalAlignment="Top"/>
         <Label x:Name="MinPriceLabel" Content="Минимальная цена" HorizontalAlignment="Left" Margin="189,90,0,0" Padding="5,5,5,0" Height="21" VerticalAlignment="Top"/>
