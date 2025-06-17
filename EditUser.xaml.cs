@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
 
     public partial class EditUser : Window
@@ -155,7 +155,7 @@ namespace ManagerAppV3._5
                 $"UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`)" +
                 $") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
                 $"UPDATE users SET name = '{NameTextBox.Text}', login = '{LoginTextBox.Text}', " +
-                $"role = '{RoleComboBox.SelectedItem}', databasename = '{dbname}'";
+                $"role = '{RoleComboBox.SelectedItem}', databasename = '{dbname}', oklad = '{OkladTextBox.Text}'";
 
             // Добавляем обновление пароля только если поля не пустые
             if (!passwordFieldsEmpty)

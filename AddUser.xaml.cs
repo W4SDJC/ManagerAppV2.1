@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
 
     public partial class AddUser : Window
@@ -56,7 +56,7 @@ namespace ManagerAppV3._5
             if (string.IsNullOrWhiteSpace(textBox.Text))
             {
                 textBox.BorderBrush = Brushes.Red;
-                return $"Please, fill the field {fieldName}.\n";
+                return $"Пожалуйста, заполните поле {fieldName}.\n";
             }
             return "";
         }
@@ -68,6 +68,7 @@ namespace ManagerAppV3._5
             ValidateTextBox(NameTextBox, "Name");
             ValidateTextBox(PasswordTextBox, "Password");
             ValidateTextBox(ConfirmPasswordTextBox, "Password confirmation");
+            ValidateTextBox(OkladTextBox, "Оклад");
             if (string.IsNullOrEmpty(DataBaseNameTextBox.Text))
             {
                 if (!ValidateInputFields())
@@ -97,14 +98,13 @@ namespace ManagerAppV3._5
                 $"`MinimumPrice` int DEFAULT NULL," +
                 $"`ShipmentValue` int DEFAULT NULL," +
                 $"`ShipmentValue(Minimum_price)` int DEFAULT NULL," +
-                $"`Reward` int DEFAULT NULL," +
-                $"`UPDNumber` int DEFAULT NULL," +
+                $"`UPDNumber` varchar(50) DEFAULT NULL," +
                 $"`ShipmentPrice` int DEFAULT NULL," +
                 $"PRIMARY KEY (`id`)," +
                 $"UNIQUE KEY `id_UNIQUE` (`id`)," +
                 $"UNIQUE KEY `UPDNumber_UNIQUE` (`UPDNumber`)" +
                 $") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
-                $"INSERT INTO users(`name`, `login`, `password`, `role`, `databasename`) VALUES ('{NameTextBox.Text}','{LoginTextBox.Text}', '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', '{RoleComboBox.SelectedItem}', '{dbname}');";
+                $"INSERT INTO users(`name`, `login`, `password`, `role`, `databasename`, `oklad`) VALUES ('{NameTextBox.Text}','{LoginTextBox.Text}', '{PasswordHasher.HashPassword(ConfirmPasswordTextBox.Text)}', '{RoleComboBox.SelectedItem}', '{dbname}', '{OkladTextBox.Text}');";
                 try
                 {
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))

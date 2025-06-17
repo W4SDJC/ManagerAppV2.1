@@ -6,7 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     public partial class LoginWindow : Window
     {
@@ -43,6 +43,8 @@ namespace ManagerAppV3._5
         }
         public void StopErrorAnimation(Button button)
         {
+            ConnectionErrorText = "";
+
             // Остановка текущей анимации
             if (button.Background is SolidColorBrush brush)
             {
@@ -69,6 +71,7 @@ namespace ManagerAppV3._5
                     SetSettingButtonImage();
                     StopErrorAnimation(SettingButton);
                     LoginButton.IsEnabled = true;
+                    this.Title = $"M.App 4.0 Pre-release";
                 }
             }
             catch (Exception ex)
@@ -140,6 +143,7 @@ namespace ManagerAppV3._5
 
                         // Переход в главное окно
                         MainWindow mainWindow = new MainWindow();
+                        mainWindow.Tablename = dbName;
                         mainWindow.Show();
                         this.Close();
 

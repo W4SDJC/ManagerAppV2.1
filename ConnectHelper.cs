@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.IO;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     public class ConnectHelper
     {
@@ -13,7 +13,7 @@ namespace ManagerAppV3._5
         public string Database { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
-        public string CurrentUserLogin { get; set; }
+        public string Version { get; set; }
         private static string filePath = "Config.json";
 
 
@@ -30,6 +30,8 @@ namespace ManagerAppV3._5
                     this.Database = loadedConfig.Database;
                     this.User = loadedConfig.User;
                     this.Password = loadedConfig.Password;
+                    this.Version = "4.0 Pre-release";
+
                 }
             }
             else
@@ -44,6 +46,7 @@ namespace ManagerAppV3._5
                 this.Database = "default_db";
                 this.User = "root";
                 this.Password = "";
+                this.Version = "4.0 Pre-release";
 
                 // Сохраняем в файл
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
@@ -133,6 +136,53 @@ namespace ManagerAppV3._5
             }
         }
 
+        public string SystemQuery(string tableName)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentException("Имя таблицы не может быть пустым", nameof(tableName));
+            }
+
+            // Приводим к единому формату (нижний регистр, удаляем пробелы)
+            string normalizedTableName = tableName.Trim().ToLower().Replace(" ", "");
+
+            switch (normalizedTableName)
+            {
+                case "productprice":
+                    return """
+                SELECT 
+                    id,
+                    `Product_name` as 'Название',
+                    `Product_price` as 'Цена',
+                    `Minimum_price` as 'Мин цена',
+                    `Unit_of_measurement` as 'Ед измерения'
+                FROM `product price`;
+                """;
+
+                case "roles":
+                    return "SELECT id, `role` as 'Роль' FROM roles;";
+
+                case "users":
+                    return """
+                SELECT 
+                    id,
+                    `name` as 'Имя',
+                    `login` as 'Логин',
+                    `password` as 'Пароль',
+                    `role` as 'Роль',
+                    `databasename` as 'Таблица',
+                    `monthplan` as 'План',
+                    `oklad` as 'Оклад'
+                FROM users;
+                """;
+
+                case "warehouses":
+                    return "SELECT id, `name` as 'Название', `address` as 'Адрес' FROM warehouses;";
+
+                default:
+                    throw new NotSupportedException($"Таблица '{tableName}' не поддерживается. Доступные таблицы: productprice, roles, users, warehouses");
+            }
+        }
         public string ManagerData(string DBName)
         {
             string Query = "SELECT " +
@@ -149,8 +199,7 @@ namespace ManagerAppV3._5
                 "ShipmentValue as 'Итого менеджера', " +
                 "`ShipmentValue(Minimum_price)` as 'Итого (Мин)', " +
                 "UPDNumber as 'Номер УПД', " +
-                "ShipmentPrice as 'Стоимость доставки', " +
-                "Reward as 'Премия' " +
+                "ShipmentPrice as 'Стоимость доставки' " +
                 $"FROM `{DBName}`;";
 
             return Query;
@@ -198,6 +247,49 @@ namespace ManagerAppV3._5
 
             // Возвращаем null если роль не найдена (вместо исключения)
             return role;
+        }
+        public string GetOklad( string table)
+        {
+            // Проверка входного параметра
+            if (string.IsNullOrWhiteSpace(table))
+            {
+                throw new ArgumentException("Имя таблицы не может быть пустым", nameof(table));
+            }
+
+            string oklad = null;
+
+            try
+            {
+                using (var con = new MySqlConnection(GetConnectionString()))
+                {
+                    // Используем параметризованный запрос для безопасности
+                    string query = $"SELECT `oklad` FROM users WHERE `databasename` = @TableName;";
+
+                    using (var cmd = new MySqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@TableName", table);
+
+                        con.Open();
+                        var result = cmd.ExecuteScalar();
+                        // Безопасное преобразование результата
+                        oklad = result?.ToString();
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                // Логирование ошибки
+                Debug.WriteLine($"Ошибка при получении роли: {ex.Message}");
+                throw new ApplicationException("Ошибка доступа к базе данных", ex);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Неожиданная ошибка: {ex.Message}");
+                throw;
+            }
+
+            // Возвращаем null если роль не найдена (вместо исключения)
+            return oklad;
         }
     }
 }

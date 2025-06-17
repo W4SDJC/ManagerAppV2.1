@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
 
     public partial class AddnEditProduct : Window

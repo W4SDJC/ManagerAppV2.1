@@ -3,7 +3,7 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     public partial class SetMonthPlan : Window
     {
@@ -104,7 +104,7 @@ namespace ManagerAppV3._5
 
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@monthplan", planValue);
+                        command.Parameters.AddWithValue("@monthplan", Math.Abs(planValue));
                         command.Parameters.AddWithValue("@login", selectedUser.Login);
 
                         int result = command.ExecuteNonQuery();

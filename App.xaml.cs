@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     /// <summary>
     /// Interaction logic for App.xaml

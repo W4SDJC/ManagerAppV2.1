@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     public partial class AddnEdit : Window
     {
@@ -125,25 +125,23 @@ namespace ManagerAppV3._5
                             MinimumPrice, 
                             ShipmentValue, 
                             `ShipmentValue(Minimum_price)`, 
-                            Reward, 
                             UPDNumber, 
                             ShipmentPrice
                         ) VALUES (@date, @warehouse, @city, @clientName, @productName, 
                             @amount, @unit, @price, @minPrice, 
-                            @value, @minValue, @reward, @updNumber, @shipmentPrice
+                            @value, @minValue, @updNumber, @shipmentPrice
                         )";
 
                         try
                         {
                             // Парсим и вычисляем значения
-                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd,MM,yyyy", CultureInfo.InvariantCulture);
                             decimal price = decimal.Parse(priceTextBox.Text);
                             decimal minPrice = decimal.Parse(minPriceTextBox.Text);
                             decimal amount = decimal.Parse(amountTextBox.Text);
                             decimal shipmentValue = price * amount;
                             decimal minShipmentValue = minPrice * amount;
-                            decimal reward = shipmentValue - minShipmentValue;
-                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+                            decimal shipmentPrice = decimal.Parse(ShipmentPriceTextBox.Text);
 
                             using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                             {
@@ -163,7 +161,6 @@ namespace ManagerAppV3._5
                                     command.Parameters.AddWithValue("@minPrice", minPrice);
                                     command.Parameters.AddWithValue("@value", shipmentValue);
                                     command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                                    command.Parameters.AddWithValue("@reward", reward);
                                     command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
                                     command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
 
@@ -204,7 +201,6 @@ namespace ManagerAppV3._5
                             MinimumPrice =  @minPrice, 
                             ShipmentValue = @value, 
                             `ShipmentValue(Minimum_price)` = @minValue, 
-                            Reward = @reward, 
                             UPDNumber = @updNumber, 
                             ShipmentPrice = @shipmentPrice
                          WHERE id = {id}";
@@ -212,14 +208,13 @@ namespace ManagerAppV3._5
                         try
                         {
                             // Парсим и вычисляем значения
-                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                            DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd,MM,yyyy", CultureInfo.InvariantCulture);
                             decimal price = decimal.Parse(priceTextBox.Text);
                             decimal minPrice = decimal.Parse(minPriceTextBox.Text);
                             decimal amount = decimal.Parse(amountTextBox.Text);
                             decimal shipmentValue = price * amount;
                             decimal minShipmentValue = minPrice * amount;
-                            decimal reward = shipmentValue - minShipmentValue;
-                            decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+                            decimal shipmentPrice = decimal.Parse(ShipmentPriceTextBox.Text);
 
                             using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                             {
@@ -239,7 +234,6 @@ namespace ManagerAppV3._5
                                     command.Parameters.AddWithValue("@minPrice", minPrice);
                                     command.Parameters.AddWithValue("@value", shipmentValue);
                                     command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                                    command.Parameters.AddWithValue("@reward", reward);
                                     command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
                                     command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
 
@@ -281,26 +275,24 @@ namespace ManagerAppV3._5
                         MinimumPrice, 
                         ShipmentValue, 
                         `ShipmentValue(Minimum_price)`, 
-                        Reward, 
                         UPDNumber, 
                         ShipmentPrice
                     ) VALUES (
                         @date, @warehouse, @city, @clientName, @productName, 
                         @amount, @unit, @price, @minPrice, 
-                        @value, @minValue, @reward, @updNumber, @shipmentPrice
+                        @value, @minValue, @updNumber, @shipmentPrice
                     )";
 
                     try
                     {
                         // Парсим и вычисляем значения
-                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd,MM,yyyy", CultureInfo.InvariantCulture);
                         decimal price = decimal.Parse(priceTextBox.Text);
                         decimal minPrice = decimal.Parse(minPriceTextBox.Text);
                         decimal amount = decimal.Parse(amountTextBox.Text);
                         decimal shipmentValue = price * amount;
                         decimal minShipmentValue = minPrice * amount;
-                        decimal reward = shipmentValue - minShipmentValue;
-                        decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+                        decimal shipmentPrice = decimal.Parse(ShipmentPriceTextBox.Text);
 
                         using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                         {
@@ -320,7 +312,6 @@ namespace ManagerAppV3._5
                                 command.Parameters.AddWithValue("@minPrice", minPrice);
                                 command.Parameters.AddWithValue("@value", shipmentValue);
                                 command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                                command.Parameters.AddWithValue("@reward", reward);
                                 command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
                                 command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
 
@@ -360,7 +351,6 @@ namespace ManagerAppV3._5
                             MinimumPrice =  @minPrice, 
                             ShipmentValue = @value, 
                             `ShipmentValue(Minimum_price)` = @minValue, 
-                            Reward = @reward, 
                             UPDNumber = @updNumber, 
                             ShipmentPrice = @shipmentPrice
                          WHERE `id` = '{id}'";
@@ -368,14 +358,13 @@ namespace ManagerAppV3._5
                     try
                     {
                         // Парсим и вычисляем значения
-                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                        DateTime shipmentDate = DateTime.ParseExact(shipmentDateTextBox.Text, "dd,MM,yyyy", CultureInfo.InvariantCulture);
                         decimal price = decimal.Parse(priceTextBox.Text);
                         decimal minPrice = decimal.Parse(minPriceTextBox.Text);
                         decimal amount = decimal.Parse(amountTextBox.Text);
                         decimal shipmentValue = price * amount;
                         decimal minShipmentValue = minPrice * amount;
-                        decimal reward = shipmentValue - minShipmentValue;
-                        decimal shipmentPrice = decimal.Parse(shipmentPriceTextBox.Text);
+                        decimal shipmentPrice = decimal.Parse(ShipmentPriceTextBox.Text);
 
                         using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                         {
@@ -395,7 +384,6 @@ namespace ManagerAppV3._5
                                 command.Parameters.AddWithValue("@minPrice", minPrice);
                                 command.Parameters.AddWithValue("@value", shipmentValue);
                                 command.Parameters.AddWithValue("@minValue", minShipmentValue);
-                                command.Parameters.AddWithValue("@reward", reward);
                                 command.Parameters.AddWithValue("@updNumber", updNumberTextBox.Text);
                                 command.Parameters.AddWithValue("@shipmentPrice", shipmentPrice);
 
@@ -445,7 +433,7 @@ namespace ManagerAppV3._5
 
         private void ProductCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string query = $"SELECT Product_price FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
+            string query = $"SELECT Minimum_price FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
             string query2 = $"SELECT Unit_of_measurement FROM `product price` where Product_name = \"{ProductCB.SelectedItem}\";"; 
 
             try
@@ -485,13 +473,14 @@ namespace ManagerAppV3._5
             priceTextBox.Text = data["Price"]?.ToString();
             minPriceTextBox.Text = data["MinimumPrice"]?.ToString();
             updNumberTextBox.Text = data["UPDNumber"]?.ToString();
-            shipmentPriceTextBox.Text = data["ShipmentValue"]?.ToString();
+            ShipmentPriceTextBox.Text = data["ShipmentValue"]?.ToString();
         }
 
         private void FillbyID(string table, string id)
         {
+
             string connStr = CH.GetConnectionString();
-            string query = $"SELECT ShipmentDate, ShipmentWarehouse, ClientCity, ClientName, ProductName, ProductAmount, UnitOfMeasurement, Price, MinimumPrice, UPDNumber, ShipmentValue FROM {table} WHERE id = @id";
+            string query = $"SELECT ShipmentDate, ShipmentWarehouse, ClientCity, ClientName, ProductName, ProductAmount, UnitOfMeasurement, Price, MinimumPrice, UPDNumber, ShipmentValue, ShipmentPrice FROM {table} WHERE id = @id";
 
 
             using var conn = new MySqlConnection(connStr);
@@ -515,7 +504,7 @@ namespace ManagerAppV3._5
                 priceTextBox.Text = reader["Price"]?.ToString();
                 minPriceTextBox.Text = reader["MinimumPrice"]?.ToString();
                 updNumberTextBox.Text = reader["UPDNumber"]?.ToString();
-                shipmentPriceTextBox.Text = reader["ShipmentValue"]?.ToString();
+                ShipmentPriceTextBox.Text = reader["ShipmentPrice"]?.ToString();
             }
         }
 
@@ -531,7 +520,7 @@ namespace ManagerAppV3._5
                 string.IsNullOrWhiteSpace(unitTextBox.Text) ||
                 string.IsNullOrWhiteSpace(priceTextBox.Text) ||
                 string.IsNullOrWhiteSpace(minPriceTextBox.Text) ||
-                string.IsNullOrWhiteSpace(shipmentPriceTextBox.Text))
+                string.IsNullOrWhiteSpace(ShipmentPriceTextBox.Text))
             {
                 MessageBox.Show("Заполните все обязательные поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
@@ -566,10 +555,10 @@ namespace ManagerAppV3._5
                 return false;
             }
 
-            if (!decimal.TryParse(shipmentPriceTextBox.Text, out decimal shipmentPrice) || shipmentPrice <= 0)
+            if (!decimal.TryParse(ShipmentPriceTextBox.Text, out decimal shipmentPrice) || shipmentPrice <= 0)
             {
                 MessageBox.Show("Цена отгрузки должна быть положительным числом!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                shipmentPriceTextBox.Focus();
+                ShipmentPriceTextBox.Focus();
                 return false;
             }
 
@@ -579,14 +568,16 @@ namespace ManagerAppV3._5
         private void ClearForm()
         {
             shipmentDateTextBox.Text = "";
+            WarehouseCB.SelectedIndex = -1;
+            WarehouseAddress.Text = "";
             cityTextBox.Text = "";
             clientNameTextBox.Text = "";
+            ProductCB.SelectedIndex = -1;
             amountTextBox.Text = "";
-            unitTextBox.Text = "";
             priceTextBox.Text = "";
-            minPriceTextBox.Text = "";
             updNumberTextBox.Text = "";
-            shipmentPriceTextBox.Text = "";
+            ShipmentPriceTextBox.Text = "";
+            ShipmentSumTextBox.Text = "0,00";
         }
 
         private void amountTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -609,8 +600,8 @@ namespace ManagerAppV3._5
             }
 
             // Пытаемся преобразовать введенные значения в числа
-            if (!int.TryParse(amountTextBox.Text, out int amount) ||
-                !int.TryParse(priceTextBox.Text, out int price))
+            if (!double.TryParse(amountTextBox.Text, out double amount) ||
+                !double.TryParse(priceTextBox.Text, out double price))
             {
                 ShowCalculationError("Введите корректные числовые значения");
                 return;
@@ -627,10 +618,10 @@ namespace ManagerAppV3._5
             {
                 ErrorTextBlock.Text = String.Empty;
                 // Вычисляем сумму
-                int sum = amount * price;
+                double sum = amount * price;
 
                 // Форматируем результат (например, с разделителями тысяч)
-                shipmentPriceTextBox.Text = sum.ToString("N0");
+                ShipmentSumTextBox.Text = sum.ToString("N2");
             }
             catch (OverflowException)
             {
@@ -649,7 +640,7 @@ namespace ManagerAppV3._5
             ErrorTextBlock.TextWrapping = TextWrapping.Wrap;
 
             ErrorTextBlock.Text = "Ошибка расчета: \n" + message;
-            shipmentPriceTextBox.Text = string.Empty;
+            ShipmentPriceTextBox.Text = string.Empty;
         }
 
         private void WarehouseCB_SelectionChanged(object sender, SelectionChangedEventArgs e)

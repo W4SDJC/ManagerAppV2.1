@@ -1,9 +1,9 @@
-﻿<Window x:Class="ManagerAppV3._5.EditUser"
+﻿<Window x:Class="ManagerAppV4._0.EditUser"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ManagerAppV3._5"
+        xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
         Title="Редактировать пользователя" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Grid Height="245" Width="510" Margin="0,0,0,0" >
@@ -15,14 +15,14 @@
 
         <Label x:Name="LoginLabel" Content="Логин" Margin="126,57,295,162" Padding="5,5,5,0"/>
         <Label x:Name="PasswordLabel" Content="Пароль" HorizontalAlignment="Left" Margin="126,103,0,120" Padding="5,5,5,0"/>
-        <Button x:Name="Cancel" Content="Отмена" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Cancel_Click">
+        <Button x:Name="Cancel" Content="Отмена" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,10" Click="Cancel_Click" TabIndex="9">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button Content="Сохранить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,105,10" Click="EditButton_Click">
+        <Button Content="Сохранить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,105,10" Click="EditButton_Click" TabIndex="10">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -33,51 +33,51 @@
         <Label x:Name="NameLabel" Content="Имя" Margin="295,57,127,162" Padding="5,5,5,0"/>
         <Label x:Name="DataBaseNameLabel" Content="Имя таблицы (необязательно)" HorizontalAlignment="Left" Margin="295,103,0,120" Padding="5,5,5,0" ScrollViewer.CanContentScroll="True"/>
         <Label x:Name="RoleLabel" Content="Роль" HorizontalAlignment="Left" Margin="295,151,0,70" Padding="5,5,5,0"/>
-        <TextBox x:Name="LoginTextBox" Margin="126,83,220,142" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+        <TextBox x:Name="LoginTextBox" Margin="126,83,220,142" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" TabIndex="2">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="NameTextBox" Margin="295,83,22,142" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="NameTextBox" Margin="295,83,22,142" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="3">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="PasswordTextBox" Margin="126,125,220,100" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="PasswordTextBox" Margin="126,125,220,100" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="4">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="DataBaseNameTextBox" Margin="295,125,22,100" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="DataBaseNameTextBox" Margin="295,125,22,100" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="5">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <TextBox x:Name="ConfirmPasswordTextBox" Margin="126,175,220,50" TextWrapping="Wrap" Padding="5,0,0,0">
+        <TextBox x:Name="ConfirmPasswordTextBox" Margin="126,175,220,50" TextWrapping="Wrap" Padding="5,0,0,0" TabIndex="6">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="2"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="295,175,0,0" VerticalAlignment="Top" Width="140" Height="20"/>
-        <ComboBox x:Name="LoginCB"  HorizontalAlignment="Left" Margin="126,33,0,0" VerticalAlignment="Top" Width="140" Height="20" SelectionChanged="LoginCB_SelectionChanged"/>
-        <Button Content="Удалить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,190,10" Click="DeleteButton_Click">
+        <ComboBox x:Name="RoleComboBox"  HorizontalAlignment="Left" Margin="295,175,0,0" VerticalAlignment="Top" Width="140" Height="20" TabIndex="7"/>
+        <ComboBox x:Name="LoginCB"  HorizontalAlignment="Left" Margin="126,33,0,0" VerticalAlignment="Top" Width="140" Height="20" SelectionChanged="LoginCB_SelectionChanged" TabIndex="0"/>
+        <Button Content="Удалить" Background="#FF333333" Foreground="White" Width="80" Height="35" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,190,10" Click="DeleteButton_Click" TabIndex="11">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="EditRoleBtn" Content="Ред." Background="#FF333333" Foreground="White" Width="50" Height="20" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,50" Click="EditRoleBtn_Click" >
+        <Button x:Name="EditRoleBtn" Content="Ред." Background="#FF333333" Foreground="White" Width="50" Height="20" Padding="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,50" Click="EditRoleBtn_Click" TabIndex="8" >
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -85,6 +85,14 @@
             </Button.Resources>
         </Button>
         <Label x:Name="LoginLabel_Копировать" Content="Пользователь" Margin="126,7,295,212" Padding="5,5,5,0"/>
+        <Label x:Name="OkladLabel" Content="Оклад" Margin="295,6,126,213" Padding="5,5,5,0"/>
+        <TextBox x:Name="OkladTextBox" Margin="295,32,51,193" TextWrapping="Wrap" Padding="5,0,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" TabIndex="1">
+            <TextBox.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
 
     </Grid>
 </Window>

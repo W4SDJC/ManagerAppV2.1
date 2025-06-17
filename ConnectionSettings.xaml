@@ -1,11 +1,11 @@
-﻿<Window x:Class="ManagerAppV3._5.ConnectionSettings"
+﻿<Window x:Class="ManagerAppV4._0.ConnectionSettings"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ManagerAppV3._5"
+        xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="ConnectionSettings" Height="300" Width="312" ResizeMode="NoResize">
+        Title="Настройки" Height="300" Width="312" ResizeMode="NoResize">
     <Grid>
         <StackPanel Margin="10">
             <TextBlock Text="Сервер:"/>

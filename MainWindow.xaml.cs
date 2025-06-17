@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System.Collections;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,7 +14,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
 
     public partial class MainWindow : Window
@@ -22,8 +23,9 @@ namespace ManagerAppV3._5
         private string Name = DataSource.UserName;
         private string Login = DataSource.Login;
         private string Role = DataSource.Role;
-        private string DBname = DataSource.DBname;
+        public string Tablename = DataSource.DBname;
         private bool AdminMode = false;
+        private int FSize = 16;
         private bool _isMouseOverDataGrid = false;
         private bool _isCtrlPressed = false;
 
@@ -33,20 +35,35 @@ namespace ManagerAppV3._5
             MainLoad();
         }
 
-
         // =========================== DATABASE MENU ===========================
         #region DATABASE MENU
         private void DatabaseMenuOpen(object sender, RoutedEventArgs e)
         {
-            if (DatabaseMenu.ActualHeight > 0)
+            if (AdminMode)
             {
-                AnimateMenu(DatabaseMenu, 0);
-                SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowDown.png");
+                if (DatabaseMenu.ActualHeight > 0)
+                {
+                    AnimateMenu(DatabaseMenu, 0);
+                    SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowDown.png");
+                }
+                else
+                {
+                    AnimateMenu(DatabaseMenu, 125);
+                    SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowUp.png");
+                }
             }
             else
             {
-                AnimateMenu(DatabaseMenu, 125);
-                SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowUp.png");
+                if (DatabaseMenu.ActualHeight > 0)
+                {
+                    AnimateMenu(DatabaseMenu, 0);
+                    SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowDown.png");
+                }
+                else
+                {
+                    AnimateMenu(DatabaseMenu, 95);
+                    SetMenuIcon(DataBaseBtnimg, "/Icons/ArrowUp.png");
+                }
             }
         }
 
@@ -55,16 +72,18 @@ namespace ManagerAppV3._5
         {
             if (AdminMode)
             {
-
-                AddnEdit addnEdit = new AddnEdit("Add", GetTabName());
+                AddnEdit addnEdit = new AddnEdit("Add", TabTranslations.GetTechnicalName(GetTabName()));
                 addnEdit.ShowDialog();
+                LoadDataToLabel(TabTranslations.GetTechnicalName(GetTabName()));
+                UpdateAll();
             }
             else
             {
-                AddnEdit addnEdit = new AddnEdit("Add",DBname);
+                AddnEdit addnEdit = new AddnEdit("Add", Tablename);
                 addnEdit.ShowDialog();
+                UpdateAll();
             }
-            ReLoadData(DBname);
+            ReLoadData(Tablename);
             ApplyColumnVisibility();
         }
 
@@ -76,7 +95,9 @@ namespace ManagerAppV3._5
                 TabItem selectedTab = AdminTabControl.SelectedItem as TabItem;
                 if (selectedTab?.Content is DataGrid dataGrid && dataGrid.SelectedItem is DataRowView row)
                 {
-                    if (selectedTab != null)
+                    var specialTables = new List<string> { "product price", "roles", "users", "warehouses" };
+
+                    if (selectedTab != null && !specialTables.Contains(TabTranslations.GetTechnicalName(GetTabName())))
                     {
                         var dataGrid1 = selectedTab.Content as DataGrid;
                         if (dataGrid1 != null && dataGrid1.SelectedItem != null)
@@ -88,12 +109,16 @@ namespace ManagerAppV3._5
                                 // Получаем значение столбца 'id':
                                 string idValue = rowView["id"].ToString();
                                 var selectedData = row.Row; // DataRow с доступом по именам колонок
-                                var editWindow = new AddnEdit("Edit", GetTabName(), row.Row, idValue, true); // передаём DataRow
+                                AddnEdit editWindow = new AddnEdit("Edit", TabTranslations.GetTechnicalName(GetTabName()), row.Row, idValue, true); // передаём DataRow
                                 editWindow.ShowDialog();
+                                UpdateAll();
                             }
                         }
                     }
+                    else { MessageBox.Show("Выберите таблицу пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error); }
                 }
+                else { MessageBox.Show("Выберите строку для изменения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information); }
+
             }
             else
             {
@@ -105,9 +130,9 @@ namespace ManagerAppV3._5
                 DataRowView selectedRow = (DataRowView)MainDataGrid.SelectedItem;
                 string id = selectedRow["id"].ToString();
 
-                var editWindow = new AddnEdit("Edit",DBname, null, id); 
+                var editWindow = new AddnEdit("Edit",Tablename, null, id); 
                 editWindow.ShowDialog();
-                ReLoadData(DBname);
+                UpdateAll();
             }
         }
         // ============================ DELETE DATA ============================
@@ -129,10 +154,12 @@ namespace ManagerAppV3._5
                         list.Remove(dataGrid.SelectedItem);
                     }
                 }
+                UpdateAll();
             }
             else
             {
                 DeleteData();
+                UpdateAll();
             }
         }
         // ============================ EXPORT DATA ============================
@@ -143,11 +170,11 @@ namespace ManagerAppV3._5
             {
                 DataTable dataTable = null;
                 string fileName = "Export.xlsx";
+                var selectedTab = AdminTabControl.SelectedItem as TabItem;
+                var specialTables = new List<string> { "product price", "roles", "users", "warehouses" };
 
-                if (AdminMode)
+                if (!specialTables.Contains(TabTranslations.GetTechnicalName(GetTabName())))
                 {
-                    // --- Экспорт из выбранной вкладки TabControl ---
-                    var selectedTab = AdminTabControl.SelectedItem as TabItem;
                     if (selectedTab == null)
                     {
                         MessageBox.Show("Не выбрана вкладка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -170,17 +197,267 @@ namespace ManagerAppV3._5
 
                     dataTable = dataView.ToTable();
                     fileName = selectedTab.Header.ToString() + ".xlsx";
+
+
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        Filter = "Excel файл (*.xlsx)|*.xlsx",
+                        Title = "Сохранить таблицу как Excel",
+                        FileName = fileName
+                    };
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        using (XLWorkbook workbook = new XLWorkbook())
+                        {
+                            // 1. Добавляем основной лист с данными
+                            var wsData = workbook.Worksheets.Add(dataTable, "Отчет");
+
+                            // Добавляем итоговые строки в конец таблицы
+                            int lastRow = wsData.LastRowUsed().RowNumber();
+                            int firstDataRow = 2; // предполагая, что строка 1 - это заголовки
+
+                            // Находим индексы столбцов по названиям
+                            int totalCol = -1, totalMinCol = -1, deliveryCol = -1;
+                            for (int i = 1; i <= wsData.ColumnCount(); i++)
+                            {
+                                string header = wsData.Cell(1, i).Value.ToString();
+                                if (header.Contains("Итого менеджера")) totalCol = i;
+                                if (header.Contains("Итого (Мин)")) totalMinCol = i;
+                                if (header.Contains("Стоимость доставки")) deliveryCol = i;
+                            }
+
+                            // Добавляем итоговые строки
+                            if (totalCol > 0 || totalMinCol > 0 || deliveryCol > 0)
+                            {
+                                lastRow++;
+                                wsData.Cell(lastRow, 1).Value = "ИТОГО:";
+
+                                if (totalCol > 0)
+                                {
+                                    wsData.Cell(lastRow, totalCol).FormulaA1 = $"SUM({wsData.Column(totalCol).Cell(firstDataRow).Address}:{wsData.Column(totalCol).Cell(lastRow - 1).Address})";
+                                }
+
+                                if (totalMinCol > 0)
+                                {
+                                    wsData.Cell(lastRow, totalMinCol).FormulaA1 = $"SUM({wsData.Column(totalMinCol).Cell(firstDataRow).Address}:{wsData.Column(totalMinCol).Cell(lastRow - 1).Address})";
+                                }
+
+                                if (deliveryCol > 0)
+                                {
+                                    wsData.Cell(lastRow, deliveryCol).FormulaA1 = $"SUM({wsData.Column(deliveryCol).Cell(firstDataRow).Address}:{wsData.Column(deliveryCol).Cell(lastRow - 1).Address})";
+                                }
+
+                                // Форматируем итоговую строку
+                                var totalRange = wsData.Range(lastRow, 1, lastRow, wsData.ColumnCount());
+                                totalRange.Style.Font.Bold = true;
+                                totalRange.Style.Fill.BackgroundColor = XLColor.LightGreen;
+                                totalRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                            }
+
+                            // 2. Создаем лист с расчетом премии с точным форматированием
+                            var wsBonus = workbook.Worksheets.Add("Расчет премии");
+
+
+                            // Установка ширины столбца E (5) в 3 см 
+                            wsBonus.Column(5).Width = 12.6;
+                            // Цвета для форматирования
+                            var lightGreen = XLColor.FromArgb(51, 191, 86);
+                            var lightGray = XLColor.FromArgb(217, 217, 217);
+                            var lightYellow = XLColor.FromHtml("#ffe699");
+
+
+                            wsBonus.Cell(2, 7).Value = $"План продаж на {GetMonth().ToString()}";
+                            SetNumberCell(wsBonus, 3, 7, NormalizeNumberStringToDecimal(MonthPlanLabel.Content.ToString()));
+                            wsBonus.Cell(3, 7).Style.NumberFormat.Format = "#,##0.00";
+                            wsBonus.Range("G2:I2").Merge();
+                            SetNumberCell(wsBonus, 7, 7, NormalizeNumberStringToDecimal(MonthPlanLabel.Content.ToString()));
+                            wsBonus.Cell(7, 7).Style.NumberFormat.Format = "#,##0.00";
+                            SetNumberCell(wsBonus, 7, 8, NormalizeNumberStringToDecimal(SoldedLabel.Content.ToString()));
+                            wsBonus.Cell(7, 8).Style.NumberFormat.Format = "#,##0.00";
+                            wsBonus.Cell(7, 9).FormulaA1 = "H7/G7*100";
+                            var range3 = wsBonus.Range("G2:I3");
+                            range3.Style.Border.OutsideBorder = XLBorderStyleValues.Medium; // внешняя рамка
+                            range3.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+
+                            // Заголовки таблиц
+
+                            wsBonus.Cell(2, 4).Value = "Условие соблюдения ценовой политики (УСЦП)";
+                            wsBonus.Range("D2:E2").Merge();
+                            wsBonus.Cell(3, 4).Value = "Условие";
+                            wsBonus.Cell(3, 5).Value = "% вознаграждения от выручки";
+                            wsBonus.Cell(4, 4).Value = "равно минимальной стоимости товара за вычетом ЦР";
+                            wsBonus.Range("D4:D5").Merge();
+                            wsBonus.Cell(4, 5).Value = 2;
+                            wsBonus.Range("E4:E5").Merge();
+                            wsBonus.Cell(6, 4).Value = "больше минимальной стоимости товара за вычетом ЦР";
+                            wsBonus.Range("D6:D7").Merge();
+                            wsBonus.Cell(6, 5).Value = 3;
+                            wsBonus.Range("E6:E7").Merge();
+                            var range2 = wsBonus.Range("D2:E7");
+                            range2.Style.Border.OutsideBorder = XLBorderStyleValues.Medium; // внешняя рамка
+                            range2.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+
+                            wsBonus.Range("G3:I3").Merge();
+
+                            // Форматирование заголовков
+                            wsBonus.Range("A2:K2").Style.Font.Bold = true;
+                            wsBonus.Range("A2:K2").Style.Font.FontSize = 12;
+                            wsBonus.Range("A2:K2").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("A2:K2").Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+                            wsBonus.Range("A3:B3").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("D2:E2").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("D3:E3").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("B4:B9").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("A2:B2").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("E4:E7").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("G2:I2").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("G3:I3").Style.Fill.BackgroundColor = lightYellow;
+                            wsBonus.Range("A3:K3").Style.Font.Bold = true;
+
+                            // Устанавливаем автоперенос слов + центрирование по вертикали и горизонтали для всего листа "Расчет премии"
+                            wsBonus.Cells().Style.Alignment.WrapText = true;
+                            wsBonus.Cells().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Cells().Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+                            // Таблица выполнения плана
+                            wsBonus.Cell(2, 1).Value = "Выполнение плана продаж";
+                            wsBonus.Range("A2:B2").Merge();
+                            wsBonus.Cell(3, 1).Value = "% выполнения плана продаж";
+                            wsBonus.Cell(3, 2).Value = "Коэффициент вознаграждения (кВ)";
+                            wsBonus.Cell(4, 1).Value = "От 50% до 70%";
+                            wsBonus.Cell(4, 2).Value = 0.00;
+                            wsBonus.Cell(5, 1).Value = "70-80%";
+                            wsBonus.Cell(5, 2).Value = 0.80;
+                            wsBonus.Cell(6, 1).Value = "80-90%";
+                            wsBonus.Cell(6, 2).Value = 0.90;
+                            wsBonus.Cell(7, 1).Value = "90-100%";
+                            wsBonus.Cell(7, 2).Value = 1.00; 
+                            wsBonus.Cell(8, 1).Value = "110-125%";
+                            wsBonus.Cell(8, 2).Value = 1.20; 
+                            wsBonus.Cell(9, 1).Value = "Более 125%";
+                            wsBonus.Cell(9, 2).Value = 1.30;
+                            var range1 = wsBonus.Range("A2:B9");
+                            range1.Style.Border.OutsideBorder = XLBorderStyleValues.Medium; // внешняя рамка
+                            range1.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+
+
+                            wsBonus.Cell(5, 7).Value = "Коэффициент вознаграждения";
+                            wsBonus.Range("G5:I5").Merge();
+                            wsBonus.Cell(6, 7).Value = "план";
+                            wsBonus.Cell(6, 8).Value = "факт";
+                            wsBonus.Cell(6, 9).Value = "% выполнения";
+                            wsBonus.Range("G5:I5").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("G6:I6").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("G7:I7").Style.Fill.BackgroundColor = lightYellow;
+                            var range = wsBonus.Range("G5:I7");
+                            range.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+                            range.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+
+
+                            string[] summaryHeaders = {
+                            "Сумма отгрузки за месяц",
+                            "Сумма транспортных расходов за месяц",
+                            "Сумма отгрузки за вычетом транспорта",
+                            "Сумма отгрузки в мин.ценах за вычетом транспорта",
+                            "расчет по УСЦП",
+                            "Расчет премии с учетом кВ без НДФЛ",
+                            "Оклад без НДФЛ",
+                            "Итого без НДФЛ",
+                            "Выплачен аванс без НДФЛ",
+                            "Подрасчет без НДФЛ"
+                        };
+
+                            // Заголовки таблицы (обязательно перенос слов + выравнивание)
+                            for (int i = 0; i < summaryHeaders.Length; i++)
+                            {
+                                var cell = wsBonus.Cell(12, i + 1);
+                                cell.Value = summaryHeaders[i];
+                                cell.Style.Alignment.WrapText = true; // Перенос слов для каждого заголовка
+                                cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                                cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                            }
+
+                            // Форматирование заголовков таблицы
+                            wsBonus.Range("A12:J12").Style.Fill.BackgroundColor = lightGreen;
+                            wsBonus.Range("A12:J12").Style.Font.Bold = true;
+                            wsBonus.Range("A12:J12").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                            // Данные таблицы
+                            if (totalCol > 0)
+                                wsBonus.Cell(13, 1).FormulaA1 = "Отчет!" + wsData.Column(totalCol).Cell(lastRow).Address;
+                            else
+                                wsBonus.Cell(13, 1).Value = 0;
+
+                            if (deliveryCol > 0)
+                                wsBonus.Cell(13, 2).FormulaA1 = "Отчет!" + wsData.Column(deliveryCol).Cell(lastRow).Address;
+                            else
+                                wsBonus.Cell(13, 2).Value = 0;
+
+                            wsBonus.Cell(13, 3).FormulaA1 = "A13-B13";
+
+                            if (totalMinCol > 0 && deliveryCol > 0)
+                                wsBonus.Cell(13, 4).FormulaA1 = $"Отчет!{wsData.Column(totalMinCol).Cell(lastRow).Address}-Отчет!{wsData.Column(deliveryCol).Cell(lastRow).Address}";
+                            else
+                                wsBonus.Cell(13, 4).Value = 0;
+
+                            wsBonus.Cell(13, 5).FormulaA1 = "D13*IF(C13=D13,$E$4,$E$6)/100";
+                            wsBonus.Cell(13, 6).FormulaA1 = "E13*VLOOKUP(H6,$A$4:$B$9,2,TRUE)";
+                            wsBonus.Cell(13, 7).Value = $"{CH.GetOklad(TabTranslations.GetTechnicalName(GetTabName()))}";
+                            wsBonus.Cell(13, 8).FormulaA1 = "G13+F13";
+
+                            wsBonus.Cell(13, 9).Value = 16000;
+                            wsBonus.Cell(13, 10).FormulaA1 = "H13-I13";
+
+                            // Границы таблицы итогов
+                            var calculationTable = wsBonus.Range("A12:J13");
+                            calculationTable.Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
+                            calculationTable.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+
+                            // Числовые форматы
+                            wsBonus.Range("B4:B9").Style.NumberFormat.Format = "0.00";
+                            wsBonus.Range("E4:E6").Style.NumberFormat.Format = "0";
+                            wsBonus.Range("F6:H6").Style.NumberFormat.Format = "#,##0.00";
+                            wsBonus.Cell(6, 8).Style.NumberFormat.Format = "0.00";
+                            wsBonus.Range("A13:J13").Style.NumberFormat.Format = "#,##0.00";
+
+                            // Выравнивание
+                            wsBonus.Range("G5:I7").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("A2:B9").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("F4:H6").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("D2:E7").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("A12:J13").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                            // Автоподбор ширины столбцов
+                            wsBonus.Columns().AdjustToContents();
+                            wsBonus.Rows().AdjustToContents();
+                            // Сохраняем файл
+                            workbook.SaveAs(saveFileDialog.FileName);
+
+                        }
+                    MessageBox.Show("Экспорт завершен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    
                 }
                 else
                 {
-                    // --- Экспорт из MainDataGrid ---
-                    if (MainDataGrid.ItemsSource == null)
+                    // --- Экспорт из выбранной вкладки TabControl ---
+                    selectedTab = AdminTabControl.SelectedItem as TabItem;
+                    if (selectedTab == null)
                     {
-                        MessageBox.Show("В таблице нет данных для экспорта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("Не выбрана вкладка.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
 
-                    var dataView = MainDataGrid.ItemsSource as DataView;
+                    var dataGrid = selectedTab.Content as DataGrid;
+                    if (dataGrid == null || dataGrid.ItemsSource == null)
+                    {
+                        MessageBox.Show("В таблице нет данных.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var dataView = dataGrid.ItemsSource as DataView;
                     if (dataView == null)
                     {
                         MessageBox.Show("Источник данных некорректен.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -188,26 +465,24 @@ namespace ManagerAppV3._5
                     }
 
                     dataTable = dataView.ToTable();
-                    fileName = $"{NameLabel.Content.ToString()}.xlsx";
-                }
-
-                // Диалог выбора пути сохранения
-                SaveFileDialog saveFileDialog = new SaveFileDialog
-                {
-                    Filter = "Excel файл (*.xlsx)|*.xlsx",
-                    Title = "Сохранить таблицу как Excel",
-                    FileName = fileName
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    using (XLWorkbook workbook = new XLWorkbook())
+                    fileName = TabTranslations.GetTechnicalName(GetTabName()) + ".xlsx";
+                    // Диалог выбора пути сохранения
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
                     {
-                        workbook.Worksheets.Add(dataTable, "Данные");
-                        workbook.SaveAs(saveFileDialog.FileName);
-                    }
+                        Filter = "Excel файл (*.xlsx)|*.xlsx",
+                        Title = "Сохранить таблицу как Excel",
+                        FileName = fileName
+                    };
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        using (XLWorkbook workbook = new XLWorkbook())
+                        {
+                            workbook.Worksheets.Add(dataTable, "Данные");
+                            workbook.SaveAs(saveFileDialog.FileName);
+                        }
 
-                    MessageBox.Show("Экспорт завершен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Экспорт завершен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
             }
             catch (Exception ex)
@@ -215,6 +490,41 @@ namespace ManagerAppV3._5
                 MessageBox.Show($"Ошибка при экспорте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        public decimal NormalizeNumberStringToDecimal(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                MessageBox.Show("Пустая или null строка. Возвращено 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return 0m;
+            }
+
+            string noDots = input.Replace(".", "");
+            string normalized = noDots.Replace(",", ".");
+
+            if (decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
+            {
+                return result;
+            }
+            else
+            {
+                MessageBox.Show($"Ошибка преобразования строки в decimal:\nОригинал: \"{input}\"\nПосле обработки: \"{normalized}\"", "Ошибка парсинга", MessageBoxButton.OK, MessageBoxImage.Error);
+                return 0m;
+            }
+        }
+        public void SetNumberCell(IXLWorksheet sheet, int row, int column, decimal number)
+        {
+            try
+            {
+                IXLCell cell = sheet.Cell(row, column);
+                cell.Value = Convert.ToDouble(number); // Устанавливаем как число
+                cell.Style.NumberFormat.Format = "0.00"; // Формат с двумя знаками после запятой
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при установке числа в ячейку [{row},{column}]: {ex.Message}");
+            }
+        }
+
         #endregion
 
         private void DatabaseMenuClose()
@@ -226,23 +536,22 @@ namespace ManagerAppV3._5
         // =========================== UPDATE BUTTON ===========================
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            ReLoadData(DBname, AdminMode);
-            ApplyColumnVisibility();
-            LoadDataToLabel(DBname);
-            GetMonth();
+            UpdateAll();
         }
         public void UpdateAll()
         {
-            ReLoadData(DBname, AdminMode);
+            ClearErrorMessages();
+            ReLoadData(Tablename, AdminMode);
             ApplyColumnVisibility();
-            LoadDataToLabel(DBname);
-            GetMonth();
+            LoadDataToLabel(Tablename);
+            GetMonthIntoLabel();
+            LoadDataToLabel(TabTranslations.GetTechnicalName(GetTabName()));
         }
         // ============================= EDIT MENU =============================
         #region EDIT MENU
         private void ManagersButton_Click(object sender, RoutedEventArgs e)
         {
-            if (EditMenu.ActualHeight > 0)
+           if ((int)EditMenu.ActualHeight > 0)
             {
                 AnimateMenu(EditMenu, 0);
                 SetMenuIcon(EditBtnIMG, "/Icons/ArrowDown.png");
@@ -468,11 +777,12 @@ namespace ManagerAppV3._5
         // ================================ LOAD ================================
         private void MainLoad()
         {
+            Tablename = DataSource.DBname;
             RoleControl();
             MinimizeElements();
-            LoadDataToLabel();
-            ReLoadData(DBname);
-            GetMonth();
+            LoadDataToLabel(Tablename);
+            ReLoadData(Tablename);
+            GetMonthIntoLabel();
         }
         // ============================ DATA CONTROL ============================
         #region DATA CONTROL
@@ -499,8 +809,12 @@ namespace ManagerAppV3._5
         private void LoadDataToLabel(string DBname = null)
         {
             string connectionString = CH.GetConnectionString();
-            string query = $"SELECT monthPlan FROM users WHERE databasename = '{DBname}'";
-
+            string query;
+            if (AdminMode)
+            {
+                query = $"SELECT monthPlan FROM users WHERE databasename = '{DBname}'";
+            }
+            else { query = $"SELECT monthPlan FROM users WHERE databasename = '{DataSource.DBname}'"; }
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -508,17 +822,17 @@ namespace ManagerAppV3._5
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(query, connection);
                     object result = command.ExecuteScalar();
-                    var culture = new CultureInfo("en-US");
+                    var culture = new CultureInfo("de-DE");
 
                     // Модифицированная проверка на null и DBNull
                     if (result == null || result == DBNull.Value)
                     {
-                        MonthPlanLabel.Content = "0";
+                        MonthPlanLabel.Content = "0,00";
                     }
                     else
                     {
                         int convResult = Convert.ToInt32(result);
-                        MonthPlanLabel.Content = convResult.ToString("N0", culture);
+                        MonthPlanLabel.Content = convResult.ToString("N2", culture);
                     }
                 }
                 SoldControl();
@@ -526,7 +840,7 @@ namespace ManagerAppV3._5
             catch (MySqlException ex)
             {
                 AddErrorMessage($"Ошибка загрузки данных (LOADDATATOLABEL): {ex.Message}"); ;
-                MonthPlanLabel.Content = "0"; // Устанавливаем 0 при ошибке
+                MonthPlanLabel.Content = "0,00"; // Устанавливаем 0 при ошибке
             }
         }
 
@@ -535,9 +849,10 @@ namespace ManagerAppV3._5
             if (AdminMode)
             {
                 string connectionString = CH.GetConnectionString();
-                string query = $"SELECT monthplan FROM users WHERE login = '{Login}'";
-                string query2 = $"SELECT SUM(ShipmentPrice) from `{GetTabName()}`";
-                var culture = new CultureInfo("en-US");
+                string query = $"SELECT monthplan FROM users WHERE databasename = '{TabTranslations.GetTechnicalName(GetTabName())}'";
+                string query2 = $"SELECT SUM(ShipmentValue) - SUM(ShipmentPrice) from `{TabTranslations.GetTechnicalName(GetTabName())}`";
+                string query3 = $"SELECT SUM(`ShipmentValue(Minimum_price)`) from `{TabTranslations.GetTechnicalName(GetTabName())}`";
+                var culture = new CultureInfo("de-DE");
 
                 try
                 {
@@ -546,46 +861,53 @@ namespace ManagerAppV3._5
                         connection.Open();
                         MySqlCommand command = new MySqlCommand(query, connection);
                         MySqlCommand command2 = new MySqlCommand(query2, connection);
+                        MySqlCommand command3 = new MySqlCommand(query3, connection);
 
                         object MonthPlan = command.ExecuteScalar();
                         object result = command2.ExecuteScalar();
+                        object resultMinimum = command3.ExecuteScalar();
 
                         // Обработка пустых значений
-                        int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
-                        int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+                        double ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
+                        double ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+                        double ConvResultMinimum = (resultMinimum == null || resultMinimum == DBNull.Value) ? 0 : Convert.ToInt32(resultMinimum);
 
                         // Логика изменения цвета
                         if (ConvResult < ConvMonthPlan / 2)
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFC00F0C"));
                         }
                         else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD324"));
                         }
                         else
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#14AE5C"));
                         }
 
-                        SoldedLabel.Content = ConvResult.ToString("N0", culture);
+                        SoldedLabel.Content = ConvResult.ToString("N2", culture);
+                        SoldedMinimumLabel.Content = ConvResultMinimum.ToString("N2", culture);
+
                     }
                 }
                 catch (Exception ex)
                 {
-                    if (ex.Message != "Unknown column 'ShipmentPrice' in 'field list'")
+                    if (ex.Message != "Unknown column 'ShipmentValue' in 'field list'")
                     {
                         AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ) ADMIN: {ex.Message}");
                     }
-                    SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
+                    SoldedLabel.Content = "0,00"; // Устанавливаем 0 при ошибке
+                    SoldedMinimumLabel.Content = "0,00";
                 }
             }
             else
             {
                 string connectionString = CH.GetConnectionString();
-                string query = $"SELECT MonthPlan FROM roles WHERE role = '{role}'";
-                string query2 = $"SELECT SUM(ShipmentPrice) from `{DBname}`";
-                var culture = new CultureInfo("en-US");
+                string query = $"SELECT monthplan FROM users WHERE login = '{Login}'";
+                string query2 = $"SELECT SUM(ShipmentValue) - SUM(ShipmentPrice) from `{Tablename}`";
+                string query3 = $"SELECT SUM(`ShipmentValue(Minimum_price)`) from `{Tablename}`";
+                var culture = new CultureInfo("de-DE");
 
                 try
                 {
@@ -594,35 +916,40 @@ namespace ManagerAppV3._5
                         connection.Open();
                         MySqlCommand command = new MySqlCommand(query, connection);
                         MySqlCommand command2 = new MySqlCommand(query2, connection);
+                        MySqlCommand command3 = new MySqlCommand(query3, connection);
 
                         object MonthPlan = command.ExecuteScalar();
                         object result = command2.ExecuteScalar();
+                        object resultMinimum = command3.ExecuteScalar();
 
                         // Обработка пустых значений
                         int ConvMonthPlan = (MonthPlan == null || MonthPlan == DBNull.Value) ? 0 : Convert.ToInt32(MonthPlan);
                         int ConvResult = (result == null || result == DBNull.Value) ? 0 : Convert.ToInt32(result);
+                        int ConvResultMinimum = (resultMinimum == null || resultMinimum == DBNull.Value) ? 0 : Convert.ToInt32(resultMinimum);
 
                         // Логика изменения цвета
                         if (ConvResult < ConvMonthPlan / 2)
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFC00F0C"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFC00F0C"));
                         }
                         else if (ConvResult > ConvMonthPlan / 2 && ConvResult < ConvMonthPlan)
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD324"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD324"));
                         }
                         else
                         {
-                            SoldedLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#14AE5C"));
+                            SoldedLabel.Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#14AE5C"));
                         }
 
-                        SoldedLabel.Content = ConvResult.ToString("N0", culture);
+                        SoldedLabel.Content = ConvResult.ToString("N2", culture);
+                        SoldedMinimumLabel.Content = ConvResultMinimum.ToString("N2", culture);
                     }
                 }
                 catch (Exception ex)
                 {
                     AddErrorMessage($"Ошибка загрузки данных (КОНТРОЛЬ ПРОДАЖ): {ex.Message}");
-                    SoldedLabel.Content = "0"; // Устанавливаем 0 при ошибке
+                    SoldedLabel.Content = "0,00"; // Устанавливаем 0 при ошибке
+                    SoldedMinimumLabel.Content = "0,00";
                 }
             }
         }
@@ -634,11 +961,12 @@ namespace ManagerAppV3._5
             AdminEditButton.Visibility = Visibility.Visible;
             AdminTabControl.Visibility = Visibility.Visible;
             MainDataGrid.Visibility = Visibility.Collapsed;
+            FontResizeGrid.Visibility = Visibility.Visible;
             GetMySQLTables(CH.GetConnectionString());
             LoadTablesIntoTabControl();
             AdminTabControl.SelectedIndex = 0;
             LoadDataAndCreateCheckBoxes(true);
-            GetMonth();
+            GetMonthIntoLabel();
         }
 
         private void AdminDelete()
@@ -650,30 +978,48 @@ namespace ManagerAppV3._5
                 // Получаем DataGrid из содержимого вкладки
                 if (currentTab.Content is DataGrid dataGrid)
                 {
+                    DataRowView selectedRow = (DataRowView)dataGrid.SelectedItem;
+                    int id = Convert.ToInt32(selectedRow["id"]);
                     // Проверяем, есть ли выбранная строка
                     if (dataGrid.SelectedItem == null)
                     {
                         MessageBox.Show("Выберите строку для удаления!");
                         return;
                     }
-                    MessageBoxResult DialogResult = MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    //MessageBoxResult DialogResult = MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                    if (DialogResult == MessageBoxResult.Yes)
+                    if (MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        // Получаем DataView (источник данных DataGrid)
-                        if (dataGrid.ItemsSource is DataView dataView)
+                        try
                         {
-                            // Удаляем строку из DataView
-                            dataView.Delete(dataGrid.SelectedIndex);
+                            using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
+                            {
+                                connection.Open();
+                                string deleteQuery = $"DELETE FROM {TabTranslations.GetTechnicalName(GetTabName())} WHERE (`id` = @id);";
+                                MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                                command.Parameters.AddWithValue("@id", id);
 
-                            // Обновляем базу данных
-                            UpdateDatabase(currentTab.Header.ToString(), dataView.Table);
+                                int rowsAffected = command.ExecuteNonQuery();
+
+                                if (rowsAffected > 0)
+                                {
+                                    MessageBox.Show("Запись успешно удалена");
+                                    UpdateAll();
+                                    ReLoadData();
+                                }
+                            }
                         }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+
                     }
+
                 }
+                ReLoadData(Tablename, true);
+                ApplyColumnVisibility();
             }
-            ReLoadData(DBname, true);
-            ApplyColumnVisibility();
         }
 
         // =========================== MANAGER LOGIN ===========================
@@ -683,9 +1029,9 @@ namespace ManagerAppV3._5
             AdminTabControl.Visibility = Visibility.Collapsed;
             AdminDatabaseGrid.Visibility = Visibility.Collapsed;
             MainDataGrid.Visibility = Visibility.Visible;
-            //LoadTablesIntoTabControl();
+            FontResizeGrid.Visibility = Visibility.Collapsed;
             LoadDataAndCreateCheckBoxes();
-            LoadDataToLabel(Role);
+            LoadDataToLabel();
         }
         private void DeleteData()
         {
@@ -703,7 +1049,7 @@ namespace ManagerAppV3._5
                     using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))
                     {
                         connection.Open();
-                        string deleteQuery = $"DELETE FROM {DBname} WHERE (`id` = @id);";
+                        string deleteQuery = $"DELETE FROM {Tablename} WHERE (`id` = @id);";
                         MySqlCommand command = new MySqlCommand(deleteQuery, connection);
                         command.Parameters.AddWithValue("@id", id);
 
@@ -712,6 +1058,7 @@ namespace ManagerAppV3._5
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Запись успешно удалена");
+                            UpdateAll();
                             ReLoadData();
                         }
                     }
@@ -721,7 +1068,7 @@ namespace ManagerAppV3._5
                     MessageBox.Show(ex.Message);
                 }
             }
-            ReLoadData(DBname);
+            ReLoadData(Tablename);
             ApplyColumnVisibility();
         }
 
@@ -732,11 +1079,24 @@ namespace ManagerAppV3._5
         {
             var dataGrid = new DataGrid
             {
-                AutoGenerateColumns = false, // Отключаем авто-генерацию столбцов
+                AutoGenerateColumns = false,
                 SelectionMode = DataGridSelectionMode.Single,
+                FontSize = FSize,
+                FontFamily = new FontFamily("Segoe UI Symbol"),
                 SelectionUnit = DataGridSelectionUnit.FullRow,
-                CanUserSortColumns = true // Разрешаем сортировку
+                CanUserSortColumns = true,
+                IsReadOnly = true, // Основное свойство для запрета редактирования
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                CanUserAddRows = false, // Запретить добавление новых строк
+                CanUserDeleteRows = false, // Запретить удаление строк
+                CanUserResizeRows = false,
+                CanUserResizeColumns = true
             };
+
+            // Добавление столбцов
+            dataGrid.Columns.Add(new DataGridTextColumn { Header = "ID", Binding = new Binding("Id") });
+            dataGrid.Columns.Add(new DataGridTextColumn { Header = "Имя", Binding = new Binding("Name") });
 
             var tableData = new DataTable();
             using (var connection = new MySqlConnection(connectionString))
@@ -746,18 +1106,24 @@ namespace ManagerAppV3._5
 
                 if (!specialTables.Contains(tableName))
                 {
-                    string query = CH.ManagerData(DBname);
-                    var adapter = new MySqlDataAdapter(query, connection);
-                    adapter.Fill(tableData);
+                    try
+                    {
+                        string query = CH.ManagerData(tableName);
+                        var adapter = new MySqlDataAdapter(query, connection);
+                        adapter.Fill(tableData);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка загрузки таблиц " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {
-                    var adapter = new MySqlDataAdapter($"SELECT * FROM `{tableName}`", connection);
+                    var adapter = new MySqlDataAdapter(CH.SystemQuery(TabTranslations.GetTechnicalName(tableName)), connection);
                     adapter.Fill(tableData);
                 }
 
             }
-
             dataGrid.Columns.Clear();
 
             foreach (DataColumn column in tableData.Columns)
@@ -839,35 +1205,6 @@ namespace ManagerAppV3._5
             return tables;
         }
 
-        // Метод для обновления базы данных после удаления
-        private void UpdateDatabase(string tableName, DataTable dataTable)
-        {
-            string connectionString = CH.GetConnectionString();
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-
-                    // Используем MySqlCommandBuilder для генерации UPDATE-запроса
-                    MySqlDataAdapter adapter = new MySqlDataAdapter($"SELECT * FROM `{tableName}`", connection);
-                    MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(adapter);
-
-                    // Применяем изменения в базе данных
-                    adapter.Update(dataTable);
-
-                    MessageBox.Show("Данные успешно удалены из базы!");
-                }
-            }
-            catch (Exception ex)
-            {
-                AddErrorMessage($"Ошибка при удалении данных (TAB CONTROL) ADMIN: {ex.Message}");
-            }
-        }
-        // Метод для обновления данных
-
-
         // Модифицированный метод загрузки данных
         private void LoadTablesIntoTabControl()
         {
@@ -880,19 +1217,26 @@ namespace ManagerAppV3._5
             {
                 var newTab = new TabItem
                 {
-                    Header = tableName,
-                    Content = CreateDataGridForTable(connectionString, tableName)
+                    Header = TabTranslations.GetUserFriendlyName(tableName),
+                    Content = CreateDataGridForTable(connectionString, tableName),
+                    Tag = tableName // Сохраняем техническое название
                 };
+                newTab.Background = GetTabColor(tableName);
 
                 AdminTabControl.Items.Add(newTab);
             }
-
-            if (AdminTabControl.Items.Count > 0)
-            {
-                AdminTabControl.SelectedIndex = 0;
-            }
         }
-
+        private Brush GetTabColor(string tableName)
+        {
+            return tableName.ToLower() switch
+            {
+                "warehouses" => Brushes.LightGreen,
+                "users" => Brushes.LightGreen,
+                "product price" => Brushes.LightGreen,
+                "roles" => Brushes.LightGreen,
+                _ => Brushes.LightBlue
+            };
+        }
         private void MinimizeElements()
         {
             DatabaseMenu.Height = 0;
@@ -922,10 +1266,10 @@ namespace ManagerAppV3._5
                     AdminTabControl.SelectedIndex = currentIndex;
                 }
 
-                string tableName = GetTabName();
+                string tableName = TabTranslations.GetTechnicalName(GetTabName());
                 if (!string.IsNullOrWhiteSpace(tableName) && tableName != "error")
                 {
-                    SoldControl(CH.GetRole(tableName));
+                    SoldControl();
                 }
                 else
                 {
@@ -934,7 +1278,7 @@ namespace ManagerAppV3._5
             }
             else
             {
-                SoldControl(CH.GetRole(DBname));
+                SoldControl();
                 MainDataGrid.ItemsSource = null;
                 try
                 {
@@ -942,7 +1286,7 @@ namespace ManagerAppV3._5
                     {
                         connection.Open();
 
-                        string query = CH.ManagerData(DBname);
+                        string query = CH.ManagerData(Tablename);
                         using (MySqlCommand command = new MySqlCommand(query, connection))
                         {
                             MySqlDataAdapter adapter = new MySqlDataAdapter(command);
@@ -1002,7 +1346,6 @@ namespace ManagerAppV3._5
                         column.Visibility = selectedColumns.Contains(column.Header.ToString()) ? Visibility.Visible : Visibility.Collapsed;
                     }
                 }
-
             }
         }
 
@@ -1053,7 +1396,7 @@ namespace ManagerAppV3._5
             if (ErrorMarquee == null || MarqueeTransform == null)
                 return;
 
-            ErrorMarquee.Text = "Готов к работе...";
+            ErrorMarquee.Text = "Готов к работе... ";
             ErrorMarquee.Foreground = Brushes.LightGray;
             RestartMarqueeAnimation();
         }
@@ -1094,7 +1437,7 @@ namespace ManagerAppV3._5
         private void FilterAllElements_Checked(object sender, RoutedEventArgs e)
         {
             LoadDataAndCreateCheckBoxes();
-            ReLoadData(DBname);
+            ReLoadData(Tablename);
         }
 
         private void LoadDataAndCreateCheckBoxes(bool AdminMode = false)
@@ -1112,7 +1455,7 @@ namespace ManagerAppV3._5
 
                     if (AdminMode)
                     {
-                        string tableName = GetTabName();
+                        string tableName = TabTranslations.GetTechnicalName(GetTabName());
                         if (string.IsNullOrWhiteSpace(tableName) || tableName.ToLower() == "error")
                         {
                             //AddErrorMessage("Ошибка: имя таблицы не определено или содержит ошибку.");
@@ -1127,19 +1470,18 @@ namespace ManagerAppV3._5
                         }
                         else
                         {
-                            query = $"SELECT * FROM `{tableName}`";
+                            query = $"{CH.SystemQuery(TabTranslations.GetTechnicalName(tableName))}";
                         }
-
                     }
                     else
                     {
-                        if (string.IsNullOrWhiteSpace(DBname))
+                        if (string.IsNullOrWhiteSpace(Tablename))
                         {
                             AddErrorMessage("Ошибка: имя базы данных не указано.");
                             return;
                         }
 
-                        query = CH.ManagerData(DBname);
+                        query = CH.ManagerData(Tablename);
                     }
 
                     var adapter = new MySqlDataAdapter(query, connection);
@@ -1227,11 +1569,10 @@ namespace ManagerAppV3._5
                 if (tabControl.SelectedItem is TabItem selectedTab)
                 {
                     LoadDataAndCreateCheckBoxes(true);
-                    DataSource.DBname = GetTabName();
-                    LoadDataToLabel(GetTabName());
+                    DataSource.DBname = TabTranslations.GetTechnicalName(GetTabName());
+                    LoadDataToLabel(TabTranslations.GetTechnicalName(GetTabName()));
                 }
             }
-
         }
         public DataGrid GetSelectedDataGrid(TabControl tabControl)
         {
@@ -1277,8 +1618,13 @@ namespace ManagerAppV3._5
                 ProfileMenuClose();
             }
         }
+        private string GetMonth()
+        {
+            string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
 
-        private void GetMonth()
+            return monthName;
+        }
+        private void GetMonthIntoLabel()
         {
             string monthName = DateTime.Now.ToString("MMMM", new System.Globalization.CultureInfo("ru-RU"));
 
@@ -1295,6 +1641,7 @@ namespace ManagerAppV3._5
 
                 if (newSize < 8 || newSize > 24)
                 {
+                    MainDataGrid.FontSize = newSize;
                     // Анимация "отскока" при достижении границ
                     DoubleAnimation anim = new DoubleAnimation
                     {
@@ -1304,11 +1651,12 @@ namespace ManagerAppV3._5
                         EasingFunction = new ElasticEase { Oscillations = 2 }
                     };
                     MainDataGrid.BeginAnimation(Control.FontSizeProperty, anim);
-                    ReLoadData(DBname);
+                    ReLoadData(Tablename);
 
                 }
                 else
                 {
+                    MainDataGrid.FontSize = newSize;
                     // Обычная плавная анимация
                     DoubleAnimation anim = new DoubleAnimation
                     {
@@ -1317,7 +1665,7 @@ namespace ManagerAppV3._5
                         EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                     };
                     MainDataGrid.BeginAnimation(Control.FontSizeProperty, anim);
-                    ReLoadData(DBname);
+                    ReLoadData(Tablename);
 
                 }
 
@@ -1394,8 +1742,25 @@ namespace ManagerAppV3._5
             bitmapImage.EndInit();
             imageControl.Source = bitmapImage;
         }
+
         #endregion
 
-        
+        private void FontPlus_Click(object sender, RoutedEventArgs e)
+        {
+            if (FSize <= 72)
+            {
+                FSize += 1;
+                ReLoadData(Tablename, AdminMode);
+            }
+        }
+
+        private void FontMinus_Click(object sender, RoutedEventArgs e)
+        {
+            if (FSize >= 8)
+            {
+                FSize -= 1;
+                ReLoadData(Tablename, AdminMode);
+            }
+        }
     }
 }

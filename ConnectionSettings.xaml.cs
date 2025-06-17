@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace ManagerAppV3._5
+namespace ManagerAppV4._0
 {
     public partial class ConnectionSettings : Window
     {
@@ -153,8 +153,7 @@ namespace ManagerAppV3._5
                                 `MinimumPrice` INT DEFAULT NULL,
                                 `ShipmentValue` INT DEFAULT NULL,
                                 `ShipmentValue(Minimum_price)` INT DEFAULT NULL,
-                                `Reward` INT DEFAULT NULL,
-                                `UPDNumber` INT DEFAULT NULL,
+                                `UPDNumber` varchar(50) DEFAULT NULL,
                                 `ShipmentPrice` INT DEFAULT NULL,
                                 PRIMARY KEY (`id`),
                                 UNIQUE KEY `id_UNIQUE` (`id`),
@@ -186,20 +185,21 @@ namespace ManagerAppV3._5
                             ) ENGINE=InnoDB AUTO_INCREMENT=8 
                               DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-                            CREATE TABLE IF NOT EXISTS `users` (
-                                `id` INT NOT NULL AUTO_INCREMENT,
-                                `name` VARCHAR(45) DEFAULT NULL,
-                                `login` VARCHAR(45) NOT NULL,
-                                `password` VARCHAR(128) NOT NULL,
-                                `role` VARCHAR(45) DEFAULT NULL,
-                                `databasename` VARCHAR(45) DEFAULT NULL,
-                                `monthplan` LONGTEXT,
-                                PRIMARY KEY (`id`),
-                                UNIQUE KEY `id_UNIQUE` (`id`),
-                                UNIQUE KEY `login_UNIQUE` (`login`),
-                                UNIQUE KEY `databasename_UNIQUE` (`databasename`)
-                            ) ENGINE=InnoDB AUTO_INCREMENT=50 
-                              DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                            CREATE TABLE `users` (
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `name` varchar(45) DEFAULT NULL,
+                              `login` varchar(45) NOT NULL,
+                              `password` varchar(128) NOT NULL,
+                              `role` varchar(45) DEFAULT NULL,
+                              `databasename` varchar(45) DEFAULT NULL,
+                              `monthplan` longtext,
+                              `oklad` varchar(45) DEFAULT NULL,
+                              PRIMARY KEY (`id`),
+                              UNIQUE KEY `id_UNIQUE` (`id`),
+                              UNIQUE KEY `login_UNIQUE` (`login`),
+                              UNIQUE KEY `databasename_UNIQUE` (`databasename`)
+                            ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
                             CREATE TABLE IF NOT EXISTS `warehouses` (
                                 `id` INT NOT NULL AUTO_INCREMENT,
@@ -240,7 +240,7 @@ namespace ManagerAppV3._5
                             }
                         }
                     }
-                    catch (Exception ex) { }
+                    catch (Exception ex) { MessageBox.Show("Ошибка: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);}
                 }
             }
         }
