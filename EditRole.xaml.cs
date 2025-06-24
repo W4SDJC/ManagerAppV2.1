@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Windows;
+using System.Windows.Input;
 
 namespace ManagerAppV4._0
 {
@@ -173,6 +174,12 @@ namespace ManagerAppV4._0
             }
 
         }
-
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
     }
 }

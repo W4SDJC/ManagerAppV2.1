@@ -2,11 +2,11 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ManagerAppV4._0
 {
-
     public partial class AddUser : Window
     {
         public AddUser()
@@ -48,7 +48,7 @@ namespace ManagerAppV4._0
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка MySQL: {ex.Message}");
+                MessageBox.Show($"Ошибка MySQL: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private string ValidateTextBox(TextBox textBox, string fieldName)
@@ -82,7 +82,6 @@ namespace ManagerAppV4._0
             }
             else
             { dbname = DataBaseNameTextBox.Text; }
-                //MessageBox.Show(dbname);
             if (ConfirmingPassword(PasswordTextBox.Text, ConfirmPasswordTextBox.Text))
             {
                 string query = $"CREATE TABLE if not exists `{dbname}` (" +
@@ -120,8 +119,7 @@ namespace ManagerAppV4._0
                 }
                 catch (MySqlException ex)
                 {
-                    MessageBox.Show($"Ошибка при создании таблицы:\n{ex.Message}", "Ошибка",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Ошибка при создании таблицы:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
 
@@ -132,7 +130,7 @@ namespace ManagerAppV4._0
             }
             else
             {
-                MessageBox.Show("Passwords don't match", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Пароли не совпадают", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             
         }
@@ -152,7 +150,7 @@ namespace ManagerAppV4._0
 
             if (password != confirmPassword)
             {
-                MessageBox.Show("Пароли не совпадают");
+                MessageBox.Show("Пароли не совпадают", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -210,6 +208,12 @@ namespace ManagerAppV4._0
 
             return true; // все проверки пройдены
         }
-
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
     }
 }

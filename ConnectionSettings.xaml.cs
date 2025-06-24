@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ManagerAppV4._0
@@ -244,6 +245,12 @@ namespace ManagerAppV4._0
                 }
             }
         }
-
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
     }
 }

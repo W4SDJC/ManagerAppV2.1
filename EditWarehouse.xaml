@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="Редактирование склада" Height="235" Width="400" MinHeight="200" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="Редактирование склада" Height="235" Width="400" MinHeight="200" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown">
     <Grid Margin="10,10,10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ManagerAppV4._0
 {
-
     public partial class EditUser : Window
     {
         ConnectHelper CH = new ConnectHelper();
@@ -403,6 +403,12 @@ namespace ManagerAppV4._0
             roleWindow.RoleChanged += LoadRoleComboBoxData; // Подписка на событие для обновления ComboBox
             roleWindow.ShowDialog();
         }
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
     }
-
 }

@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ManagerAppV4._0
 {
-
     public partial class AddnEditProduct : Window
     {
         ConnectHelper CH = new ConnectHelper();
@@ -51,10 +51,7 @@ namespace ManagerAppV4._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки данных пользователя: {ex.Message}",
-                              "Ошибка",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки данных пользователя: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 ClearUserForm();
             }
         }
@@ -117,10 +114,7 @@ namespace ManagerAppV4._0
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}\n\nКод ошибки: {ex.Number}",
-                              "Ошибка MySQL",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}\n\nКод ошибки: {ex.Number}", "Ошибка MySQL", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 // Логирование ошибки
                 Debug.WriteLine($"MySQL Error {ex.Number}: {ex.Message}\n{ex.StackTrace}");
@@ -129,10 +123,7 @@ namespace ManagerAppV4._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Неожиданная ошибка: {ex.Message}",
-                              "Ошибка",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Неожиданная ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 Debug.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
             }
@@ -176,10 +167,7 @@ namespace ManagerAppV4._0
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка базы данных: {ex.Message}\nКод ошибки: {ex.Number}",
-                              "Ошибка MySQL",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка базы данных: {ex.Message}\nКод ошибки: {ex.Number}", "Ошибка MySQL", MessageBoxButton.OK, MessageBoxImage.Error);
                 ClearUserForm();
             }
         }
@@ -244,8 +232,7 @@ namespace ManagerAppV4._0
                 }
                 catch (MySqlException ex)
                 {
-                    MessageBox.Show($"Ошибка при создании элементов:\n{ex.Message}", "Ошибка",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Ошибка при создании элементов:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
             }
@@ -286,13 +273,18 @@ namespace ManagerAppV4._0
                 }
                 catch (MySqlException ex)
                 {
-                    MessageBox.Show($"Ошибка при обновлении элементов:\n{ex.Message}", "Ошибка",
-                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Ошибка при обновлении элементов:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
 
     }
 }

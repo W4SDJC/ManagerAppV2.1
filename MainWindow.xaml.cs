@@ -1000,7 +1000,7 @@ namespace ManagerAppV4._0
                     // Проверяем, есть ли выбранная строка
                     if (dataGrid.SelectedItem == null)
                     {
-                        MessageBox.Show("Выберите строку для удаления!");
+                        MessageBox.Show("Выберите строку для удаления!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     //MessageBoxResult DialogResult = MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);

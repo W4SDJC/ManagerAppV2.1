@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="Вход" WindowStartupLocation="CenterScreen" Width="330" Height="460" ResizeMode="NoResize" >
+        Title="Вход" WindowStartupLocation="CenterScreen" Width="330" Height="460" ResizeMode="NoResize" KeyDown="Window_KeyDown">
     <Grid>
         <Button x:Name="SettingButton" Background="#333333" Foreground="White" BorderThickness="0" Margin="10,10,0,0" Click="SettingButton_Click" Padding="0,0,0,0" HorizontalAlignment="Left" Width="45" Height="45" VerticalAlignment="Top">
             <Button.Resources>

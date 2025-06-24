@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="Создание пользователя" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="Создание пользователя" Height="260" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown">
     <Grid Height="245" Width="510" Margin="0,0,0,0" >
         <Border CornerRadius="45,45,45,45" Margin="24,49,0,0" Width="86" HorizontalAlignment="Left" Height="86" VerticalAlignment="Top" BorderBrush="Black" BorderThickness="3">
             <Border.Background>

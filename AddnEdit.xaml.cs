@@ -3,6 +3,7 @@ using System.Data;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ManagerAppV4._0
 {
@@ -678,6 +679,12 @@ namespace ManagerAppV4._0
                 MessageBox.Show("Ошибка загрузки адреса: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close(); // Закрываем текущее окно
+            }
+        }
     }
 }

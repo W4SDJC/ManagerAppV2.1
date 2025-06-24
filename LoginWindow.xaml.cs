@@ -197,5 +197,6 @@ namespace ManagerAppV4._0
             ConnectionSettings CS = new ConnectionSettings(this); // передаем ссылку на главное окно
             CS.ShowDialog();
         }
+
     }
 }
