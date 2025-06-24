@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="Редактирование склада" Height="235" Width="400" MinHeight="200" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown">
+        Title="Редактирование склада" Height="235" Width="400" WindowStartupLocation="CenterScreen" MinHeight="200" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown">
     <Grid Margin="10,10,10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,11 +20,11 @@
 
         <Label Grid.Row="0" Content="Выберите склад:" Margin="0,0,0,5"/>
         <ComboBox x:Name="cmbWarehouses" Grid.Row="1" Margin="0,0,0,2" DisplayMemberPath="Name"
-                  SelectionChanged="CmbWarehouses_SelectionChanged"/>
+                  SelectionChanged="CmbWarehouses_SelectionChanged" TabIndex="0"/>
 
         <Label Grid.Row="5" Content="Новый адрес склада:" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="125"/>
-        <TextBox x:Name="txtAddress" Grid.Row="6" Height="25"/>
-        <Button Content="Обновить адрес" Background="#FF333333" Foreground="White" Padding="1,1,1,1" Click="BtnUpdateAddress_Click" Grid.Row="7" Height="35" VerticalAlignment="Center" HorizontalAlignment="Right" Width="105" Margin="0,5,0,0">
+        <TextBox x:Name="txtAddress" Grid.Row="6" Height="25" TabIndex="2"/>
+        <Button Content="Обновить адрес" Background="#FF333333" Foreground="White" Padding="1,1,1,1" Click="BtnUpdateAddress_Click" Grid.Row="7" Height="35" VerticalAlignment="Center" HorizontalAlignment="Right" Width="105" Margin="0,5,0,0" TabIndex="3">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -32,8 +32,8 @@
             </Button.Resources>
         </Button>
         <Label Grid.Row="3" Content="Новое имя склада" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="125"/>
-        <TextBox x:Name="WarehouseNameTextBox" Grid.Row="4" Height="25" />
-        <Button x:Name="DeleteBtn" Content="Удалить адрес" Background="#FF333333" Foreground="White" Padding="1,1,1,1" Grid.Row="7" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" Margin="0,5,110,0" Click="DeleteBtn_Click">
+        <TextBox x:Name="WarehouseNameTextBox" Grid.Row="4" Height="25" TabIndex="1" />
+        <Button x:Name="DeleteBtn" Content="Удалить адрес" Background="#FF333333" Foreground="White" Padding="1,1,1,1" Grid.Row="7" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" Margin="0,5,110,0" Click="DeleteBtn_Click" TabIndex="4">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>

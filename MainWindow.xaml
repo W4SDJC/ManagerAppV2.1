@@ -57,7 +57,7 @@
                 </StackPanel>
             </Grid>
             <Grid x:Name="Search" Margin="310,5,506,5">
-                <TextBox x:Name="SearchTextBox" TextWrapping="Wrap" VerticalContentAlignment="Center" TextChanged="SearchField_TextChanged" BorderBrush="#FF333333">
+                <TextBox x:Name="SearchTextBox" TextWrapping="Wrap" TextChanged="SearchField_TextChanged" BorderBrush="#FF333333" VerticalContentAlignment="Center" Padding="5,0,30,0">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="8"/>

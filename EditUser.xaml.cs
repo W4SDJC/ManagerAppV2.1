@@ -202,7 +202,7 @@ namespace ManagerAppV4._0
         private async Task LoadUserDataAsync(string login)
         {
             const string query = @"
-        SELECT login, name, password, role, databasename 
+        SELECT login, name, password, role, databasename, oklad 
         FROM users 
         WHERE login = @login 
         LIMIT 1";
@@ -223,7 +223,7 @@ namespace ManagerAppV4._0
                     LoginTextBox.Text = reader["login"]?.ToString() ?? "";
                     NameTextBox.Text = reader["name"]?.ToString() ?? "";
                     DataBaseNameTextBox.Text = reader["databasename"]?.ToString() ?? "";
-
+                    OkladTextBox.Text = reader["oklad"]?.ToString() ?? "";
                     // Безопасное преобразование пароля
                     if (reader["password"] != DBNull.Value)
                     {
@@ -257,10 +257,7 @@ namespace ManagerAppV4._0
             }
             catch (MySqlException ex)
             {
-                MessageBox.Show($"Ошибка базы данных: {ex.Message}\nКод ошибки: {ex.Number}",
-                              "Ошибка MySQL",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка базы данных: {ex.Message}\nКод ошибки: {ex.Number}", "Ошибка MySQL", MessageBoxButton.OK, MessageBoxImage.Error);
                 ClearUserForm();
             }
         }
@@ -326,10 +323,7 @@ namespace ManagerAppV4._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки данных пользователя: {ex.Message}",
-                              "Ошибка",
-                              MessageBoxButton.OK,
-                              MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки данных пользователя: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 ClearUserForm();
             }
         }
@@ -338,6 +332,7 @@ namespace ManagerAppV4._0
             LoginTextBox.Text = "";
             NameTextBox.Text = "";
             DataBaseNameTextBox.Text = "";
+            OkladTextBox.Text = string.Empty;
             RoleComboBox.SelectedIndex = -1;
         }
         private void DeleteButton_Click(object sender, RoutedEventArgs e)

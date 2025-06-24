@@ -9,10 +9,10 @@
     <Window.Resources>
 
     </Window.Resources>
-    <Grid x:Name="MainGrid" Background="#FFD9D9D9" Width="490">
+    <Grid x:Name="MainGrid" Background="#FFD9D9D9">
         <TextBlock x:Name="mainLabel" Text="Добавление новой отгрузки" FontSize="16" FontWeight="Bold" Margin="25,5,56,0" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-        <ScrollViewer Margin="0,29,0,70" HorizontalAlignment="Center">
-            <StackPanel Height="577" Width="440">
+        <ScrollViewer Margin="17,29,16,70">
+            <StackPanel Height="577">
 
                 <!-- Минимальная цена -->
                 <!-- Дата отгрузки -->

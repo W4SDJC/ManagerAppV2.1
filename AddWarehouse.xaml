@@ -5,22 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManagerAppV4._0"
         mc:Ignorable="d"
-        Title="Добавление склада" Height="70" Width="365" MinHeight="195" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown">
-    <Grid Margin="10">
+        Title="Добавление склада" Height="70" Width="365" MinHeight="195" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize" KeyDown="Window_KeyDown" ContentStringFormat="asdasdasdasdasd">
+    <Grid Margin="10" Height="160">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" MinHeight="35"/>
-            <RowDefinition/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="Auto" MinHeight="43.28"/>
+            <RowDefinition Height="29*"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Content="Название склада:" Margin="0,0,0,5"/>
-        <TextBox x:Name="txtName" Grid.Row="1" Margin="0,0,0,10"/>
+        <Label Content="Название склада:" VerticalAlignment="Center" VerticalContentAlignment="Bottom" Height="26"/>
+        <TextBox x:Name="txtName" Grid.Row="1" FontSize="16" Margin="0,0,0,2" VerticalContentAlignment="Center"/>
 
-        <Label Grid.Row="2" Content="Адрес склада:" Margin="0,0,0,5"/>
-        <TextBox x:Name="txtAddress" Grid.Row="3" Margin="0,0,0,15"/>
-        <Button Content="Добавить" Background="#FF333333" Foreground="White" Width="80" Padding="1,1,1,1" HorizontalAlignment="Left" Click="BtnAddWarehouse_Click" Grid.Row="4" Margin="265,0,0,-1" Height="35">
+        <Label Grid.Row="2" Content="Адрес склада:" VerticalContentAlignment="Bottom"/>
+        <TextBox x:Name="txtAddress" Grid.Row="3" FontSize="16" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
+        <Button Content="Добавить" Background="#FF333333" Foreground="White" Width="80" Padding="1,1,1,1" HorizontalAlignment="Left" Click="BtnAddWarehouse_Click" Grid.Row="4" Margin="265,1,0,1" Height="25">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>

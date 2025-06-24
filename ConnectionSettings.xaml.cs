@@ -127,7 +127,7 @@ namespace ManagerAppV4._0
             MySQLTableChecker checker = new MySQLTableChecker(CH.GetConnectionString());
             if (checker.AreRequiredTablesPresent())
             {
-                MessageBox.Show("Все нужные таблицы найдены.");
+                MessageBox.Show("Все нужные таблицы найдены.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
@@ -228,7 +228,7 @@ namespace ManagerAppV4._0
                                 int result = command.ExecuteNonQuery();
                                 if (result > 0)
                                 {
-                                    MessageBox.Show("Таблицы успешно созданы!");
+                                    MessageBox.Show("Таблицы успешно созданы!", "Успех", MessageBoxButton.OK, MessageBoxImage.Error);
                                 }
                             }
                             using (MySqlCommand command = new MySqlCommand(query2, conn))

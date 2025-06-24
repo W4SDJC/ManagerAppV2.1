@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -83,23 +84,20 @@ namespace ManagerAppV4._0
         private void SetSettingButtonImage()
         {
             BitmapImage bi = new BitmapImage();
-            // BitmapImage.UriSource must be in a BeginInit/EndInit block.
             bi.BeginInit();
             bi.UriSource = new Uri(@"/Icons/Setting.png", UriKind.RelativeOrAbsolute);
             bi.EndInit();
-            // Set the image source.
             SettingButtonImage.Source = bi;
         }
 
-        // Обработчик кнопки "Войти"
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private void Login()
         {
             string login = LoginTextBox.Text.Trim();
             string password = Passwordbox.Password;
 
             if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Введите логин и пароль");
+                MessageBox.Show("Введите логин и пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -152,13 +150,15 @@ namespace ManagerAppV4._0
                 }
                 else
                 {
-                    MessageBox.Show("Неверный логин или пароль");
+                    MessageBox.Show("Неверный логин или пароль","Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            // Ошибки уже обработаны внутри CheckMySQLConnection
+        }
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            Login();
         }
 
-        // Проверка наличия конфигурационного файла и активация кнопки входа
         private void CheckConfigFile(string path, Button settingButton)
         {
             if (File.Exists(path))
@@ -197,6 +197,14 @@ namespace ManagerAppV4._0
             ConnectionSettings CS = new ConnectionSettings(this); // передаем ссылку на главное окно
             CS.ShowDialog();
         }
+        private void Enter(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Login(); // Закрываем текущее окно
+            }
+        }
 
+        
     }
 }
