@@ -68,6 +68,7 @@ namespace ManagerAppV4._0
         }
 
         // ======================== ADD DATA TO DATABASE ========================
+        #region Add
         public void AddData_Click(object sender, RoutedEventArgs e)
         {
             if (AdminMode)
@@ -86,8 +87,9 @@ namespace ManagerAppV4._0
             ReLoadData(Tablename);
             ApplyColumnVisibility();
         }
-
+        #endregion
         // ============================= EDIT DATA =============================
+        #region Edit
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             if (AdminMode)
@@ -135,7 +137,9 @@ namespace ManagerAppV4._0
                 UpdateAll();
             }
         }
+        #endregion
         // ============================ DELETE DATA ============================
+        #region Delete
         private void DeleteBtn_Click(object sender, RoutedEventArgs e)
         {
             if (Role == "Admin" || Role == "Developer")
@@ -162,6 +166,7 @@ namespace ManagerAppV4._0
                 UpdateAll();
             }
         }
+        #endregion
         // ============================ EXPORT DATA ============================
         #region Export Button
         private void ExportBtn_Click(object sender, RoutedEventArgs e)
@@ -253,14 +258,28 @@ namespace ManagerAppV4._0
                                 totalRange.Style.Font.Bold = true;
                                 totalRange.Style.Fill.BackgroundColor = XLColor.LightGreen;
                                 totalRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                                wsData.Range(1, 1, lastRow, wsData.ColumnCount()).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                                wsData.Range(lastRow, 1, lastRow, wsData.ColumnCount()).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
                             }
 
                             // 2. Создаем лист с расчетом премии с точным форматированием
                             var wsBonus = workbook.Worksheets.Add("Расчет премии");
 
 
-                            // Установка ширины столбца E (5) в 3 см 
-                            wsBonus.Column(5).Width = 12.6;
+                            // Установка ширины столбцов
+                            wsBonus.Column(1).Width = 15.10;
+                            wsBonus.Column(2).Width = 15.10;
+                            wsBonus.Column(3).Width = 15.10;
+                            wsBonus.Column(4).Width = 30.21;
+                            wsBonus.Column(5).Width = 17.62;
+                            wsBonus.Column(6).Width = 11.58;
+                            wsBonus.Column(7).Width = 15.10;
+                            wsBonus.Column(8).Width = 15.10;
+                            wsBonus.Column(9).Width = 15.10;
+                            wsBonus.Column(10).Width = 17.62;
+                            wsBonus.Cell("G3").Style.Font.FontSize = 20;
+                            
                             // Цвета для форматирования
                             var lightGreen = XLColor.FromArgb(51, 191, 86);
                             var lightGray = XLColor.FromArgb(217, 217, 217);
@@ -303,8 +322,7 @@ namespace ManagerAppV4._0
                             // Форматирование заголовков
                             wsBonus.Range("A2:K2").Style.Font.Bold = true;
                             wsBonus.Range("A2:K2").Style.Font.FontSize = 12;
-                            wsBonus.Range("A2:K2").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            wsBonus.Range("A2:K2").Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
 
                             wsBonus.Range("A3:B3").Style.Fill.BackgroundColor = lightGreen;
                             wsBonus.Range("D2:E2").Style.Fill.BackgroundColor = lightGreen;
@@ -326,21 +344,24 @@ namespace ManagerAppV4._0
                             wsBonus.Range("A2:B2").Merge();
                             wsBonus.Cell(3, 1).Value = "% выполнения плана продаж";
                             wsBonus.Cell(3, 2).Value = "Коэффициент вознаграждения (кВ)";
-                            wsBonus.Cell(4, 1).Value = "От 50% до 70%";
+                            wsBonus.Cell(4, 1).Value = 50;
                             wsBonus.Cell(4, 2).Value = 0.00;
-                            wsBonus.Cell(5, 1).Value = "70-80%";
+                            wsBonus.Cell(5, 1).Value = 70;
                             wsBonus.Cell(5, 2).Value = 0.80;
-                            wsBonus.Cell(6, 1).Value = "80-90%";
+                            wsBonus.Cell(6, 1).Value = 80;
                             wsBonus.Cell(6, 2).Value = 0.90;
-                            wsBonus.Cell(7, 1).Value = "90-100%";
+                            wsBonus.Cell(7, 1).Value = 90;
                             wsBonus.Cell(7, 2).Value = 1.00; 
-                            wsBonus.Cell(8, 1).Value = "110-125%";
+                            wsBonus.Cell(8, 1).Value = 110;
                             wsBonus.Cell(8, 2).Value = 1.20; 
-                            wsBonus.Cell(9, 1).Value = "Более 125%";
+                            wsBonus.Cell(9, 1).Value = 125;
                             wsBonus.Cell(9, 2).Value = 1.30;
-                            var range1 = wsBonus.Range("A2:B9");
+                            var range1 = wsBonus.Range("A2:B3");
                             range1.Style.Border.OutsideBorder = XLBorderStyleValues.Medium; // внешняя рамка
                             range1.Style.Border.InsideBorder = XLBorderStyleValues.Medium;
+                            var range12 = wsBonus.Range("A4:B9");
+                            range12.Style.Border.OutsideBorder = XLBorderStyleValues.Medium; // внешняя рамка
+                            range12.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
 
 
                             wsBonus.Cell(5, 7).Value = "Коэффициент вознаграждения";
@@ -402,9 +423,9 @@ namespace ManagerAppV4._0
                             else
                                 wsBonus.Cell(13, 4).Value = 0;
 
-                            wsBonus.Cell(13, 5).FormulaA1 = "D13*IF(C13=D13,$E$4,$E$6)/100";
-                            wsBonus.Cell(13, 6).FormulaA1 = "E13*VLOOKUP(H6,$A$4:$B$9,2,TRUE)";
-                            wsBonus.Cell(13, 7).Value = $"{CH.GetOklad(TabTranslations.GetTechnicalName(GetTabName()))}";
+                            wsBonus.Cell(13, 5).FormulaA1 = "=C13*IF(C13<D13,0,IF(C13>D13,$E$6,E4))/100";
+                            wsBonus.Cell(13, 6).FormulaA1 = "=E13*VLOOKUP(I7,A1:B6,2,1)";
+                            wsBonus.Cell(13, 7).Value = Convert.ToInt32(CH.GetOklad(TabTranslations.GetTechnicalName(GetTabName())));
                             wsBonus.Cell(13, 8).FormulaA1 = "G13+F13";
 
                             wsBonus.Cell(13, 9).Value = 16000;
@@ -419,19 +440,18 @@ namespace ManagerAppV4._0
                             wsBonus.Range("B4:B9").Style.NumberFormat.Format = "0.00";
                             wsBonus.Range("E4:E6").Style.NumberFormat.Format = "0";
                             wsBonus.Range("F6:H6").Style.NumberFormat.Format = "#,##0.00";
+                            wsBonus.Range("I7").Style.NumberFormat.Format = "#,##0.00";
                             wsBonus.Cell(6, 8).Style.NumberFormat.Format = "0.00";
                             wsBonus.Range("A13:J13").Style.NumberFormat.Format = "#,##0.00";
 
                             // Выравнивание
-                            wsBonus.Range("G5:I7").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            wsBonus.Range("A2:B9").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            wsBonus.Range("F4:H6").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            wsBonus.Range("D2:E7").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                            wsBonus.Range("A12:J13").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                            wsBonus.Range("A1:J13").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                            wsBonus.Range("A1:J13").Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
 
                             // Автоподбор ширины столбцов
-                            wsBonus.Columns().AdjustToContents();
-                            wsBonus.Rows().AdjustToContents();
+                            wsData.Columns().AdjustToContents();
+                            wsData.Rows().AdjustToContents();
                             // Сохраняем файл
                             workbook.SaveAs(saveFileDialog.FileName);
 
@@ -597,7 +617,6 @@ namespace ManagerAppV4._0
             AnimateMenu(UserMenu, 0);
         }
         #endregion
-
         // ============================ PRODUCT MENU ============================
         #region PRODUCT MENU
         private void ProductMenu_Click(object sender, RoutedEventArgs e)
@@ -633,7 +652,6 @@ namespace ManagerAppV4._0
         // ========================== PRODUCT MENU END ==========================
         #endregion
         // =========================== WAREHOUSE MENU ===========================
-
         #region WAREHOUSE MENU
         private void WarehouseMenuBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -979,7 +997,6 @@ namespace ManagerAppV4._0
                 if (currentTab.Content is DataGrid dataGrid)
                 {
                     DataRowView selectedRow = (DataRowView)dataGrid.SelectedItem;
-                    int id = Convert.ToInt32(selectedRow["id"]);
                     // Проверяем, есть ли выбранная строка
                     if (dataGrid.SelectedItem == null)
                     {
@@ -990,6 +1007,8 @@ namespace ManagerAppV4._0
 
                     if (MessageBox.Show("Удалить выбранную запись?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
+                        int id = Convert.ToInt32(selectedRow["id"]);
+
                         try
                         {
                             using (MySqlConnection connection = new MySqlConnection(CH.GetConnectionString()))

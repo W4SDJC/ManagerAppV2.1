@@ -463,7 +463,7 @@ namespace ManagerAppV4._0
             InitializeComponent();
 
             // Заполняем поля
-            shipmentDateTextBox.Text = DateTime.TryParse(data["ShipmentDate"]?.ToString(), out var dt)? dt.ToString("dd.MM.yyyy"): "";
+            shipmentDateTextBox.Text = DateTime.TryParse(data["ShipmentDate"]?.ToString(), out var dt)? dt.ToString("dd,MM,yyyy"): "";
             WarehouseCB.Text = data["ShipmentWarehouse"]?.ToString();
             cityTextBox.Text = data["ClientCity"]?.ToString();
             clientNameTextBox.Text = data["ClientName"]?.ToString();
@@ -494,7 +494,7 @@ namespace ManagerAppV4._0
             {
 
 
-                shipmentDateTextBox.Text = DateTime.TryParse(reader["ShipmentDate"]?.ToString(), out var dt) ? dt.ToString("dd.MM.yyyy") : "";
+                shipmentDateTextBox.Text = DateTime.TryParse(reader["ShipmentDate"]?.ToString(), out var dt) ? dt.ToString("dd,MM,yyyy") : "";
                 WarehouseCB.SelectedItem = reader["ShipmentWarehouse"]?.ToString();
                 cityTextBox.Text = reader["ClientCity"]?.ToString();
                 clientNameTextBox.Text = reader["ClientName"]?.ToString();
